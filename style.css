@@ -1,0 +1,85 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Adjust alignment to avoid cutting off content */
+    min-height: 100vh;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 20px; /* Add some padding */
+    box-sizing: border-box; /* Include padding in element's total width and height */
+}
+
+.container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 90%; /* Adjust width for better responsiveness */
+    max-width: 800px;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+.resources, .workers, .locations {
+    margin-bottom: 25px;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.resources p, .workers p {
+    font-size: 1.1em;
+    margin: 8px 0;
+}
+
+.locations {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.location-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.location-item h3 {
+    margin-top: 0;
+    color: #555;
+}
+
+.location-item button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.location-item button:hover {
+    background-color: #45a049;
+}
+
+.location-item button:active {
+    background-color: #3e8e41;
+}
+
+/* Specific styling for remove buttons */
+.location-item button[onclick^="removeWorker"] {
+    background-color: #f44336; /* Red color */
+}
+
+.location-item button[onclick^="removeWorker"]:hover {
+    background-color: #da190b;
+}

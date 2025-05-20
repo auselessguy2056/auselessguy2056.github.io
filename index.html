@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Khai Thác Tài Nguyên</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Trò Chơi Khai Thác Tài Nguyên</h1>
+
+        <div class="resources">
+            <h2>Tài Nguyên</h2>
+            <p>Gỗ: <span id="wood">0</span></p>
+            <p>Lúa: <span id="grain">0</span></p>
+            <p>Vàng: <span id="gold">0</span></p>
+            <p>Đá: <span id="stone">0</span></p>
+        </div>
+
+        <div class="workers">
+            <h2>Công Nhân</h2>
+            <p>Tổng số công nhân: <span id="total-workers">5</span></p>
+            <p>Công nhân rảnh: <span id="idle-workers">5</span></p>
+        </div>
+
+        <div class="locations">
+            <h2>Khu Vực Khai Thác</h2>
+            <div class="location-item">
+                <h3>Rừng (Gỗ)</h3>
+                <p>Công nhân đang làm: <span id="workers-forest">0</span></p>
+                <button onclick="assignWorker('forest')">Gửi công nhân</button>
+                <button onclick="removeWorker('forest')">Rút công nhân</button>
+            </div>
+            <div class="location-item">
+                <h3>Nông Trại (Lúa)</h3>
+                <p>Công nhân đang làm: <span id="workers-farm">0</span></p>
+                <button onclick="assignWorker('farm')">Gửi công nhân</button>
+                <button onclick="removeWorker('farm')">Rút công nhân</button>
+            </div>
+            <div class="location-item">
+                <h3>Mỏ Vàng (Vàng)</h3>
+                <p>Công nhân đang làm: <span id="workers-mine">0</span></p>
+                <button onclick="assignWorker('mine')">Gửi công nhân</button>
+                <button onclick="removeWorker('mine')">Rút công nhân</button>
+            </div>
+            <div class="location-item">
+                <h3>Quặng Đá (Đá)</h3>
+                <p>Công nhân đang làm: <span id="workers-quarry">0</span></p>
+                <button onclick="assignWorker('quarry')">Gửi công nhân</button>
+                <button onclick="removeWorker('quarry')">Rút công nhân</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
