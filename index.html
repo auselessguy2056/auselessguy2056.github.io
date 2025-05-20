@@ -24,33 +24,55 @@
             <p>Công nhân rảnh: <span id="idle-workers">5</span></p>
         </div>
 
-        <div class="locations">
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('mining-tab')">Khai Thác</button>
+            <button class="tab-button" onclick="showTab('buildings-tab')">Công Trình</button>
+        </div>
+
+        <div id="mining-tab" class="tab-content active">
             <h2>Khu Vực Khai Thác</h2>
-            <div class="location-item">
-                <h3>Rừng (Gỗ)</h3>
-                <p>Công nhân đang làm: <span id="workers-forest">0</span></p>
-                <button onclick="assignWorker('forest')">Gửi công nhân</button>
-                <button onclick="removeWorker('forest')">Rút công nhân</button>
-            </div>
-            <div class="location-item">
-                <h3>Nông Trại (Lúa)</h3>
-                <p>Công nhân đang làm: <span id="workers-farm">0</span></p>
-                <button onclick="assignWorker('farm')">Gửi công nhân</button>
-                <button onclick="removeWorker('farm')">Rút công nhân</button>
-            </div>
-            <div class="location-item">
-                <h3>Mỏ Vàng (Vàng)</h3>
-                <p>Công nhân đang làm: <span id="workers-mine">0</span></p>
-                <button onclick="assignWorker('mine')">Gửi công nhân</button>
-                <button onclick="removeWorker('mine')">Rút công nhân</button>
-            </div>
-            <div class="location-item">
-                <h3>Quặng Đá (Đá)</h3>
-                <p>Công nhân đang làm: <span id="workers-quarry">0</span></p>
-                <button onclick="assignWorker('quarry')">Gửi công nhân</button>
-                <button onclick="removeWorker('quarry')">Rút công nhân</button>
+            <div class="locations">
+                <div class="location-item">
+                    <h3>Rừng (Gỗ)</h3>
+                    <p>Công nhân đang làm: <span id="workers-forest">0</span></p>
+                    <button onclick="assignWorker('forest')">Gửi công nhân</button>
+                    <button onclick="removeWorker('forest')">Rút công nhân</button>
+                </div>
+                <div class="location-item">
+                    <h3>Nông Trại (Lúa)</h3>
+                    <p>Công nhân đang làm: <span id="workers-farm">0</span></p>
+                    <button onclick="assignWorker('farm')">Gửi công nhân</button>
+                    <button onclick="removeWorker('farm')">Rút công nhân</button>
+                </div>
+                <div class="location-item">
+                    <h3>Mỏ Vàng (Vàng)</h3>
+                    <p>Công nhân đang làm: <span id="workers-mine">0</span></p>
+                    <button onclick="assignWorker('mine')">Gửi công nhân</button>
+                    <button onclick="removeWorker('mine')">Rút công nhân</button>
+                </div>
+                <div class="location-item">
+                    <h3>Quặng Đá (Đá)</h3>
+                    <p>Công nhân đang làm: <span id="workers-quarry">0</span></p>
+                    <button onclick="assignWorker('quarry')">Gửi công nhân</button>
+                    <button onclick="removeWorker('quarry')">Rút công nhân</button>
+                </div>
             </div>
         </div>
+
+        <div id="buildings-tab" class="tab-content">
+            <h2>Công Trình</h2>
+            <div class="building-item">
+                <h3>Nhà ở</h3>
+                <p>Cấp độ: <span id="house-level">1</span></p>
+                <p>Công nhân tối đa: <span id="house-max-workers">5</span></p>
+                <p>Chi phí nâng cấp:</p>
+                <ul>
+                    <li>Gỗ: <span id="house-upgrade-cost-wood">50</span></li>
+                    <li>Đá: <span id="house-upgrade-cost-stone">30</span></li>
+                </ul>
+                <button onclick="upgradeBuilding('house')">Nâng cấp</button>
+            </div>
+            </div>
     </div>
 
     <script src="script.js"></script>
