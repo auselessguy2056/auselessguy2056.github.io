@@ -17,7 +17,7 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 90%;
-    max-width: 800px;
+    max-width: 900px;
 }
 
 h1, h2 {
@@ -40,18 +40,22 @@ h1, h2 {
 /* Tab navigation */
 .tabs {
     margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .tab-button {
     background-color: #ddd;
     color: #333;
-    padding: 10px 20px;
+    padding: 10px 15px;
     border: none;
     cursor: pointer;
-    font-size: 1.1em;
+    font-size: 1em;
     border-radius: 5px 5px 0 0;
     margin: 0 2px;
     transition: background-color 0.3s ease;
+    white-space: nowrap;
 }
 
 .tab-button:hover {
@@ -65,34 +69,56 @@ h1, h2 {
 
 /* Tab content */
 .tab-content {
-    display: none; /* Hide all tab content by default */
+    display: none;
     padding: 20px 0;
     border-top: 1px solid #eee;
 }
 
 .tab-content.active {
-    display: block; /* Show active tab content */
+    display: block;
 }
 
-.locations {
+.locations, .building-grid, .training-research-grid, .crafting-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
 }
+.building-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Hơi rộng hơn cho công trình */
+}
+.training-research-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Điều chỉnh cho các mục mới */
+}
 
-.location-item, .building-item { /* Apply similar styles to building items */
+
+.location-item, .building-item, .training-item, .research-item, .crafting-item {
     border: 1px solid #ddd;
     padding: 15px;
     border-radius: 5px;
     background-color: #fff;
+    text-align: left;
+    display: flex; /* Sử dụng flexbox */
+    flex-direction: column; /* Xếp các mục theo cột */
+    justify-content: space-between; /* Đẩy nội dung và nút ra hai đầu */
+    align-items: stretch; /* Đảm bảo các mục con kéo dài hết chiều rộng */
 }
-
-.location-item h3, .building-item h3 {
+.location-item h3, .building-item h3, .training-item h3, .research-item h3, .crafting-item h3 {
     margin-top: 0;
     color: #555;
+    text-align: center;
+    margin-bottom: 15px;
 }
 
-.location-item button, .building-item button {
+/* Nhóm nút */
+.button-group {
+    display: flex;
+    justify-content: center; /* Căn giữa các nút */
+    gap: 10px; /* Khoảng cách giữa các nút */
+    margin-top: auto; /* Đẩy nhóm nút xuống cuối item */
+    flex-wrap: wrap; /* Cho phép các nút xuống dòng */
+}
+
+.location-item button, .building-item button, .training-item button, .research-item button, .crafting-item button {
     background-color: #4CAF50;
     color: white;
     padding: 8px 15px;
@@ -100,33 +126,78 @@ h1, h2 {
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.9em;
-    margin: 5px;
     transition: background-color 0.3s ease;
+    flex-grow: 1; /* Cho phép nút mở rộng để lấp đầy khoảng trống */
+    max-width: 150px; /* Giới hạn chiều rộng của nút */
 }
 
-.location-item button:hover, .building-item button:hover {
+.location-item button:hover, .building-item button:hover, .training-item button:hover, .research-item button:hover, .crafting-item button:hover {
     background-color: #45a049;
 }
 
-.location-item button:active, .building-item button:active {
+.location-item button:active, .building-item button:active, .training-item button:active, .research-item button:active, .crafting-item button:active {
     background-color: #3e8e41;
 }
 
 /* Specific styling for remove buttons */
-.location-item button[onclick^="removeWorker"] {
-    background-color: #f44336; /* Red color */
+.location-item button[onclick^="removeWorker"],
+.research-item button[onclick^="removeResearcher"] {
+    background-color: #f44336;
 }
 
-.location-item button[onclick^="removeWorker"]:hover {
+.location-item button[onclick^="removeWorker"]:hover,
+.research-item button[onclick^="removeResearcher"]:hover {
     background-color: #da190b;
 }
 
-.building-item ul {
+/* Disable button style */
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.building-item ul, .training-item ul, .crafting-item ul, .research-item ul {
     list-style: none;
     padding: 0;
     margin: 10px 0;
 }
 
-.building-item ul li {
+.building-item ul li, .training-item ul li, .crafting-item ul li, .research-item ul li {
     margin-bottom: 5px;
+    font-size: 0.95em;
+}
+
+/* Progress Bar Styles */
+.progress-bar-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 15px;
+    position: relative; /* Để span .progress-text có thể đặt lên trên */
+    height: 25px; /* Chiều cao của thanh progress */
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #4CAF50; /* Màu xanh lá cây */
+    width: 0%;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 25px; /* Để text nằm giữa theo chiều dọc */
+    color: white; /* Màu chữ */
+    transition: width 0.1s linear; /* Hiệu ứng chuyển động mượt mà */
+    box-sizing: border-box; /* Bao gồm padding/border trong width */
+}
+
+.progress-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 25px; /* Để text nằm giữa theo chiều dọc */
+    top: 0;
+    left: 0;
+    color: #333; /* Màu chữ cho thời gian */
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.7); /* Thêm hiệu ứng nổi */
 }
