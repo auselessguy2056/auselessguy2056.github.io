@@ -983,24 +983,32 @@ function showSubTab(tabId) {
         updateExplorationSuccessRate('fortress');
     }
 }
+   // Khởi tạo trò chơi
+    window.onload = () => {
+        // Đảm bảo các thuộc tính capacity được khởi tạo nếu chưa có (khi tải save cũ)
+        buildings.warehouse.capacityPerLevel = buildings.warehouse.capacityPerLevel || 500;
+        resources.woodCapacity = resources.woodCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
+        resources.grainCapacity = resources.grainCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
+        resources.goldCapacity = resources.goldCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
+        resources.stoneCapacity = resources.stoneCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
+        resources.ironCapacity = resources.ironCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
 
-// Khởi tạo trò chơi
-window.onload = () => {
-    // Đảm bảo các thuộc tính capacity được khởi tạo nếu chưa có (khi tải save cũ)
-    buildings.warehouse.capacityPerLevel = buildings.warehouse.capacityPerLevel || 500; // Đặt giá trị mặc định nếu không tồn tại
-    resources.woodCapacity = resources.woodCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
-    resources.grainCapacity = resources.grainCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
-    resources.goldCapacity = resources.goldCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
-    resources.stoneCapacity = resources.stoneCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
-    resources.ironCapacity = resources.ironCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
+        // Đảm bảo workers.idleSoldiers được khởi tạo đúng khi tải game hoặc mới bắt đầu
+        workers.soldiers = workers.soldiers || 0;
+        workers.idleSoldiers = workers.soldiers - exploration.emptyLand.assignedSoldiers - exploration.fortress.assignedSoldiers;
+        if (workers.idleSoldiers < 0) workers.idleSoldiers = 0;
 
-    // Đảm bảo workers.idleSoldiers được khởi tạo đúng khi tải game hoặc mới bắt đầu
-    workers.soldiers = workers.soldiers || 0;
-    // Tính toán lại idleSoldiers dựa trên tổng lính và lính đang đi thám hiểm
-    workers.idleSoldiers = workers.soldiers - exploration.emptyLand.assignedSoldiers - exploration.fortress.assignedSoldiers;
-    if (workers.idleSoldiers < 0) workers.idleSoldiers = 0; // Đảm bảo không âm
+        updateUI();
+        startGameLoop();
+        showMainTab('world-tab');
 
-    updateUI();
-    startGameLoop();
-    showMainTab('world-tab');
-};
+        // Logic để ẩn phần hack nếu URL chứa '.github.io'
+        const developerHackSection = document.getElementById('developer-hack-section');
+        if (developerHackSection) {
+            if (window.location.hostname.includes('.github.io')) {
+                developerHackSection.style.display = 'none';
+            } else {
+                developerHackSection.style.display = 'block'; // Đảm bảo hiển thị nếu không phải github.io
+            }
+        }
+    };
