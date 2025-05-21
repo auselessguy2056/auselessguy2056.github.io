@@ -18,6 +18,7 @@
             <p>Đá: <span id="stone">0</span></p>
             <p>Sắt: <span id="iron">0</span></p>
             <p>Điểm Nghiên Cứu: <span id="research-points">0</span></p>
+            <p>Áo Giáp: <span id="armor">0</span></p>
         </div>
 
         <div class="workers">
@@ -25,152 +26,196 @@
             <p>Tổng số công nhân: <span id="total-workers">5</span></p>
             <p>Công nhân rảnh: <span id="idle-workers">5</span></p>
             <p>Nhà nghiên cứu: <span id="researchers">0</span></p>
+            <p>Binh sĩ: <span id="soldiers">0</span></p>
         </div>
 
-        <div class="tabs">
-            <button class="tab-button active" onclick="showTab('mining-tab')">Khai Thác</button>
-            <button class="tab-button" onclick="showTab('buildings-tab')">Công Trình</button>
-            <button class="tab-button" onclick="showTab('training-research-tab')">Huấn Luyện & Nghiên Cứu</button>
-            <button class="tab-button" onclick="showTab('blacksmith-tab')">Lò Rèn</button>
+        <div class="main-tabs">
+            <button class="tab-button active" onclick="showMainTab('world-tab')">Thế Giới</button>
+            <button class="tab-button" onclick="showMainTab('settings-tab')">Cài Đặt</button>
         </div>
 
-        <div id="mining-tab" class="tab-content active">
-            <h2>Khu Vực Khai Thác</h2>
-            <div class="locations">
-                <div class="location-item">
-                    <h3>Rừng (Gỗ)</h3>
-                    <p>Công nhân đang làm: <span id="workers-forest">0</span></p>
-                    <div class="button-group">
-                        <button onclick="assignWorker('forest')">Gửi công nhân</button>
-                        <button onclick="removeWorker('forest')">Rút công nhân</button>
+        <div id="world-tab" class="tab-content active">
+            <div class="sub-tabs">
+                <button class="sub-tab-button active" onclick="showSubTab('mining-tab')">Khai Thác</button>
+                <button class="sub-tab-button" onclick="showSubTab('buildings-tab')">Công Trình</button>
+                <button class="sub-tab-button" onclick="showSubTab('training-research-tab')">Huấn Luyện & Nghiên Cứu</button>
+                <button class="sub-tab-button" onclick="showSubTab('military-tab')">Quân Đội</button>
+                <button class="sub-tab-button" onclick="showSubTab('blacksmith-tab')">Lò Rèn</button>
+            </div>
+
+            <div id="mining-tab" class="sub-tab-content active">
+                <h2>Khu Vực Khai Thác</h2>
+                <div class="locations">
+                    <div class="location-item">
+                        <h3>Rừng (Gỗ)</h3>
+                        <p>Công nhân đang làm: <span id="workers-forest">0</span></p>
+                        <div class="button-group">
+                            <button onclick="assignWorker('forest')">Gửi công nhân</button>
+                            <button onclick="removeWorker('forest')">Rút công nhân</button>
+                        </div>
                     </div>
-                </div>
-                <div class="location-item">
-                    <h3>Nông Trại (Lúa)</h3>
-                    <p>Công nhân đang làm: <span id="workers-farm">0</span></p>
-                    <div class="button-group">
-                        <button onclick="assignWorker('farm')">Gửi công nhân</button>
-                        <button onclick="removeWorker('farm')">Rút công nhân</button>
+                    <div class="location-item">
+                        <h3>Nông Trại (Lúa)</h3>
+                        <p>Công nhân đang làm: <span id="workers-farm">0</span></p>
+                        <div class="button-group">
+                            <button onclick="assignWorker('farm')">Gửi công nhân</button>
+                            <button onclick="removeWorker('farm')">Rút công nhân</button>
+                        </div>
                     </div>
-                </div>
-                <div class="location-item">
-                    <h3>Mỏ Vàng (Vàng)</h3>
-                    <p>Công nhân đang làm: <span id="workers-mine">0</span></p>
-                    <div class="button-group">
-                        <button onclick="assignWorker('mine')">Gửi công nhân</button>
-                        <button onclick="removeWorker('mine')">Rút công nhân</button>
+                    <div class="location-item">
+                        <h3>Mỏ Vàng (Vàng)</h3>
+                        <p>Công nhân đang làm: <span id="workers-mine">0</span></p>
+                        <div class="button-group">
+                            <button onclick="assignWorker('mine')">Gửi công nhân</button>
+                            <button onclick="removeWorker('mine')">Rút công nhân</button>
+                        </div>
                     </div>
-                </div>
-                <div class="location-item">
-                    <h3>Quặng Đá (Đá)</h3>
-                    <p>Công nhân đang làm: <span id="workers-quarry">0</span></p>
-                    <div class="button-group">
-                        <button onclick="assignWorker('quarry')">Gửi công nhân</button>
-                        <button onclick="removeWorker('quarry')">Rút công nhân</button>
+                    <div class="location-item">
+                        <h3>Quặng Đá (Đá)</h3>
+                        <p>Công nhân đang làm: <span id="workers-quarry">0</span></p>
+                        <div class="button-group">
+                            <button onclick="assignWorker('quarry')">Gửi công nhân</button>
+                            <button onclick="removeWorker('quarry')">Rút công nhân</button>
+                        </div>
                     </div>
-                </div>
-                <div class="location-item">
-                    <h3>Mỏ Sắt (Sắt)</h3>
-                    <p>Công nhân đang làm: <span id="workers-iron-mine">0</span></p>
-                    <div class="button-group">
-                        <button onclick="assignWorker('ironMine')">Gửi công nhân</button>
-                        <button onclick="removeWorker('ironMine')">Rút công nhân</button>
+                    <div class="location-item">
+                        <h3>Mỏ Sắt (Sắt)</h3>
+                        <p>Công nhân đang làm: <span id="workers-iron-mine">0</span></p>
+                        <div class="button-group">
+                            <button onclick="assignWorker('ironMine')">Gửi công nhân</button>
+                            <button onclick="removeWorker('ironMine')">Rút công nhân</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div id="buildings-tab" class="tab-content">
-            <h2>Công Trình</h2>
-            <div class="building-grid">
-                <div class="building-item">
-                    <h3>Nhà ở</h3>
-                    <p>Cấp độ: <span id="house-level">1</span></p>
-                    <p>Công nhân tối đa: <span id="house-max-workers">5</span></p>
-                    <p>Chi phí nâng cấp:</p>
-                    <ul>
-                        <li>Gỗ: <span id="house-upgrade-cost-wood">50</span></li>
-                        <li>Đá: <span id="house-upgrade-cost-stone">30</span></li>
-                    </ul>
-                    <button onclick="upgradeBuilding('house')">Nâng cấp</button>
-                </div>
-                <div class="building-item">
-                    <h3>Thư Viện</h3>
-                    <p>Cấp độ: <span id="library-level">0</span></p>
-                    <p>Nhà nghiên cứu tối đa: <span id="library-max-researchers">0</span></p>
-                    <p id="library-cost-label">Chi phí xây dựng:</p>
-                    <ul>
-                        <li>Gỗ: <span id="library-cost-wood">100</span></li>
-                        <li>Đá: <span id="library-cost-stone">70</span></li>
-                    </ul>
-                    <button id="build-library-btn" onclick="buildBuilding('library')">Xây dựng</button>
-                    <button id="upgrade-library-btn" style="display:none;" onclick="upgradeBuilding('library')">Nâng cấp</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="training-research-tab" class="tab-content">
-            <h2>Huấn Luyện & Nghiên Cứu</h2>
-            <div class="training-research-grid">
-                <div class="training-item">
-                    <h3>Huấn Luyện Nhà Nghiên Cứu</h3>
-                    <p>Công nhân rảnh: <span id="idle-workers-for-training">5</span></p>
-                    <p>Chi phí huấn luyện:</p>
-                    <ul>
-                        <li>Lúa: 10</li>
-                        <li>Vàng: 5</li>
-                    </ul>
-                    <button id="train-researcher-btn" onclick="startTrainingResearcher()">Huấn luyện (60s)</button>
-                    <div class="progress-bar-container" id="researcher-training-progress-container" style="display:none;">
-                        <div class="progress-bar" id="researcher-training-progress" style="width:0%;"></div>
-                        <span class="progress-text" id="researcher-training-countdown">0 giây</span>
-                    </div>
-                </div>
-
-                <div class="research-item">
-                    <h3>Phân Bổ Nhà Nghiên Cứu</h3>
-                    <p>Nhà nghiên cứu rảnh: <span id="idle-researchers">0</span></p>
-                    <p>Nhà nghiên cứu đang làm việc: <span id="assigned-researchers">0</span></p>
-                    <div class="button-group">
-                        <button onclick="assignResearcher()">Gửi</button>
-                        <button onclick="removeResearcher()">Rút</button>
-                    </div>
-                </div>
-
-                <div class="research-item">
-                    <h3>Nghiên Cứu</h3>
-                    <p>Điểm Nghiên Cứu mỗi giây: <span id="research-points-per-sec">0</span></p>
-                    <p>Tổng điểm nghiên cứu: <span id="total-research-points">0</span></p>
-                    <h4>Công nghệ cần mở khóa:</h4>
-                    <ul>
-                        <li>Chế tạo Áo Giáp: <span id="armor-unlock-cost">50</span> điểm</li>
-                    </ul>
-                    <button id="unlock-armor-crafting-btn" onclick="unlockTechnology('armorCrafting')" disabled>Mở khóa Chế tạo Áo Giáp</button>
-                    <h4>Công nghệ đã mở khóa:</h4>
-                    <ul id="unlocked-technologies">
+            <div id="buildings-tab" class="sub-tab-content">
+                <h2>Công Trình</h2>
+                <div class="building-grid">
+                    <div class="building-item">
+                        <h3>Nhà ở</h3>
+                        <p>Cấp độ: <span id="house-level">1</span></p>
+                        <p>Công nhân tối đa: <span id="house-max-workers">5</span></p>
+                        <p>Chi phí nâng cấp:</p>
+                        <ul>
+                            <li>Gỗ: <span id="house-upgrade-cost-wood">50</span></li>
+                            <li>Đá: <span id="house-upgrade-cost-stone">30</span></li>
                         </ul>
+                        <button onclick="upgradeBuilding('house')">Nâng cấp</button>
+                    </div>
+                    <div class="building-item">
+                        <h3>Thư Viện</h3>
+                        <p>Cấp độ: <span id="library-level">0</span></p>
+                        <p>Nhà nghiên cứu tối đa: <span id="library-max-researchers">0</span></p>
+                        <p id="library-cost-label">Chi phí xây dựng:</p>
+                        <ul>
+                            <li>Gỗ: <span id="library-cost-wood">100</span></li>
+                            <li>Đá: <span id="library-cost-stone">70</span></li>
+                        </ul>
+                        <button id="build-library-btn" onclick="buildBuilding('library')">Xây dựng</button>
+                        <button id="upgrade-library-btn" style="display:none;" onclick="upgradeBuilding('library')">Nâng cấp</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div id="blacksmith-tab" class="tab-content">
-            <h2>Lò Rèn</h2>
-            <div class="crafting-grid">
-                <div class="crafting-item">
-                    <h3>Tạo Áo Giáp</h3>
-                    <p>Áo Giáp: <span id="armor-count">0</span></p>
-                    <p>Chi phí:</p>
-                    <ul>
-                        <li>Sắt: 50</li>
-                    </ul>
-                    <button id="craft-armor-btn" onclick="startCraftingArmor()" disabled>Tạo Áo Giáp (60s)</button>
-                    <div class="progress-bar-container" id="armor-crafting-progress-container" style="display:none;">
-                        <div class="progress-bar" id="armor-crafting-progress" style="width:0%;"></div>
-                        <span class="progress-text" id="armor-crafting-countdown">0 giây</span>
+            <div id="training-research-tab" class="sub-tab-content">
+                <h2>Huấn Luyện & Nghiên Cứu</h2>
+                <div class="training-research-grid">
+                    <div class="training-item">
+                        <h3>Huấn Luyện Nhà Nghiên Cứu</h3>
+                        <p>Công nhân rảnh: <span id="idle-workers-for-researcher-training">5</span></p>
+                        <p>Chi phí huấn luyện:</p>
+                        <ul>
+                            <li>Lúa: 10</li>
+                            <li>Vàng: 5</li>
+                        </ul>
+                        <button id="train-researcher-btn" onclick="startTrainingResearcher()">Huấn luyện (60s)</button>
+                        <div class="progress-bar-container" id="researcher-training-progress-container" style="display:none;">
+                            <div class="progress-bar" id="researcher-training-progress" style="width:0%;"></div>
+                            <span class="progress-text" id="researcher-training-countdown">0 giây</span>
+                        </div>
+                    </div>
+
+                    <div class="research-item">
+                        <h3>Phân Bổ Nhà Nghiên Cứu</h3>
+                        <p>Nhà nghiên cứu rảnh: <span id="idle-researchers">0</span></p>
+                        <p>Nhà nghiên cứu đang làm việc: <span id="assigned-researchers">0</span></p>
+                        <div class="button-group">
+                            <button onclick="assignResearcher()">Gửi</button>
+                            <button onclick="removeResearcher()">Rút</button>
+                        </div>
+                    </div>
+
+                    <div class="research-item">
+                        <h3>Nghiên Cứu</h3>
+                        <p>Điểm Nghiên Cứu mỗi giây: <span id="research-points-per-sec">0</span></p>
+                        <p>Tổng điểm nghiên cứu: <span id="total-research-points">0</span></p>
+                        <h4>Công nghệ cần mở khóa:</h4>
+                        <ul>
+                            <li>Chế tạo Áo Giáp: <span id="armor-unlock-cost">50</span> điểm</li>
+                        </ul>
+                        <button id="unlock-armor-crafting-btn" onclick="unlockTechnology('armorCrafting')" disabled>Mở khóa Chế tạo Áo Giáp</button>
+                        <h4>Công nghệ đã mở khóa:</h4>
+                        <ul id="unlocked-technologies">
+                            </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="military-tab" class="sub-tab-content">
+                <h2>Quân Đội</h2>
+                <div class="training-research-grid">
+                    <div class="training-item">
+                        <h3>Huấn Luyện Binh Sĩ</h3>
+                        <p>Công nhân rảnh: <span id="idle-workers-for-soldier-training">5</span></p>
+                        <p>Chi phí huấn luyện:</p>
+                        <ul>
+                            <li>Lúa: 20</li>
+                            <li>Vàng: 15</li>
+                            <li>Áo Giáp: 1</li>
+                        </ul>
+                        <button id="train-soldier-btn" onclick="startTrainingSoldier()">Huấn luyện (300s)</button>
+                        <div class="progress-bar-container" id="soldier-training-progress-container" style="display:none;">
+                            <div class="progress-bar" id="soldier-training-progress" style="width:0%;"></div>
+                            <span class="progress-text" id="soldier-training-countdown">0 giây</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="blacksmith-tab" class="sub-tab-content">
+                <h2>Lò Rèn</h2>
+                <div class="crafting-grid">
+                    <div class="crafting-item">
+                        <h3>Tạo Áo Giáp</h3>
+                        <p>Chi phí:</p>
+                        <ul>
+                            <li>Sắt: 50</li>
+                        </ul>
+                        <button id="craft-armor-btn" onclick="startCraftingArmor()" disabled>Tạo Áo Giáp (60s)</button>
+                        <div class="progress-bar-container" id="armor-crafting-progress-container" style="display:none;">
+                            <div class="progress-bar" id="armor-crafting-progress" style="width:0%;"></div>
+                            <span class="progress-text" id="armor-crafting-countdown">0 giây</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div id="settings-tab" class="tab-content">
+            <h2>Cài Đặt</h2>
+            <div class="setting-item">
+                <h3>Lưu Game</h3>
+                <textarea id="save-game-data" rows="5" readonly></textarea>
+                <button onclick="saveGame()">Lưu Game</button>
+            </div>
+            <div class="setting-item">
+                <h3>Tải Game</h3>
+                <textarea id="load-game-data" rows="5" placeholder="Dán dữ liệu game vào đây"></textarea>
+                <button onclick="loadGame()">Tải Game</button>
+            </div>
+
+                 </div>
 
     </div>
 

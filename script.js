@@ -5,7 +5,8 @@ let resources = {
     gold: 0,
     stone: 0,
     iron: 0,
-    researchPoints: 0
+    researchPoints: 0,
+    armor: 0
 };
 
 let workers = {
@@ -20,7 +21,8 @@ let workers = {
     },
     researchers: 0,
     idleResearchers: 0,
-    assignedResearchers: 0
+    assignedResearchers: 0,
+    soldiers: 0
 };
 
 let buildings = {
@@ -54,27 +56,34 @@ let training = {
             grain: 10,
             gold: 5
         },
-        duration: 60 // Giây
+        duration: 60
+    },
+    soldier: {
+        inProgress: false,
+        timeRemaining: 0,
+        cost: {
+            grain: 20,
+            gold: 15,
+            armor: 1
+        },
+        duration: 300
     }
 };
 
 let research = {
     unlockedTechnologies: [],
-    // armorCraftingUnlocked: false, // Không còn tự động mở khóa
     armorCraftingCost: 50,
-    // Trạng thái công nghệ riêng biệt để kiểm tra đã đạt đủ điểm nghiên cứu chưa
     canUnlockArmorCrafting: false
 };
 
 let crafting = {
     armor: {
-        count: 0,
         inProgress: false,
         timeRemaining: 0,
         cost: {
             iron: 50
         },
-        duration: 60 // Giây
+        duration: 60
     }
 };
 
@@ -86,11 +95,15 @@ function updateUI() {
     document.getElementById('stone').textContent = resources.stone;
     document.getElementById('iron').textContent = resources.iron;
     document.getElementById('research-points').textContent = resources.researchPoints;
+    document.getElementById('armor').textContent = resources.armor;
 
     document.getElementById('total-workers').textContent = workers.total;
     document.getElementById('idle-workers').textContent = workers.idle;
     document.getElementById('researchers').textContent = workers.researchers;
-    document.getElementById('idle-workers-for-training').textContent = workers.idle;
+    document.getElementById('soldiers').textContent = workers.soldiers;
+
+    document.getElementById('idle-workers-for-researcher-training').textContent = workers.idle;
+    document.getElementById('idle-workers-for-soldier-training').textContent = workers.idle;
 
     document.getElementById('workers-forest').textContent = workers.assigned.forest;
     document.getElementById('workers-farm').textContent = workers.assigned.farm;
@@ -106,9 +119,8 @@ function updateUI() {
 
     // Cập nhật thông tin Thư viện
     document.getElementById('library-level').textContent = buildings.library.level;
-    document.getElementById('library-max-researchers').textContent = buildings.library.maxResearchers; // Thay đổi ID
+    document.getElementById('library-max-researchers').textContent = buildings.library.maxResearchers;
 
-    // Hiển thị/ẩn nút xây/nâng cấp thư viện
     if (buildings.library.level === 0) {
         document.getElementById('build-library-btn').style.display = 'inline-block';
         document.getElementById('upgrade-library-btn').style.display = 'none';
@@ -133,9 +145,22 @@ function updateUI() {
         document.getElementById('train-researcher-btn').disabled = true;
     } else {
         document.getElementById('researcher-training-progress-container').style.display = 'none';
-        // Vô hiệu hóa nút nếu không đủ tài nguyên
         const canAffordResearcher = resources.grain >= training.researcher.cost.grain && resources.gold >= training.researcher.cost.gold && workers.idle > 0;
         document.getElementById('train-researcher-btn').disabled = !canAffordResearcher;
+    }
+
+    // Cập nhật huấn luyện binh sĩ
+    document.getElementById('soldier-training-countdown').textContent = training.soldier.timeRemaining + ' giây';
+    const soldierProgressPercent = ((training.soldier.duration - training.soldier.timeRemaining) / training.soldier.duration) * 100;
+    document.getElementById('soldier-training-progress').style.width = soldierProgressPercent + '%';
+
+    if (training.soldier.inProgress) {
+        document.getElementById('soldier-training-progress-container').style.display = 'block';
+        document.getElementById('train-soldier-btn').disabled = true;
+    } else {
+        document.getElementById('soldier-training-progress-container').style.display = 'none';
+        const canAffordSoldier = resources.grain >= training.soldier.cost.grain && resources.gold >= training.soldier.cost.gold && resources.armor >= training.soldier.cost.armor && workers.idle > 0;
+        document.getElementById('train-soldier-btn').disabled = !canAffordSoldier;
     }
 
     // Cập nhật phân bổ nhà nghiên cứu
@@ -146,16 +171,14 @@ function updateUI() {
 
     // Cập nhật nút mở khóa công nghệ
     document.getElementById('armor-unlock-cost').textContent = research.armorCraftingCost;
-    // Nút mở khóa áo giáp chỉ khả dụng khi đủ điểm và chưa được mở khóa
     const isArmorCraftingUnlocked = research.unlockedTechnologies.includes('Chế tạo Áo Giáp');
     document.getElementById('unlock-armor-crafting-btn').disabled = !research.canUnlockArmorCrafting || isArmorCraftingUnlocked;
     if (isArmorCraftingUnlocked) {
         document.getElementById('unlock-armor-crafting-btn').textContent = 'Đã mở khóa';
     }
-
-
+    
     // Cập nhật Lò Rèn
-    document.getElementById('armor-count').textContent = crafting.armor.count;
+    // resources.armor đã được hiển thị ở mục Tài Nguyên, không cần hiển thị lại ở đây
     const isCraftingArmorUnlocked = research.unlockedTechnologies.includes('Chế tạo Áo Giáp');
     document.getElementById('craft-armor-btn').disabled = !isCraftingArmorUnlocked || crafting.armor.inProgress || resources.iron < crafting.armor.cost.iron;
 
@@ -296,6 +319,7 @@ function startTrainingResearcher() {
         alert('Không đủ công nhân rảnh để huấn luyện!');
         return;
     }
+    
     const costGrain = training.researcher.cost.grain;
     const costGold = training.researcher.cost.gold;
 
@@ -305,7 +329,7 @@ function startTrainingResearcher() {
         workers.idle--;
         training.researcher.inProgress = true;
         training.researcher.timeRemaining = training.researcher.duration;
-        updateUI(); // Cập nhật UI ngay để hiển thị progress bar
+        updateUI();
     } else {
         let message = 'Không đủ tài nguyên để huấn luyện nhà nghiên cứu!\n';
         if (resources.grain < costGrain) message += `Thiếu Lúa: ${costGrain - resources.grain}\n`;
@@ -315,7 +339,7 @@ function startTrainingResearcher() {
 }
 
 // Logic tiến trình huấn luyện nhà nghiên cứu
-function advanceTraining() {
+function advanceTrainingResearcher() {
     if (training.researcher.inProgress) {
         training.researcher.timeRemaining--;
         if (training.researcher.timeRemaining <= 0) {
@@ -323,6 +347,51 @@ function advanceTraining() {
             workers.researchers++;
             workers.idleResearchers++;
             alert('Một nhà nghiên cứu đã hoàn thành khóa huấn luyện!');
+        }
+        updateUI();
+    }
+}
+
+// Bắt đầu huấn luyện binh sĩ
+function startTrainingSoldier() {
+    if (training.soldier.inProgress) {
+        alert('Đang có binh sĩ được huấn luyện!');
+        return;
+    }
+    if (workers.idle < 1) {
+        alert('Không đủ công nhân rảnh để huấn luyện!');
+        return;
+    }
+
+    const costGrain = training.soldier.cost.grain;
+    const costGold = training.soldier.cost.gold;
+    const costArmor = training.soldier.cost.armor;
+
+    if (resources.grain >= costGrain && resources.gold >= costGold && resources.armor >= costArmor) {
+        resources.grain -= costGrain;
+        resources.gold -= costGold;
+        resources.armor -= costArmor;
+        workers.idle--;
+        training.soldier.inProgress = true;
+        training.soldier.timeRemaining = training.soldier.duration;
+        updateUI();
+    } else {
+        let message = 'Không đủ tài nguyên để huấn luyện binh sĩ!\n';
+        if (resources.grain < costGrain) message += `Thiếu Lúa: ${costGrain - resources.grain}\n`;
+        if (resources.gold < costGold) message += `Thiếu Vàng: ${costGold - resources.gold}\n`;
+        if (resources.armor < costArmor) message += `Thiếu Áo Giáp: ${costArmor - resources.armor}\n`;
+        alert(message);
+    }
+}
+
+// Logic tiến trình huấn luyện binh sĩ
+function advanceTrainingSoldier() {
+    if (training.soldier.inProgress) {
+        training.soldier.timeRemaining--;
+        if (training.soldier.timeRemaining <= 0) {
+            training.soldier.inProgress = false;
+            workers.soldiers++;
+            alert('Một binh sĩ đã hoàn thành khóa huấn luyện!');
         }
         updateUI();
     }
@@ -372,12 +441,10 @@ function gatherResources() {
     resources.stone = Math.floor(resources.stone);
     resources.iron = Math.floor(resources.iron);
 
-    // Tăng điểm nghiên cứu
     resources.researchPoints += workers.assignedResearchers * 1;
     resources.researchPoints = Math.floor(resources.researchPoints);
 
-    // Cập nhật trạng thái có thể mở khóa công nghệ
-    if (resources.researchPoints >= research.armorCraftingCost) {
+    if (resources.researchPoints >= research.armorCraftingCost && !research.unlockedTechnologies.includes('Chế tạo Áo Giáp')) {
         research.canUnlockArmorCrafting = true;
     } else {
         research.canUnlockArmorCrafting = false;
@@ -389,10 +456,10 @@ function gatherResources() {
 // Mở khóa công nghệ (thủ công)
 function unlockTechnology(techName) {
     if (techName === 'armorCrafting') {
-        if (research.canUnlockArmorCrafting) {
+        if (resources.researchPoints >= research.armorCraftingCost) {
             const isUnlocked = research.unlockedTechnologies.includes('Chế tạo Áo Giáp');
             if (!isUnlocked) {
-                resources.researchPoints -= research.armorCraftingCost; // Trừ điểm nghiên cứu
+                resources.researchPoints -= research.armorCraftingCost;
                 research.unlockedTechnologies.push('Chế tạo Áo Giáp');
                 alert('Bạn đã mở khóa công nghệ "Chế tạo Áo Giáp" tại Lò Rèn!');
                 updateUI();
@@ -422,47 +489,204 @@ function startCraftingArmor() {
         resources.iron -= costIron;
         crafting.armor.inProgress = true;
         crafting.armor.timeRemaining = crafting.armor.duration;
-        updateUI(); // Cập nhật UI ngay để hiển thị progress bar
+        updateUI();
     } else {
         alert(`Không đủ tài nguyên để tạo Áo Giáp! Thiếu Sắt: ${costIron - resources.iron}`);
     }
 }
 
 // Logic tiến trình tạo Áo Giáp
-function advanceCrafting() {
+function advanceCraftingArmor() {
     if (crafting.armor.inProgress) {
         crafting.armor.timeRemaining--;
         if (crafting.armor.timeRemaining <= 0) {
             crafting.armor.inProgress = false;
-            crafting.armor.count++;
+            resources.armor++;
             alert('Một bộ Áo Giáp đã hoàn thành!');
         }
         updateUI();
     }
 }
 
-// Chuyển đổi giữa các tab
-function showTab(tabId) {
+// Hàm lưu game
+function saveGame() {
+    const gameState = {
+        resources: resources,
+        workers: workers,
+        buildings: buildings,
+        training: training,
+        research: research,
+        crafting: crafting
+    };
+    const jsonString = JSON.stringify(gameState);
+
+    const encodedData = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g,
+        function toSolidBytes(match, p1) {
+            return String.fromCharCode('0x' + p1);
+        }));
+    document.getElementById('save-game-data').value = encodedData;
+    alert('Game đã được lưu! Sao chép đoạn văn bản để sử dụng sau.');
+}
+
+// Hàm tải game
+function loadGame() {
+    const encodedData = document.getElementById('load-game-data').value;
+    if (!encodedData) {
+        alert('Vui lòng dán dữ liệu game vào ô để tải!');
+        return;
+    }
+    try {
+        const jsonString = decodeURIComponent(atob(encodedData).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        const loadedState = JSON.parse(jsonString);
+
+        resources = loadedState.resources;
+        workers = loadedState.workers;
+        buildings = loadedState.buildings;
+        training = loadedState.training;
+        research = loadedState.research;
+        crafting = loadedState.crafting;
+
+        if (research.unlockedTechnologies.includes('Chế tạo Áo Giáp')) {
+            document.getElementById('unlock-armor-crafting-btn').textContent = 'Đã mở khóa';
+            document.getElementById('unlock-armor-crafting-btn').disabled = true;
+        } else {
+            document.getElementById('unlock-armor-crafting-btn').textContent = 'Mở khóa Chế tạo Áo Giáp';
+            document.getElementById('unlock-armor-crafting-btn').disabled = !research.canUnlockArmorCrafting;
+        }
+        
+        const isCraftingArmorUnlocked = research.unlockedTechnologies.includes('Chế tạo Áo Giáp');
+        document.getElementById('craft-armor-btn').disabled = !isCraftingArmorUnlocked || crafting.armor.inProgress || resources.iron < crafting.armor.cost.iron;
+
+
+        alert('Game đã được tải thành công!');
+        updateUI();
+        clearInterval(gameInterval);
+        startGameLoop();
+    } catch (e) {
+        alert('Dữ liệu tải game không hợp lệ! Vui lòng kiểm tra lại.');
+        console.error('Lỗi khi tải game:', e);
+    }
+}
+
+// --- Các hàm Hack (Chỉ dùng cho mục đích test) ---
+
+function hackResources() {
+    resources.wood += 10000;
+    resources.grain += 10000;
+    resources.gold += 10000;
+    resources.stone += 10000;
+    resources.iron += 10000;
+    resources.researchPoints += 1000;
+    resources.armor += 100;
+    alert('Đã thêm 10000 tài nguyên mỗi loại, 1000 điểm nghiên cứu và 100 áo giáp!');
+    updateUI();
+}
+
+function hackTrainingAndCrafting() {
+    if (training.researcher.inProgress) {
+        training.researcher.timeRemaining = 1;
+        alert('Huấn luyện Nhà nghiên cứu sẽ hoàn thành ngay lập tức!');
+    } else {
+        workers.researchers++;
+        workers.idleResearchers++;
+        alert('Đã thêm 1 Nhà nghiên cứu!');
+    }
+
+    if (training.soldier.inProgress) {
+        training.soldier.timeRemaining = 1;
+        alert('Huấn luyện Binh sĩ sẽ hoàn thành ngay lập tức!');
+    } else {
+        workers.soldiers++;
+        alert('Đã thêm 1 Binh sĩ!');
+    }
+
+    if (crafting.armor.inProgress) {
+        crafting.armor.timeRemaining = 1;
+        alert('Chế tạo Áo giáp sẽ hoàn thành ngay lập tức!');
+    } else {
+        resources.armor++;
+        alert('Đã thêm 1 bộ Áo giáp!');
+    }
+    
+    if (!research.unlockedTechnologies.includes('Chế tạo Áo Giáp')) {
+        research.unlockedTechnologies.push('Chế tạo Áo Giáp');
+        alert('Công nghệ Chế tạo Áo Giáp đã được mở khóa!');
+    }
+
+
+    updateUI();
+}
+
+
+// Biến để lưu trữ ID của setInterval
+let gameInterval;
+
+// Hàm khởi tạo game loop
+function startGameLoop() {
+    gameInterval = setInterval(() => {
+        gatherResources();
+        advanceTrainingResearcher();
+        advanceTrainingSoldier();
+        advanceCraftingArmor();
+    }, 1000);
+}
+
+// ... (giữ nguyên tất cả các code hiện có ở trên) ...
+
+// Chuyển đổi giữa các tab chính (Thế Giới, Cài Đặt)
+function showMainTab(tabId) {
+    // Ẩn tất cả nội dung tab chính
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
     });
 
-    document.querySelectorAll('.tab-button').forEach(button => {
+    // Xóa trạng thái active của tất cả nút tab chính
+    document.querySelectorAll('.main-tabs .tab-button').forEach(button => {
+        button.classList.remove('active');
+    });
+
+    // Hiển thị nội dung tab được chọn và đặt active cho nút
+    document.getElementById(tabId).classList.add('active');
+    document.querySelector(`.main-tabs .tab-button[onclick="showMainTab('${tabId}')"]`).classList.add('active');
+
+    // Lấy tham chiếu đến các phần tử tài nguyên và công nhân
+    const resourcesSection = document.querySelector('.resources');
+    const workersSection = document.querySelector('.workers');
+
+    // Logic ẩn/hiện dựa trên tab được chọn
+    if (tabId === 'world-tab') {
+        // Nếu là tab Thế Giới, hiển thị Tài Nguyên và Công Nhân
+        if (resourcesSection) resourcesSection.style.display = 'block';
+        if (workersSection) workersSection.style.display = 'block';
+        showSubTab('mining-tab'); // Hiển thị tab con Khai Thác mặc định
+    } else if (tabId === 'settings-tab') {
+        // Nếu là tab Cài Đặt, ẩn Tài Nguyên và Công Nhân
+        if (resourcesSection) resourcesSection.style.display = 'none';
+        if (workersSection) workersSection.style.display = 'none';
+    }
+}
+
+// ... (giữ nguyên tất cả các code hiện có ở dưới) ...
+
+// Chuyển đổi giữa các tab con (Khai Thác, Công Trình,...)
+function showSubTab(tabId) {
+    document.querySelectorAll('#world-tab .sub-tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+
+    document.querySelectorAll('.sub-tabs .sub-tab-button').forEach(button => {
         button.classList.remove('active');
     });
 
     document.getElementById(tabId).classList.add('active');
-    document.querySelector(`.tab-button[onclick="showTab('${tabId}')"]`).classList.add('active');
+    document.querySelector(`.sub-tabs .sub-tab-button[onclick="showSubTab('${tabId}')"]`).classList.add('active');
 }
 
 // Khởi tạo trò chơi
 window.onload = () => {
     updateUI();
-    // Chạy các hàm cập nhật mỗi giây
-    setInterval(() => {
-        gatherResources();
-        advanceTraining();
-        advanceCrafting();
-    }, 1000);
-    showTab('mining-tab');
+    startGameLoop();
+    showMainTab('world-tab'); // Mặc định hiển thị tab "Thế Giới" và nó sẽ tự động gọi showSubTab('mining-tab')
 };

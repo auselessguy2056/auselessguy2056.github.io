@@ -24,7 +24,41 @@ h1, h2 {
     color: #333;
 }
 
+/* New: Styles for main tabs (World, Settings) */
+.main-tabs {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px; /* Khoảng cách giữa nút và đường kẻ */
+}
+
+.main-tabs .tab-button {
+    background-color: #e0e0e0;
+    border: none;
+    padding: 12px 25px; /* To hơn một chút */
+    cursor: pointer;
+    font-size: 1.1em; /* Chữ to hơn */
+    font-weight: bold;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    transition: background-color 0.3s ease;
+    margin: 0 5px;
+}
+
+.main-tabs .tab-button:hover {
+    background-color: #d0d0d0;
+}
+
+.main-tabs .tab-button.active {
+    background-color: #007bff; /* Màu xanh dương cho tab chính */
+    color: white;
+    border-bottom: 2px solid #007bff; /* Highlight tab active */
+}
+
+
 .resources, .workers {
+    margin-top: 25px; /* Giữ khoảng cách sau tab chính */
     margin-bottom: 25px;
     padding: 15px;
     border: 1px solid #eee;
@@ -37,116 +71,101 @@ h1, h2 {
     margin: 8px 0;
 }
 
-/* Tab navigation */
-.tabs {
+/* Sub-tab navigation (Khai Thac, Cong Trinh, etc.) */
+.sub-tabs {
+    margin-top: 20px; /* Khoảng cách với phần resources/workers */
     margin-bottom: 20px;
     display: flex;
     justify-content: center;
-    flex-wrap: wrap;
+    border-bottom: 1px solid #eee; /* Đường kẻ mỏng hơn */
+    padding-bottom: 5px;
 }
 
-.tab-button {
-    background-color: #ddd;
-    color: #333;
-    padding: 10px 15px;
+.sub-tab-button {
+    background-color: #f0f0f0;
     border: none;
+    padding: 8px 15px;
     cursor: pointer;
-    font-size: 1em;
-    border-radius: 5px 5px 0 0;
-    margin: 0 2px;
+    font-size: 0.95em;
+    border-radius: 4px;
     transition: background-color 0.3s ease;
-    white-space: nowrap;
+    margin: 0 2px;
 }
 
-.tab-button:hover {
-    background-color: #ccc;
+.sub-tab-button:hover {
+    background-color: #e0e0e0;
 }
 
-.tab-button.active {
-    background-color: #007bff;
+.sub-tab-button.active {
+    background-color: #4CAF50; /* Màu xanh lá cây cho tab con */
     color: white;
+    font-weight: bold;
 }
 
-/* Tab content */
+/* Main tab content (World, Settings) */
 .tab-content {
-    display: none;
+    display: none; /* Mặc định ẩn tất cả các tab content chính */
     padding: 20px 0;
-    border-top: 1px solid #eee;
 }
 
 .tab-content.active {
-    display: block;
+    display: block; /* Hiển thị tab content chính đang hoạt động */
 }
 
-.locations, .building-grid, .training-research-grid, .crafting-grid {
+/* Sub-tab content (Mining, Buildings, etc.) */
+.sub-tab-content {
+    display: none; /* Mặc định ẩn tất cả các tab content con */
+    padding: 20px 0;
+}
+
+.sub-tab-content.active {
+    display: block; /* Hiển thị tab content con đang hoạt động */
+}
+
+
+/* Specific content areas within tabs */
+.worker-assignment, .building-grid, .training-grid, .research-assignment, .research-technologies, .crafting-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
-}
-.building-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Hơi rộng hơn cho công trình */
-}
-.training-research-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Điều chỉnh cho các mục mới */
+    margin-top: 20px;
 }
 
-
-.location-item, .building-item, .training-item, .research-item, .crafting-item {
-    border: 1px solid #ddd;
-    padding: 15px;
+.assignment-item, .building-item, .training-item, .crafting-item, .research-item {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
     border-radius: 5px;
-    background-color: #fff;
-    text-align: left;
-    display: flex; /* Sử dụng flexbox */
-    flex-direction: column; /* Xếp các mục theo cột */
-    justify-content: space-between; /* Đẩy nội dung và nút ra hai đầu */
-    align-items: stretch; /* Đảm bảo các mục con kéo dài hết chiều rộng */
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
-.location-item h3, .building-item h3, .training-item h3, .research-item h3, .crafting-item h3 {
+
+.assignment-item h3, .building-item h3, .training-item h3, .crafting-item h3, .research-item h3 {
     margin-top: 0;
     color: #555;
-    text-align: center;
-    margin-bottom: 15px;
 }
 
-/* Nhóm nút */
-.button-group {
-    display: flex;
-    justify-content: center; /* Căn giữa các nút */
-    gap: 10px; /* Khoảng cách giữa các nút */
-    margin-top: auto; /* Đẩy nhóm nút xuống cuối item */
-    flex-wrap: wrap; /* Cho phép các nút xuống dòng */
-}
-
-.location-item button, .building-item button, .training-item button, .research-item button, .crafting-item button {
-    background-color: #4CAF50;
+.assignment-item button, .building-item button, .training-item button, .research-assignment button, .research-technologies button, .crafting-item button, .settings-section button {
+    background-color: #4CAF50; /* Green */
     color: white;
     padding: 8px 15px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.9em;
-    transition: background-color 0.3s ease;
-    flex-grow: 1; /* Cho phép nút mở rộng để lấp đầy khoảng trống */
-    max-width: 150px; /* Giới hạn chiều rộng của nút */
+    margin: 5px;
+    transition: background-color 0.2s ease;
 }
 
-.location-item button:hover, .building-item button:hover, .training-item button:hover, .research-item button:hover, .crafting-item button:hover {
+.assignment-item button:hover, .building-item button:hover, .training-item button:hover, .research-assignment button:hover, .research-technologies button:hover, .crafting-item button:hover, .settings-section button:hover {
     background-color: #45a049;
 }
 
-.location-item button:active, .building-item button:active, .training-item button:active, .research-item button:active, .crafting-item button:active {
-    background-color: #3e8e41;
+/* Remove Worker button specific style */
+button[onclick^="removeWorker"], button[onclick^="removeResearcher"] {
+    background-color: #f44336; /* Red */
 }
 
-/* Specific styling for remove buttons */
-.location-item button[onclick^="removeWorker"],
-.research-item button[onclick^="removeResearcher"] {
-    background-color: #f44336;
-}
-
-.location-item button[onclick^="removeWorker"]:hover,
-.research-item button[onclick^="removeResearcher"]:hover {
+button[onclick^="removeWorker"]:hover, button[onclick^="removeResearcher"]:hover {
     background-color: #da190b;
 }
 
@@ -184,20 +203,52 @@ button:disabled {
     width: 0%;
     border-radius: 5px;
     text-align: center;
-    line-height: 25px; /* Để text nằm giữa theo chiều dọc */
-    color: white; /* Màu chữ */
-    transition: width 0.1s linear; /* Hiệu ứng chuyển động mượt mà */
-    box-sizing: border-box; /* Bao gồm padding/border trong width */
+    line-height: 25px; /* Để text nằm giữa */
+    color: white; /* Màu chữ của progress bar */
+    transition: width 0.5s ease-out; /* Hiệu ứng chuyển động mượt mà */
 }
 
 .progress-text {
     position: absolute;
-    width: 100%;
-    text-align: center;
-    line-height: 25px; /* Để text nằm giữa theo chiều dọc */
-    top: 0;
-    left: 0;
-    color: #333; /* Màu chữ cho thời gian */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #333; /* Màu chữ của countdown */
     font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.7); /* Thêm hiệu ứng nổi */
+    z-index: 1; /* Đảm bảo text nằm trên progress bar */
+}
+
+/* Settings Tab Specific Styles */
+.settings-section {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.settings-section h3 {
+    margin-top: 0;
+    color: #555;
+}
+
+.settings-section textarea {
+    width: calc(100% - 20px); /* Kích thước textarea */
+    min-height: 100px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical; /* Cho phép resize theo chiều dọc */
+    font-family: monospace; /* Font chữ đơn cách để dễ đọc mã */
+}
+
+/* Nút lưu/tải game có màu khác một chút */
+.settings-section button {
+    background-color: #007bff; /* Blue for settings buttons */
+}
+
+.settings-section button:hover {
+    background-color: #0056b3;
 }
