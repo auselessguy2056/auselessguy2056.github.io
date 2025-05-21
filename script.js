@@ -579,7 +579,7 @@ function advanceTrainingResearcher() {
             training.researcher.inProgress = false;
             workers.researchers++;
             workers.idleResearchers++;
-            workers.idle++; // Trả công nhân đã huấn luyện về trạng thái rảnh
+           // workers.idle++; // Trả công nhân đã huấn luyện về trạng thái rảnh
             alert('Một nhà nghiên cứu đã hoàn thành khóa huấn luyện!');
         }
         updateUI();
@@ -635,7 +635,7 @@ function advanceTrainingSoldier() {
             };
             workers.soldiers.push(newSoldier); // Thêm binh sĩ vào mảng
             workers.idleSoldiers++; // Binh sĩ sau khi huấn luyện xong là rảnh
-            workers.idle++; // Trả công nhân đã huấn luyện về trạng thái rảnh
+          //  workers.idle++; // Trả công nhân đã huấn luyện về trạng thái rảnh
             alert('Một binh sĩ mới đã hoàn thành khóa huấn luyện!');
         }
         updateUI();
