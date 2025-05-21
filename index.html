@@ -12,11 +12,11 @@
 
         <div class="resources">
             <h2>Tài Nguyên</h2>
-            <p>Gỗ: <span id="wood">0</span></p>
-            <p>Lúa: <span id="grain">0</span></p>
-            <p>Vàng: <span id="gold">0</span></p>
-            <p>Đá: <span id="stone">0</span></p>
-            <p>Sắt: <span id="iron">0</span></p>
+            <p>Gỗ: <span id="wood">0 / 500</span></p>
+            <p>Lúa: <span id="grain">0 / 500</span></p>
+            <p>Vàng: <span id="gold">0 / 500</span></p>
+            <p>Đá: <span id="stone">0 / 500</span></p>
+            <p>Sắt: <span id="iron">0 / 500</span></p>
             <p>Điểm Nghiên Cứu: <span id="research-points">0</span></p>
             <p>Áo Giáp: <span id="armor">0</span></p>
         </div>
@@ -41,6 +41,7 @@
                 <button class="sub-tab-button" onclick="showSubTab('training-research-tab')">Huấn Luyện & Nghiên Cứu</button>
                 <button class="sub-tab-button" onclick="showSubTab('military-tab')">Quân Đội</button>
                 <button class="sub-tab-button" onclick="showSubTab('blacksmith-tab')">Lò Rèn</button>
+                <button class="sub-tab-button" onclick="showSubTab('exploration-tab')">Thám Hiểm</button>
             </div>
 
             <div id="mining-tab" class="sub-tab-content active">
@@ -114,6 +115,16 @@
                         </ul>
                         <button id="build-library-btn" onclick="buildBuilding('library')">Xây dựng</button>
                         <button id="upgrade-library-btn" style="display:none;" onclick="upgradeBuilding('library')">Nâng cấp</button>
+                    </div>
+                    <div class="building-item">
+                        <h3>Nhà Kho</h3>
+                        <p>Cấp độ: <span id="warehouse-level">1</span></p>
+                        <p>Chi phí nâng cấp:</p>
+                        <ul>
+                            <li>Gỗ: <span id="warehouse-upgrade-cost-wood">150</span></li>
+                            <li>Đá: <span id="warehouse-upgrade-cost-stone">100</span></li>
+                        </ul>
+                        <button onclick="upgradeBuilding('warehouse')">Nâng cấp</button>
                     </div>
                 </div>
             </div>
@@ -200,12 +211,47 @@
                     </div>
                 </div>
             </div>
+
+            <div id="exploration-tab" class="sub-tab-content">
+                <h2>Thám Hiểm</h2>
+                <div class="exploration-grid">
+                    <div class="exploration-item">
+                        <h3>Vùng Đất Trống</h3>
+                        <p>Phần thưởng: Tài nguyên cơ bản</p>
+                        <p>Rủi ro binh sĩ: Thấp</p>
+                        <p>Binh sĩ rảnh: <span id="idle-soldiers-explore-empty">0</span></p>
+                        <p>Số binh sĩ cử đi: <input type="number" id="soldiers-empty-land" value="0" min="0" oninput="updateExplorationSuccessRate('emptyLand')"></p>
+                        <p>Tỉ lệ thành công: <span id="success-rate-empty-land">0%</span></p>
+                        <p>Tỉ lệ tử trận (ước tính): <span id="casualty-rate-empty-land">0%</span></p>
+                        <button onclick="startExploration('emptyLand')">Thám hiểm</button>
+                        <div class="progress-bar-container" id="empty-land-exploration-progress-container" style="display:none;">
+                            <div class="progress-bar" id="empty-land-exploration-progress" style="width:0%;"></div>
+                            <span class="progress-text" id="empty-land-exploration-countdown">0 giây</span>
+                        </div>
+                    </div>
+                    <div class="exploration-item">
+                        <h3>Thành Trì Lân Cận</h3>
+                        <p>Phần thưởng: Tài nguyên cao cấp, Vàng</p>
+                        <p>Rủi ro binh sĩ: Cao</p>
+                        <p>Binh sĩ rảnh: <span id="idle-soldiers-explore-fortress">0</span></p>
+                        <p>Số binh sĩ cử đi: <input type="number" id="soldiers-fortress" value="0" min="0" oninput="updateExplorationSuccessRate('fortress')"></p>
+                        <p>Tỉ lệ thành công: <span id="success-rate-fortress">0%</span></p>
+                        <p>Tỉ lệ tử trận (ước tính): <span id="casualty-rate-fortress">0%</span></p>
+                        <button onclick="startExploration('fortress')">Thám hiểm</button>
+                        <div class="progress-bar-container" id="fortress-exploration-progress-container" style="display:none;">
+                            <div class="progress-bar" id="fortress-exploration-progress" style="width:0%;"></div>
+                            <span class="progress-text" id="fortress-exploration-countdown">0 giây</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <div id="settings-tab" class="tab-content">
             <h2>Cài Đặt</h2>
             <div class="setting-item">
-                <h3>Lưu Game (Bạn nhớ bấm Ctrol+C nhé)</h3>
+                <h3>Lưu Game</h3>
                 <textarea id="save-game-data" rows="5" readonly></textarea>
                 <button onclick="saveGame()">Lưu Game</button>
             </div>
@@ -215,7 +261,12 @@
                 <button onclick="loadGame()">Tải Game</button>
             </div>
 
-                 </div>
+            <div class="setting-item">
+                <h3>Hack (Chỉ dùng cho Developer)</h3>
+                <button onclick="hackResources()">Hack Full Tài Nguyên</button>
+                <button onclick="hackTrainingAndCrafting()">Hoàn Thành Huấn Luyện/Chế Tạo Nhanh</button>
+            </div>
+        </div>
 
     </div>
 

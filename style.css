@@ -232,6 +232,10 @@ button:disabled {
     margin-top: 0;
     color: #555;
 }
+.resources p span {
+    /* Để giới hạn hiển thị rõ ràng hơn */
+    font-weight: bold;
+    color: #0056b3; /* Một màu sắc để phân biệt */
 
 .settings-section textarea {
     width: calc(100% - 20px); /* Kích thước textarea */
@@ -243,6 +247,67 @@ button:disabled {
     resize: vertical; /* Cho phép resize theo chiều dọc */
     font-family: monospace; /* Font chữ đơn cách để dễ đọc mã */
 }
+.exploration-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.exploration-item {
+    background-color: #f0f8ff; /* Light blue background */
+    border: 1px solid #cceeff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    text-align: left;
+}
+
+.exploration-item h3 {
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.exploration-item p {
+    font-size: 0.95em;
+    margin-bottom: 8px;
+}
+
+.exploration-item input[type="number"] {
+    width: 80px;
+    padding: 5px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.exploration-item button {
+    display: block; /* Make button take full width */
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-top: 15px;
+}
+
+.exploration-item button:hover {
+    background-color: #0056b3;
+}
+
+.exploration-item button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Style cho các phần tử tài nguyên để hiển thị giới hạn */
+.resources p span {
+    font-weight: bold;
+    color: #0056b3; /* Một màu sắc để phân biệt */
 
 /* Nút lưu/tải game có màu khác một chút */
 .settings-section button {
@@ -251,4 +316,100 @@ button:disabled {
 
 .settings-section button:hover {
     background-color: #0056b3;
+}
+
+/* Thêm vào cuối file style.css */
+
+.exploration-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.exploration-item {
+    background-color: #f0f8ff; /* Light blue background */
+    border: 1px solid #cceeff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    text-align: left;
+}
+
+.exploration-item h3 {
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.exploration-item p {
+    font-size: 0.95em;
+    margin-bottom: 8px;
+}
+
+.exploration-item input[type="number"] {
+    width: 80px;
+    padding: 5px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.exploration-item button {
+    display: block; /* Make button take full width */
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-top: 15px;
+}
+
+.exploration-item button:hover {
+    background-color: #0056b3;
+}
+
+.exploration-item button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Style cho các phần tử tài nguyên để hiển thị giới hạn */
+.resources p span {
+    font-weight: bold;
+    color: #0056b3; /* Một màu sắc để phân biệt */
+}
+
+/* Progress Bar Styles */
+.progress-bar-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 15px;
+    position: relative; /* Để span .progress-text có thể đặt lên trên */
+    height: 25px; /* Chiều cao của thanh progress */
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #4CAF50; /* Màu xanh lá cây */
+    width: 0%;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 25px; /* Để text nằm giữa theo chiều dọc */
+    color: white; /* Màu chữ trên thanh progress */
+    transition: width 1s ease-in-out; /* Hiệu ứng chuyển động mượt mà */
+}
+
+.progress-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 25px; /* Căn giữa chiều dọc */
+    color: #333; /* Màu chữ cho countdown */
+    font-weight: bold;
 }
