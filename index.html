@@ -190,6 +190,7 @@
                             <div class="progress-bar" id="soldier-training-progress" style="width:0%;"></div>
                             <span class="progress-text" id="soldier-training-countdown">0 giây</span>
                         </div>
+                        <p>Binh sĩ: <span id="current-soldiers-info">0</span></p>
                     </div>
                 </div>
             </div>
@@ -221,9 +222,7 @@
                         <p>Rủi ro binh sĩ: Thấp</p>
                         <p>Binh sĩ rảnh: <span id="idle-soldiers-explore-empty">0</span></p>
                         <p>Số binh sĩ cử đi: <input type="number" id="soldiers-empty-land" value="0" min="0" oninput="updateExplorationSuccessRate('emptyLand')"></p>
-                        <p>Tỉ lệ thành công: <span id="success-rate-empty-land">0%</span></p>
-                        <p>Tỉ lệ tử trận (ước tính): <span id="casualty-rate-empty-land">0%</span></p>
-                        <button onclick="startExploration('emptyLand')">Thám hiểm</button>
+                                              <button onclick="startExploration('emptyLand')">Thám hiểm</button>
                         <div class="progress-bar-container" id="empty-land-exploration-progress-container" style="display:none;">
                             <div class="progress-bar" id="empty-land-exploration-progress" style="width:0%;"></div>
                             <span class="progress-text" id="empty-land-exploration-countdown">0 giây</span>
@@ -235,41 +234,62 @@
                         <p>Rủi ro binh sĩ: Cao</p>
                         <p>Binh sĩ rảnh: <span id="idle-soldiers-explore-fortress">0</span></p>
                         <p>Số binh sĩ cử đi: <input type="number" id="soldiers-fortress" value="0" min="0" oninput="updateExplorationSuccessRate('fortress')"></p>
-                        <p>Tỉ lệ thành công: <span id="success-rate-fortress">0%</span></p>
-                        <p>Tỉ lệ tử trận (ước tính): <span id="casualty-rate-fortress">0%</span></p>
-                        <button onclick="startExploration('fortress')">Thám hiểm</button>
+                                              <button onclick="startExploration('fortress')">Thám hiểm</button>
                         <div class="progress-bar-container" id="fortress-exploration-progress-container" style="display:none;">
                             <div class="progress-bar" id="fortress-exploration-progress" style="width:0%;"></div>
                             <span class="progress-text" id="fortress-exploration-countdown">0 giây</span>
                         </div>
                     </div>
                 </div>
-            </div>
-
-        </div>
-
-        <div id="settings-tab" class="tab-content">
-            <h2>Cài Đặt</h2>
-            <div class="setting-item">
-                <h3>Lưu Game</h3>
-                <textarea id="save-game-data" rows="5" readonly></textarea>
-                <button onclick="saveGame()">Lưu Game</button>
-            </div>
-            <div class="setting-item">
-                <h3>Tải Game</h3>
-                <textarea id="load-game-data" rows="5" placeholder="Dán dữ liệu game vào đây"></textarea>
-                <button onclick="loadGame()">Tải Game</button>
-            </div>
-
-             <div id="developer-hack-section"> <div class="setting-item">
-                    <h3>Hack (Chỉ dùng cho Developer)</h3>
-                    <button onclick="hackResources()">Hack Full Tài Nguyên</button>
-                    <button onclick="hackTrainingAndCrafting()">Hoàn Thành Huấn Luyện/Chế Tạo Nhanh</button>
+                <div id="exploration-report-container" style="margin-top: 30px; text-align: left; background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
+                    <h3>Báo Cáo Thám Hiểm</h3>
+                    <div id="exploration-report-content" style="max-height: 300px; overflow-y: auto; background-color: #fff; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+                        <p>Chưa có báo cáo nào.</p>
+                    </div>
                 </div>
             </div>
+
         </div>
 
+     <div id="settings-tab" class="tab-content">
+    <h2>Cài Đặt</h2>
+
+    <div class="settings-group"> <h3>Lưu & Tải Game</h3>
+        <div class="settings-section">
+            <h4>Lưu Game</h4>
+            <textarea id="save-game-data" rows="5" cols="50" readonly></textarea>
+            <button onclick="copySaveGameData()">Sao chép dữ liệu</button> 
+            <button onclick="saveGame()">Lưu Game</button>
+        </div>
+        <div class="settings-section">
+            <h4>Tải Game</h4>
+            <textarea id="load-game-data" rows="5" cols="50" placeholder="Dán dữ liệu game vào đây"></textarea>
+            <button onclick="loadGame()">Tải Game</button>
+        </div>
     </div>
+
+    <div class="settings-group"> <h3>Đóng Góp</h3>
+        <div class="settings-section">
+            <p>Tác giả: auselessguy2056@gmail.com</p>
+        </div>
+    </div>
+
+    <div class="settings-group"> <h3>Thành Tựu</h3>
+        <div class="settings-section">
+            <ul id="achievements-list">
+                <li><span id="achievement-warehouse-level-10" class="achievement-locked">Kho Báu Vĩ Đại (Nhà kho cấp 10) <span class="achievement-icon"></span></span></li>
+                <li><span id="achievement-100-soldiers" class="achievement-locked">Đại Quân (100 binh sĩ) <span class="achievement-icon"></span></span></li>
+                <li><span id="achievement-50-successful-explorations" class="achievement-locked">Chinh Phục 50 (Hoàn thành 50 chuyến thám hiểm thành công) <span class="achievement-icon"></span></span></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="developer-hack-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+        <h3>Công cụ nhà phát triển (Dành cho thử nghiệm)</h3>
+        <button onclick="hackResources()">Hack Tài Nguyên</button>
+        <button onclick="hackTrainingAndCrafting()">Hack Huấn luyện/Chế tạo/Thám hiểm</button>
+    </div>
+</div>
 
     <script src="script.js"></script>
 </body>

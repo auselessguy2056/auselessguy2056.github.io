@@ -7,8 +7,7 @@ let resources = {
     iron: 0,
     researchPoints: 0,
     armor: 0,
-    // Thêm giới hạn tài nguyên
-    woodCapacity: 500, // Sức chứa ban đầu
+    woodCapacity: 500,
     grainCapacity: 500,
     goldCapacity: 500,
     stoneCapacity: 500,
@@ -28,9 +27,8 @@ let workers = {
     researchers: 0,
     idleResearchers: 0,
     assignedResearchers: 0,
-    soldiers: 0, // Tổng số binh sĩ
-    idleSoldiers: 0, // Binh sĩ rảnh rỗi (chưa đi thám hiểm)
-    exploringSoldiers: 0 // Binh sĩ đang đi thám hiểm (không còn dùng biến này mà tính từ assignedSoldiers)
+    soldiers: [], // Thay đổi từ số lượng thành mảng các đối tượng binh sĩ
+    idleSoldiers: 0 // Số lính rảnh rỗi (tính từ mảng soldiers)
 };
 
 let buildings = {
@@ -54,10 +52,9 @@ let buildings = {
             stone: 40
         }
     },
-    // Thêm Nhà Kho
     warehouse: {
         level: 1,
-        capacityPerLevel: 500, // Mức tăng sức chứa mỗi cấp
+        capacityPerLevel: 1000,
         upgradeCost: {
             wood: 150,
             stone: 100
@@ -83,14 +80,27 @@ let training = {
             gold: 15,
             armor: 1
         },
-        duration: 300
+        duration: 300,
+        // Thuộc tính cơ bản của binh sĩ mới huấn luyện
+        baseAttack: 5,
+        baseDefense: 3,
+        baseHealth: 20
     }
 };
 
 let research = {
     unlockedTechnologies: [],
     armorCraftingCost: 50,
-    canUnlockArmorCrafting: false
+    canUnlockArmorCrafting: false,
+    // Nghiên cứu mới cho binh sĩ
+    soldierAttackResearchCost: 100,
+    soldierDefenseResearchCost: 100,
+    soldierHealthResearchCost: 100,
+    unlockedSoldierUpgrades: {
+        attack: 0,
+        defense: 0,
+        health: 0
+    }
 };
 
 let crafting = {
@@ -108,28 +118,32 @@ let exploration = {
     emptyLand: {
         inProgress: false,
         timeRemaining: 0,
-        duration: 120, // 2 phút
-        assignedSoldiers: 0, // Số binh sĩ được giao cho chuyến thám hiểm này
-        baseSuccessRate: 40, // Tỉ lệ thành công cơ bản khi không có binh sĩ
-        successRatePerSoldier: 5, // Mỗi binh sĩ tăng 5% tỉ lệ thành công
-        maxSuccessRate: 100,
-        baseCasualtyRate: 5, // Tỉ lệ tử trận cơ bản (nhẹ)
-        casualtyRateDecreasePerSoldier: 0.5 // Mỗi binh sĩ giảm 0.5% tỉ lệ tử trận
+        duration: 120,
+        assignedSoldiers: [], // Lưu trữ các đối tượng binh sĩ được giao
+        // Định nghĩa các loại kẻ thù có thể xuất hiện, không phải số lượng cụ thể
+        enemyTypes: [{ name: 'Quái vật nhỏ', attack: 5, defense: 2, health: 30 }], // Tăng HP để trận đấu kéo dài hơn
+        activeEnemiesInstances: [], // Mảng chứa các đối tượng kẻ thù CỤ THỂ đang chiến đấu
+        rewards: { wood: { min: 20, max: 50 }, grain: { min: 20, max: 50 } },
+        report: [], // Lưu trữ các tin nhắn báo cáo
     },
     fortress: {
         inProgress: false,
         timeRemaining: 0,
-        duration: 300, // 5 phút
-        assignedSoldiers: 0, // Số binh sĩ được giao cho chuyến thám hiểm này
-        baseSuccessRate: 10,
-        successRatePerSoldier: 3,
-        maxSuccessRate: 80, // Có thể giới hạn tỉ lệ thành công tối đa ở thành trì
-        baseCasualtyRate: 20, // Tỉ lệ tử trận cơ bản (cao)
-        casualtyRateDecreasePerSoldier: 0.8
+        duration: 300,
+        assignedSoldiers: [], // Lưu trữ các đối tượng binh sĩ được giao
+        enemyTypes: [{ name: 'Lính canh', attack: 8, defense: 5, health: 60 }, { name: 'Thủ lĩnh', attack: 15, defense: 10, health: 120 }], // Tăng HP
+        activeEnemiesInstances: [],
+        rewards: { gold: { min: 50, max: 100 }, iron: { min: 30, max: 70 } },
+        report: [],
     }
 };
 
-
+let achievements = {
+    warehouseLevel10: false,
+    soldiers100: false,
+    successfulExplorations50: false,
+    successfulExplorationsCount: 0 // Biến để đếm số lần thám hiểm thành công
+};
 // Cập nhật giao diện người dùng
 function updateUI() {
     // Cập nhật hiển thị tài nguyên và giới hạn
@@ -144,7 +158,11 @@ function updateUI() {
     document.getElementById('total-workers').textContent = workers.total;
     document.getElementById('idle-workers').textContent = workers.idle;
     document.getElementById('researchers').textContent = workers.researchers;
-    document.getElementById('soldiers').textContent = workers.soldiers; // Tổng số binh sĩ
+
+    // Cập nhật tổng số binh sĩ (số lượng phần tử trong mảng)
+    document.getElementById('soldiers').textContent = workers.soldiers.length;
+    // Cập nhật thông tin binh sĩ trong tab quân đội
+    document.getElementById('current-soldiers-info').textContent = `${workers.soldiers.length} (Rảnh: ${workers.idleSoldiers})`;
     
     // Cập nhật binh sĩ rảnh cho huấn luyện
     document.getElementById('idle-workers-for-researcher-training').textContent = workers.idle;
@@ -257,20 +275,37 @@ function updateUI() {
 
     // Cập nhật cho tab Thám Hiểm
     // Tính toán lại idleSoldiers dựa trên tổng lính và lính đang đi thám hiểm
-    workers.idleSoldiers = workers.soldiers - exploration.emptyLand.assignedSoldiers - exploration.fortress.assignedSoldiers;
+    const assignedSoldiersCount = exploration.emptyLand.assignedSoldiers.length + exploration.fortress.assignedSoldiers.length;
+    workers.idleSoldiers = workers.soldiers.length - assignedSoldiersCount;
     document.getElementById('idle-soldiers-explore-empty').textContent = workers.idleSoldiers;
     document.getElementById('idle-soldiers-explore-fortress').textContent = workers.idleSoldiers;
 
-    // Cập nhật tỉ lệ thành công khi UI được cập nhật
-    updateExplorationSuccessRate('emptyLand');
-    updateExplorationSuccessRate('fortress');
+    // Cập nhật lại các input soldiersToAssign để nó không bị lỗi khi chuyển tab
+    if (exploration.emptyLand.inProgress) {
+        document.getElementById('soldiers-empty-land').value = exploration.emptyLand.assignedSoldiers.length;
+    } else {
+        // Giữ giá trị nếu người dùng đã nhập, nếu không thì đặt về 0.
+        const emptyLandInput = document.getElementById('soldiers-empty-land');
+        if (parseInt(emptyLandInput.value) === 0 || emptyLandInput.value === '') {
+            emptyLandInput.value = 0;
+        }
+    }
+    if (exploration.fortress.inProgress) {
+        document.getElementById('soldiers-fortress').value = exploration.fortress.assignedSoldiers.length;
+    } else {
+        // Giữ giá trị nếu người dùng đã nhập, nếu không thì đặt về 0.
+        const fortressInput = document.getElementById('soldiers-fortress');
+        if (parseInt(fortressInput.value) === 0 || fortressInput.value === '') {
+            fortressInput.value = 0;
+        }
+    }
 
     // Cập nhật tiến trình thám hiểm Vùng Đất Trống
     const emptyLandCountdownElem = document.getElementById('empty-land-exploration-countdown');
     const emptyLandProgressElem = document.getElementById('empty-land-exploration-progress');
     const emptyLandProgressContainer = document.getElementById('empty-land-exploration-progress-container');
 
-    if (emptyLandCountdownElem && emptyLandProgressElem && emptyLandProgressContainer) { // Kiểm tra sự tồn tại của các phần tử
+    if (emptyLandCountdownElem && emptyLandProgressElem && emptyLandProgressContainer) {
         emptyLandCountdownElem.textContent = exploration.emptyLand.timeRemaining + ' giây';
         const emptyLandProgressPercent = ((exploration.emptyLand.duration - exploration.emptyLand.timeRemaining) / exploration.emptyLand.duration) * 100;
         emptyLandProgressElem.style.width = emptyLandProgressPercent + '%';
@@ -287,7 +322,7 @@ function updateUI() {
     const fortressProgressElem = document.getElementById('fortress-exploration-progress');
     const fortressProgressContainer = document.getElementById('fortress-exploration-progress-container');
 
-    if (fortressCountdownElem && fortressProgressElem && fortressProgressContainer) { // Kiểm tra sự tồn tại của các phần tử
+    if (fortressCountdownElem && fortressProgressElem && fortressProgressContainer) {
         fortressCountdownElem.textContent = exploration.fortress.timeRemaining + ' giây';
         const fortressProgressPercent = ((exploration.fortress.duration - exploration.fortress.timeRemaining) / exploration.fortress.duration) * 100;
         fortressProgressElem.style.width = fortressProgressPercent + '%';
@@ -298,7 +333,85 @@ function updateUI() {
             fortressProgressContainer.style.display = 'none';
         }
     }
+
+    // Cập nhật báo cáo thám hiểm
+    const reportContent = document.getElementById('exploration-report-content');
+    if (reportContent) {
+        reportContent.innerHTML = '';
+        const allReports = [];
+        // Lấy báo cáo từ cả hai loại thám hiểm và gộp lại
+        if (exploration.emptyLand.report) {
+            allReports.push(...exploration.emptyLand.report);
+        }
+        if (exploration.fortress.report) {
+            allReports.push(...exploration.fortress.report);
+        }
+
+        if (allReports.length === 0) {
+            reportContent.innerHTML = '<p>Chưa có báo cáo nào.</p>';
+        } else {
+            // Sắp xếp báo cáo theo thời gian giảm dần (mới nhất lên trên)
+            allReports.sort((a, b) => b.timestamp - a.timestamp);
+            allReports.forEach(entry => {
+                const p = document.createElement('p');
+                p.textContent = `[${new Date(entry.timestamp).toLocaleTimeString()}] ${entry.message}`;
+                reportContent.appendChild(p);
+            });
+        }
+    }
+// Cập nhật Thành Tựu
+  // Cập nhật Thành Tựu
+    const achievementWarehouseLevel10 = document.getElementById('achievement-warehouse-level-10');
+    const achievement100Soldiers = document.getElementById('achievement-100-soldiers');
+    const achievement50SuccessfulExplorations = document.getElementById('achievement-50-successful-explorations');
+
+    if (achievementWarehouseLevel10 && achievement100Soldiers && achievement50SuccessfulExplorations) {
+        // Kho Báu Vĩ Đại (Nhà kho cấp 10)
+        if (buildings.warehouse.level >= 10 && !achievements.warehouseLevel10) {
+            achievements.warehouseLevel10 = true;
+            alert('Thành tựu mới: Kho Báu Vĩ Đại (Nhà kho cấp 10)!');
+        }
+        if (achievements.warehouseLevel10) {
+            achievementWarehouseLevel10.classList.remove('achievement-locked');
+            achievementWarehouseLevel10.classList.add('achievement-unlocked');
+            achievementWarehouseLevel10.querySelector('.achievement-icon').classList.add('achievement-unlocked-icon');
+        }
+
+        // Đại Quân (100 binh sĩ)
+        if (workers.soldiers.length >= 100 && !achievements.soldiers100) {
+            achievements.soldiers100 = true;
+            alert('Thành tựu mới: Đại Quân (100 binh sĩ)!');
+        }
+        if (achievements.soldiers100) {
+            achievement100Soldiers.classList.remove('achievement-locked');
+            achievement100Soldiers.classList.add('achievement-unlocked');
+            achievement100Soldiers.querySelector('.achievement-icon').classList.add('achievement-unlocked-icon');
+        }
+
+        // Chinh Phục 50 (Hoàn thành 50 chuyến thám hiểm thành công)
+        if (achievements.successfulExplorationsCount >= 50 && !achievements.successfulExplorations50) {
+            achievements.successfulExplorations50 = true;
+            alert('Thành tựu mới: Chinh Phục 50 (Hoàn thành 50 chuyến thám hiểm thành công)!');
+        }
+        if (achievements.successfulExplorations50) {
+            achievement50SuccessfulExplorations.classList.remove('achievement-locked');
+            achievement50SuccessfulExplorations.classList.add('achievement-unlocked');
+            achievement50SuccessfulExplorations.querySelector('.achievement-icon').classList.add('achievement-unlocked-icon');
+        }
+    }
+} // Đảm bảo dấu đóng ngoặc } này là của hàm updateUI()
+
+// Hàm thêm tin nhắn vào báo cáo thám hiểm
+function addExplorationReport(type, message) {
+    const timestamp = Date.now();
+    exploration[type].report.unshift({ timestamp, message }); // Thêm vào đầu để báo cáo mới nhất hiện lên trên
+    // Giới hạn số lượng báo cáo để tránh quá tải bộ nhớ
+    if (exploration[type].report.length > 50) { // Giữ 50 báo cáo gần nhất
+        exploration[type].report.pop();
+    }
+    updateUI();
 }
+
 
 // Gửi công nhân đến một khu vực
 function assignWorker(location) {
@@ -400,7 +513,7 @@ function upgradeBuilding(buildingName) {
             if (resources.stone < costStone) message += `Thiếu Đá: ${costStone - resources.stone}\n`;
             alert(message);
         }
-    } else if (buildingName === 'warehouse') { // Logic nâng cấp Nhà Kho
+    } else if (buildingName === 'warehouse') {
         const costWood = buildings.warehouse.upgradeCost.wood;
         const costStone = buildings.warehouse.upgradeCost.stone;
 
@@ -409,15 +522,14 @@ function upgradeBuilding(buildingName) {
             resources.stone -= costStone;
             buildings.warehouse.level++;
             
-            // Tăng giới hạn của tất cả các loại tài nguyên
             resources.woodCapacity += buildings.warehouse.capacityPerLevel;
             resources.grainCapacity += buildings.warehouse.capacityPerLevel;
             resources.goldCapacity += buildings.warehouse.capacityPerLevel;
             resources.stoneCapacity += buildings.warehouse.capacityPerLevel;
             resources.ironCapacity += buildings.warehouse.capacityPerLevel;
 
-            buildings.warehouse.upgradeCost.wood = Math.floor(buildings.warehouse.upgradeCost.wood * 1.6); // Tăng chi phí nâng cấp
-            buildings.warehouse.upgradeCost.stone = Math.floor(buildings.warehouse.upgradeCost.stone * 1.6);
+            buildings.warehouse.upgradeCost.wood = Math.floor(buildings.warehouse.upgradeCost.wood * 1.4);
+            buildings.warehouse.upgradeCost.stone = Math.floor(buildings.warehouse.upgradeCost.stone * 1.4);
 
             alert(`Nâng cấp Nhà Kho lên cấp ${buildings.warehouse.level} thành công!`);
             updateUI();
@@ -512,10 +624,19 @@ function advanceTrainingSoldier() {
         training.soldier.timeRemaining--;
         if (training.soldier.timeRemaining <= 0) {
             training.soldier.inProgress = false;
-            workers.soldiers++;
+            // Tạo một đối tượng binh sĩ mới với thuộc tính từ research upgrades
+            const newSoldier = {
+                id: Date.now() + Math.random(), // ID duy nhất
+                name: `Binh sĩ ${workers.soldiers.length + 1}`, // Đặt tên Binh sĩ 1, Binh sĩ 2, ...
+                attack: training.soldier.baseAttack + research.unlockedSoldierUpgrades.attack,
+                defense: training.soldier.baseDefense + research.unlockedSoldierUpgrades.defense,
+                health: training.soldier.baseHealth + research.unlockedSoldierUpgrades.health,
+                currentHealth: training.soldier.baseHealth + research.unlockedSoldierUpgrades.health
+            };
+            workers.soldiers.push(newSoldier); // Thêm binh sĩ vào mảng
             workers.idleSoldiers++; // Binh sĩ sau khi huấn luyện xong là rảnh
             workers.idle++; // Trả công nhân đã huấn luyện về trạng thái rảnh
-            alert('Một binh sĩ đã hoàn thành khóa huấn luyện!');
+            alert('Một binh sĩ mới đã hoàn thành khóa huấn luyện!');
         }
         updateUI();
     }
@@ -553,7 +674,6 @@ function removeResearcher() {
 
 // Khai thác tài nguyên (chạy định kỳ)
 function gatherResources() {
-    // Kiểm tra giới hạn trước khi thêm tài nguyên
     resources.wood = Math.min(resources.wood + workers.assigned.forest * 1, resources.woodCapacity);
     resources.grain = Math.min(resources.grain + workers.assigned.farm * 1, resources.grainCapacity);
     resources.gold = Math.min(resources.gold + workers.assigned.mine * 1, resources.goldCapacity);
@@ -589,6 +709,7 @@ function unlockTechnology(techName) {
             alert(`Không đủ điểm nghiên cứu để mở khóa! Cần ${research.armorCraftingCost} điểm.`);
         }
     }
+    // Logic cho nghiên cứu binh sĩ có thể được thêm vào đây
 }
 
 // Bắt đầu tạo Áo Giáp
@@ -627,42 +748,21 @@ function advanceCraftingArmor() {
     }
 }
 
-// Tính toán tỉ lệ thành công và tử trận cho thám hiểm
-function calculateExplorationRates(type, soldiersSent) {
-    let successRate = 0;
-    let casualtyRate = 0;
-    const config = exploration[type];
-
-    // Tỉ lệ thành công
-    successRate = config.baseSuccessRate + (soldiersSent * config.successRatePerSoldier);
-    successRate = Math.min(successRate, config.maxSuccessRate);
-
-    // Tỉ lệ tử trận
-    casualtyRate = config.baseCasualtyRate - (soldiersSent * config.casualtyRateDecreasePerSoldier);
-    casualtyRate = Math.max(casualtyRate, 0); // Không thể có tỉ lệ tử trận âm
-
-    return { successRate, casualtyRate };
-}
-
-// Cập nhật tỉ lệ thành công/tử trận trên UI
+// Hàm này chủ yếu dùng để đảm bảo các input hiển thị đúng giá trị khi chuyển tab
+// và sẽ không có các cập nhật tỉ lệ ước tính nữa.
 function updateExplorationSuccessRate(type) {
-    const inputId = type === 'emptyLand' ? 'soldiers-empty-land' : 'soldiers-fortress';
-    const successRateSpanId = type === 'emptyLand' ? 'success-rate-empty-land' : 'success-rate-fortress';
-    const casualtyRateSpanId = type === 'emptyLand' ? 'casualty-rate-empty-land' : 'casualty-rate-fortress';
-
-    const soldiersInput = document.getElementById(inputId);
-    if (!soldiersInput) return; // Đảm bảo phần tử tồn tại trước khi truy cập
-
-    let soldiersSent = parseInt(soldiersInput.value) || 0;
-
-    // Giới hạn số lính có thể cử đi bằng số lính rảnh
-    soldiersSent = Math.min(soldiersSent, workers.idleSoldiers + (exploration[type].inProgress ? exploration[type].assignedSoldiers : 0));
-    soldiersInput.value = soldiersSent;
-
-    const rates = calculateExplorationRates(type, soldiersSent);
-    document.getElementById(successRateSpanId).textContent = `${rates.successRate.toFixed(0)}%`;
-    document.getElementById(casualtyRateSpanId).textContent = `${rates.casualtyRate.toFixed(1)}%`;
+    // Các logic liên quan đến soldiersInput.value đã được chuyển sang showSubTab
+    // và startExploration để tránh việc tự động nhảy số.
+    // Hàm này có thể được giữ lại rỗng hoặc xóa bỏ nếu không còn mục đích nào khác.
+    // Tuy nhiên, để an toàn, ta giữ lại nhưng không làm gì cả.
 }
+
+// Biến tạm để lưu trữ số lính được giao trước khi bắt đầu thám hiểm
+// Cần thiết để hiển thị trong báo cáo cuối cùng
+let soldiersToAssignCountBeforeExploration = {
+    emptyLand: 0,
+    fortress: 0
+};
 
 // Bắt đầu thám hiểm
 function startExploration(type) {
@@ -673,82 +773,260 @@ function startExploration(type) {
 
     const inputId = type === 'emptyLand' ? 'soldiers-empty-land' : 'soldiers-fortress';
     const soldiersInput = document.getElementById(inputId);
-    let soldiersToAssign = parseInt(soldiersInput.value) || 0;
+    let soldiersToAssignCount = parseInt(soldiersInput.value) || 0;
 
-    if (soldiersToAssign <= 0) {
+    if (soldiersToAssignCount <= 0) {
         alert('Cần cử ít nhất 1 binh sĩ đi thám hiểm!');
         return;
     }
-    if (soldiersToAssign > workers.idleSoldiers) {
-        alert(`Không đủ binh sĩ rảnh! Bạn có ${workers.idleSoldiers} binh sĩ rảnh.`);
+    if (soldiersToAssignCount > workers.idleSoldiers) {
+        // Nếu số lính nhập vào lớn hơn số lính rảnh, điều chỉnh lại giá trị input
+        soldiersToAssignCount = workers.idleSoldiers;
+        soldiersInput.value = soldiersToAssignCount; // Cập nhật input
+        alert(`Bạn chỉ có ${workers.idleSoldiers} binh sĩ rảnh. Đã tự động điều chỉnh về số binh sĩ tối đa có thể cử đi.`);
+        if (soldiersToAssignCount === 0) { // Nếu không còn lính rảnh, không thể bắt đầu
+            alert('Không còn binh sĩ rảnh để cử đi thám hiểm!');
+            return;
+        }
+    }
+
+    // Lấy các binh sĩ rảnh đầu tiên để cử đi
+    const assignedSoldiers = [];
+    
+    // Lấy bản sao của các binh sĩ rảnh để tránh thao tác trực tiếp trên mảng gốc khi lặp
+    // Chỉ lấy số lượng binh sĩ cần thiết
+    const soldiersToPick = workers.soldiers.filter(s => 
+        // Binh sĩ phải còn sống và không đang trong chuyến thám hiểm khác
+        s.currentHealth > 0 &&
+        !exploration.emptyLand.assignedSoldiers.some(assignedS => assignedS.id === s.id) &&
+        !exploration.fortress.assignedSoldiers.some(assignedS => assignedS.id === s.id)
+    ).slice(0, soldiersToAssignCount); // Chỉ lấy số lượng binh sĩ cần cử đi
+
+    if (soldiersToPick.length !== soldiersToAssignCount) {
+        alert('Có lỗi khi gán binh sĩ. Không đủ binh sĩ rảnh và hợp lệ.');
         return;
     }
 
-    // Trừ binh sĩ rảnh và gán vào đội thám hiểm
-    workers.idleSoldiers -= soldiersToAssign;
-    exploration[type].assignedSoldiers = soldiersToAssign;
+    // Gán binh sĩ cho chuyến thám hiểm
+    soldiersToPick.forEach(soldier => {
+        assignedSoldiers.push(soldier);
+        // Reset currentHealth của binh sĩ khi bắt đầu chuyến thám hiểm mới
+        soldier.currentHealth = soldier.health; 
+    });
+
+    exploration[type].assignedSoldiers = assignedSoldiers;
     exploration[type].inProgress = true;
     exploration[type].timeRemaining = exploration[type].duration;
+    exploration[type].report = []; // Xóa báo cáo cũ khi bắt đầu chuyến mới
 
-    alert(`Đã cử ${soldiersToAssign} binh sĩ đi thám hiểm ${type === 'emptyLand' ? 'Vùng Đất Trống' : 'Thành Trì Lân Cận'}!`);
-    updateUI(); // Cập nhật UI ngay lập tức để hiển thị thanh tiến trình
+    // Khởi tạo các cá thể kẻ thù (instances) cho chuyến thám hiểm
+    exploration[type].activeEnemiesInstances = [];
+    let enemiesSpawnedReport = []; // Để tạo báo cáo tổng hợp
+
+    if (type === 'emptyLand') {
+        const enemyCount = Math.floor(Math.random() * 3) + 1; // 1-3 quái vật nhỏ
+        for (let i = 0; i < enemyCount; i++) {
+            const enemyBase = exploration.emptyLand.enemyTypes[0];
+            const uniqueEnemyName = `${enemyBase.name} ${i + 1}`; // Tên duy nhất: "Quái vật nhỏ 1", "Quái vật nhỏ 2", ...
+            exploration[type].activeEnemiesInstances.push({
+                id: Date.now() + Math.random() + i, // ID duy nhất cho mỗi cá thể kẻ thù
+                name: uniqueEnemyName, // Sử dụng tên duy nhất
+                attack: enemyBase.attack,
+                defense: enemyBase.defense,
+                health: enemyBase.health,
+                currentHealth: enemyBase.health
+            });
+            enemiesSpawnedReport.push(uniqueEnemyName); // Thêm vào danh sách báo cáo
+        }
+        addExplorationReport(type, `Kẻ thù xuất hiện: ${enemiesSpawnedReport.join(', ')}.`);
+    } else if (type === 'fortress') {
+        const guardCount = Math.floor(Math.random() * 2) + 1; // 1-2 lính canh
+        const leaderCount = Math.random() < 0.3 ? 1 : 0; // 30% có thủ lĩnh
+
+        for (let i = 0; i < guardCount; i++) {
+            const enemyBase = exploration.fortress.enemyTypes[0];
+            const uniqueEnemyName = `${enemyBase.name} ${i + 1}`;
+            exploration[type].activeEnemiesInstances.push({
+                id: Date.now() + Math.random() + i,
+                name: uniqueEnemyName,
+                attack: enemyBase.attack,
+                defense: enemyBase.defense,
+                health: enemyBase.health,
+                currentHealth: enemyBase.health
+            });
+            enemiesSpawnedReport.push(uniqueEnemyName);
+        }
+        for (let i = 0; i < leaderCount; i++) {
+            const enemyBase = exploration.fortress.enemyTypes[1];
+            const uniqueEnemyName = `${enemyBase.name} ${i + 1}`;
+            exploration[type].activeEnemiesInstances.push({
+                id: Date.now() + Math.random() + 100 + i,
+                name: uniqueEnemyName,
+                attack: enemyBase.attack,
+                defense: enemyBase.defense,
+                health: enemyBase.health,
+                currentHealth: enemyBase.health
+            });
+            enemiesSpawnedReport.push(uniqueEnemyName);
+        }
+        addExplorationReport(type, `Kẻ thù xuất hiện: ${enemiesSpawnedReport.join(', ')}.`);
+    }
+    
+    soldiersToAssignCountBeforeExploration[type] = soldiersToAssignCount; // Lưu lại số lính ban đầu
+    addExplorationReport(type, `Đã cử ${soldiersToAssignCount} binh sĩ đi thám hiểm ${type === 'emptyLand' ? 'Vùng Đất Trống' : 'Thành Trì Lân Cận'}!`);
+    updateUI();
 }
-
-// Logic tiến trình thám hiểm
+// Trong hàm advanceExploration()
 function advanceExploration() {
     for (const type in exploration) {
         if (exploration[type].inProgress) {
-            exploration[type].timeRemaining--;
-            if (exploration[type].timeRemaining <= 0) {
-                // Kết thúc thám hiểm
-                exploration[type].inProgress = false;
-                const soldiersSent = exploration[type].assignedSoldiers;
-                const rates = calculateExplorationRates(type, soldiersSent);
-
-                // Xử lý kết quả thám hiểm
-                const successRoll = Math.random() * 100; // 0-99.99
-                const casualtyRoll = Math.random() * 100;
-
-                let message = `Đội thám hiểm ở ${type === 'emptyLand' ? 'Vùng Đất Trống' : 'Thành Trì Lân Cận'} đã trở về.`;
-                let soldiersLost = 0;
-
-                // Tính toán số lính bị thương vong
-                if (casualtyRoll < rates.casualtyRate) {
-                    soldiersLost = Math.ceil(Math.random() * (soldiersSent * 0.5)); // Mất đến 50% số lính cử đi
-                    soldiersLost = Math.min(soldiersLost, soldiersSent); // Không thể mất nhiều hơn số đã cử
-                    workers.soldiers -= soldiersLost;
-                    message += `\n${soldiersLost} binh sĩ đã hy sinh.`;
-                }
-                
-                // Trả lại binh sĩ còn sống về trạng thái rảnh
-                workers.idleSoldiers += (soldiersSent - soldiersLost);
-                exploration[type].assignedSoldiers = 0; // Đặt lại số lính đã giao nhiệm vụ
-
-                if (successRoll < rates.successRate) {
-                    // Thành công: nhận phần thưởng
-                    message += '\nThám hiểm thành công! Bạn nhận được:';
-                    if (type === 'emptyLand') {
-                        const woodReward = Math.floor(Math.random() * 50) + 20;
-                        const grainReward = Math.floor(Math.random() * 50) + 20;
-                        resources.wood = Math.min(resources.wood + woodReward, resources.woodCapacity);
-                        resources.grain = Math.min(resources.grain + grainReward, resources.grainCapacity);
-                        message += `\n+ Gỗ: ${woodReward}\n+ Lúa: ${grainReward}`;
-                    } else if (type === 'fortress') {
-                        const goldReward = Math.floor(Math.random() * 100) + 50;
-                        const ironReward = Math.floor(Math.random() * 70) + 30;
-                        resources.gold = Math.min(resources.gold + goldReward, resources.goldCapacity);
-                        resources.iron = Math.min(resources.iron + ironReward, resources.ironCapacity);
-                        message += `\n+ Vàng: ${goldReward}\n+ Sắt: ${ironReward}`;
-                    }
-                } else {
-                    // Thất bại: không nhận được phần thưởng
-                    message += '\nThám hiểm thất bại. Không nhận được tài nguyên.';
-                }
-                alert(message);
+            // Lọc ra các binh sĩ còn sống ở đầu mỗi tick
+            let currentActiveSoldiers = exploration[type].assignedSoldiers.filter(s => s.currentHealth > 0);
+            
+            // Kiểm tra nếu tất cả binh sĩ đã chết
+            if (currentActiveSoldiers.length === 0) {
+                addExplorationReport(type, 'Tất cả binh sĩ đã hy sinh! Chuyến thám hiểm thất bại.');
+                handleExplorationEnd(type, false); // Thất bại
+                return; 
             }
-            updateUI(); // Luôn cập nhật UI để hiển thị thời gian giảm
+
+            // Kiểm tra nếu tất cả kẻ thù đã chết
+            let currentActiveEnemies = exploration[type].activeEnemiesInstances.filter(e => e.currentHealth > 0);
+            if (currentActiveEnemies.length === 0) {
+                addExplorationReport(type, 'Tất cả kẻ thù đã bị tiêu diệt! Chuyến thám hiểm thành công.');
+                handleExplorationEnd(type, true); // Thành công
+                return;
+            }
+
+            // Vẫn còn cả binh sĩ và kẻ thù, tiếp tục chiến đấu
+            exploration[type].timeRemaining--;
+            
+            // Lượt của Binh sĩ
+            // Sử dụng bản sao của mảng currentActiveSoldiers để duyệt
+            [...currentActiveSoldiers].forEach(soldier => { // <--- CHỈNH SỬA Ở ĐÂY: sử dụng spread operator để tạo bản sao
+                if (soldier.currentHealth <= 0) return; // Binh sĩ đã chết trong lượt này, bỏ qua
+
+                const targetEnemy = currentActiveEnemies[Math.floor(Math.random() * currentActiveEnemies.length)];
+
+                if (targetEnemy) {
+                    const damage = Math.max(0, soldier.attack - targetEnemy.defense + Math.floor(Math.random() * 3) - 1);
+                    if (damage > 0) {
+                        targetEnemy.currentHealth -= damage; // Trừ trực tiếp vào health của đối tượng
+                        addExplorationReport(type, `${soldier.name} tấn công ${targetEnemy.name}, gây ${damage} sát thương. ${targetEnemy.name} còn ${Math.max(0, targetEnemy.currentHealth)} HP.`);
+                        if (targetEnemy.currentHealth <= 0) {
+                            addExplorationReport(type, `${targetEnemy.name} đã bị tiêu diệt.`);
+                            // Cập nhật lại danh sách kẻ thù còn sống ngay lập tức
+                            currentActiveEnemies = currentActiveEnemies.filter(e => e.currentHealth > 0); 
+                        }
+                    } else {
+                        addExplorationReport(type, `${soldier.name} tấn công ${targetEnemy.name} nhưng trượt hoặc không gây sát thương.`);
+                    }
+                }
+            });
+
+            // Sau lượt tấn công của binh sĩ, kiểm tra lại kẻ thù
+            if (currentActiveEnemies.length === 0) {
+                addExplorationReport(type, 'Tất cả kẻ thù đã bị tiêu diệt! Chuyến thám hiểm thành công.');
+                handleExplorationEnd(type, true);
+                return;
+            }
+
+            // Lượt của Kẻ thù
+            // Sử dụng bản sao của mảng currentActiveEnemies để duyệt
+            [...currentActiveEnemies].forEach(enemy => { // <--- CHỈNH SỬA Ở ĐÂY: sử dụng spread operator để tạo bản sao
+                if (enemy.currentHealth <= 0) return; // Kẻ thù đã chết trong lượt này, bỏ qua
+
+                // Lọc lại danh sách binh sĩ còn sống trước khi chọn mục tiêu
+                currentActiveSoldiers = exploration[type].assignedSoldiers.filter(s => s.currentHealth > 0); // <--- RẤT QUAN TRỌNG: Cập nhật lại mảng binh sĩ sống sót
+                if (currentActiveSoldiers.length === 0) {
+                    // Nếu không còn binh sĩ nào, kẻ thù không thể tấn công
+                    return; 
+                }
+
+                const targetSoldier = currentActiveSoldiers[Math.floor(Math.random() * currentActiveSoldiers.length)];
+
+                if (targetSoldier) {
+                    const damage = Math.max(0, enemy.attack - targetSoldier.defense + Math.floor(Math.random() * 3) - 1);
+                    if (damage > 0) {
+                        targetSoldier.currentHealth -= damage;
+                        addExplorationReport(type, `${enemy.name} tấn công ${targetSoldier.name}, gây ${damage} sát thương. ${targetSoldier.name} còn ${Math.max(0, targetSoldier.currentHealth)} HP.`);
+                        if (targetSoldier.currentHealth <= 0) {
+                            addExplorationReport(type, `${targetSoldier.name} đã hy sinh.`);
+                            // Cập nhật lại danh sách binh sĩ còn sống ngay lập tức
+                            currentActiveSoldiers = currentActiveSoldiers.filter(s => s.currentHealth > 0);
+                        }
+                    } else {
+                        addExplorationReport(type, `${enemy.name} tấn công ${targetSoldier.name} nhưng trượt hoặc bị phòng thủ.`);
+                    }
+                }
+            });
+
+            // Nếu hết thời gian
+            if (exploration[type].timeRemaining <= 0) {
+                const finalActiveSoldiers = exploration[type].assignedSoldiers.filter(s => s.currentHealth > 0);
+                const finalActiveEnemies = exploration[type].activeEnemiesInstances.filter(e => e.currentHealth > 0);
+
+                if (finalActiveSoldiers.length > 0 && finalActiveEnemies.length === 0) {
+                    handleExplorationEnd(type, true); // Thành công
+                } else {
+                    handleExplorationEnd(type, false); // Thất bại (hết giờ mà kẻ thù vẫn còn hoặc lính hết sạch)
+                }
+            }
+            updateUI();
         }
     }
+}
+// Hàm xử lý kết thúc thám hiểm
+function handleExplorationEnd(type, success) {
+    exploration[type].inProgress = false;
+    
+    const initialSoldiersCount = soldiersToAssignCountBeforeExploration[type]; 
+    
+    const survivingSoldiersInExploration = exploration[type].assignedSoldiers.filter(s => s.currentHealth > 0);
+    
+    const lostSoldiersCount = initialSoldiersCount - survivingSoldiersInExploration.length;
+    
+    workers.soldiers = workers.soldiers.filter(soldier => {
+        const isAssignedToThisExploration = exploration[type].assignedSoldiers.some(assignedSoldier => assignedSoldier.id === soldier.id);
+
+        if (isAssignedToThisExploration) {
+            return soldier.currentHealth > 0;
+        } else {
+            return true;
+        }
+    });
+
+    exploration[type].assignedSoldiers = []; // Reset lính được giao cho chuyến này
+    exploration[type].activeEnemiesInstances = []; // Reset kẻ thù đang chiến đấu
+
+    let message = `Đội thám hiểm ở ${type === 'emptyLand' ? 'Vùng Đất Trống' : 'Thành Trì Lân Cận'} đã trở về.`;
+    message += `\nTổng số binh sĩ đã cử đi: ${initialSoldiersCount}`;
+    message += `\nBinh sĩ hy sinh: ${lostSoldiersCount}`;
+
+
+    if (success) {
+        achievements.successfulExplorationsCount++; // Tăng số lần thành công
+        message += '\nThám hiểm thành công! Bạn nhận được:';
+        if (type === 'emptyLand') {
+            const woodReward = Math.floor(Math.random() * (exploration[type].rewards.wood.max - exploration[type].rewards.wood.min + 1)) + exploration[type].rewards.wood.min;
+            const grainReward = Math.floor(Math.random() * (exploration[type].rewards.grain.max - exploration[type].rewards.grain.min + 1)) + exploration[type].rewards.grain.min;
+            resources.wood = Math.min(resources.wood + woodReward, resources.woodCapacity);
+            resources.grain = Math.min(resources.grain + grainReward, resources.grainCapacity);
+            message += `\n+ Gỗ: ${woodReward}\n+ Lúa: ${grainReward}`;
+        } else if (type === 'fortress') {
+            const goldReward = Math.floor(Math.random() * (exploration[type].rewards.gold.max - exploration[type].rewards.gold.min + 1)) + exploration[type].rewards.gold.min;
+            const ironReward = Math.floor(Math.random() * (exploration[type].rewards.iron.max - exploration[type].rewards.iron.min + 1)) + exploration[type].rewards.iron.min;
+            resources.gold = Math.min(resources.gold + goldReward, resources.goldCapacity);
+            resources.iron = Math.min(resources.iron + ironReward, resources.ironCapacity);
+            message += `\n+ Vàng: ${goldReward}\n+ Sắt: ${ironReward}`;
+        }
+    } else {
+        message += '\nThám hiểm thất bại. Không nhận được tài nguyên.';
+    }
+    
+    addExplorationReport(type, message);
+    alert(message);
+    updateUI();
 }
 
 
@@ -761,7 +1039,8 @@ function saveGame() {
         training: training,
         research: research,
         crafting: crafting,
-        exploration: exploration // Lưu trạng thái thám hiểm
+        exploration: exploration,
+  	achievements: achievements // THÊM DÒNG NÀY
     };
     const jsonString = JSON.stringify(gameState);
 
@@ -772,6 +1051,21 @@ function saveGame() {
     document.getElementById('save-game-data').value = encodedData;
     alert('Game đã được lưu! Sao chép đoạn văn bản để sử dụng sau.');
 }
+
+function copySaveGameData() {
+    const saveTextArea = document.getElementById('save-game-data');
+    saveTextArea.select();
+    saveTextArea.setSelectionRange(0, 99999); // For mobile devices
+
+    // Sử dụng Clipboard API hiện đại
+    navigator.clipboard.writeText(saveTextArea.value).then(() => {
+        alert('Dữ liệu đã được sao chép vào clipboard!');
+    }).catch(err => {
+        console.error('Không thể sao chép văn bản: ', err);
+        alert('Không thể tự động sao chép. Vui lòng chọn và sao chép thủ công.');
+    });
+}
+
 
 // Hàm tải game
 function loadGame() {
@@ -792,18 +1086,44 @@ function loadGame() {
         training = loadedState.training;
         research = loadedState.research;
         crafting = loadedState.crafting;
-        exploration = loadedState.exploration || { // Đảm bảo exploration có mặc định nếu tải save cũ
+           // Đảm bảo achievements được tải, nếu không có thì khởi tạo mặc định
+        achievements = loadedState.achievements || {
+            warehouseLevel10: false,
+            soldiers100: false,
+            successfulExplorations50: false,
+            successfulExplorationsCount: 0
+};
+        // Đảm bảo exploration được khởi tạo với cấu trúc mới nếu tải từ save cũ
+        exploration = loadedState.exploration || {
             emptyLand: {
-                inProgress: false, timeRemaining: 0, duration: 120, assignedSoldiers: 0,
-                baseSuccessRate: 40, successRatePerSoldier: 5, maxSuccessRate: 100,
-                baseCasualtyRate: 5, casualtyRateDecreasePerSoldier: 0.5
+                inProgress: false, timeRemaining: 0, duration: 120, assignedSoldiers: [],
+                enemyTypes: [{ name: 'Quái vật nhỏ', attack: 5, defense: 2, health: 30 }], // Tăng HP
+                activeEnemiesInstances: [], report: []
             },
             fortress: {
-                inProgress: false, timeRemaining: 0, duration: 300, assignedSoldiers: 0,
-                baseSuccessRate: 10, successRatePerSoldier: 3, maxSuccessRate: 80,
-                baseCasualtyRate: 20, casualtyRateDecreasePerSoldier: 0.8
+                inProgress: false, timeRemaining: 0, duration: 300, assignedSoldiers: [],
+                enemyTypes: [{ name: 'Lính canh', attack: 8, defense: 5, health: 60 }, { name: 'Thủ lĩnh', attack: 15, defense: 10, health: 120 }], // Tăng HP
+                activeEnemiesInstances: [], report: []
             }
         };
+
+        // Đảm bảo các thuộc tính con trong exploration cũng được khởi tạo
+        for (const type in exploration) {
+            if (exploration[type].report === undefined) exploration[type].report = [];
+            if (exploration[type].assignedSoldiers === undefined) exploration[type].assignedSoldiers = [];
+            if (exploration[type].activeEnemiesInstances === undefined) exploration[type].activeEnemiesInstances = [];
+            if (exploration[type].enemyTypes === undefined) { // Cập nhật enemyTypes nếu thiếu
+                 if (type === 'emptyLand') {
+                    exploration[type].enemyTypes = [{ name: 'Quái vật nhỏ', attack: 5, defense: 2, health: 30 }];
+                 } else if (type === 'fortress') {
+                    exploration[type].enemyTypes = [{ name: 'Lính canh', attack: 8, defense: 5, health: 60 }, { name: 'Thủ lĩnh', attack: 15, defense: 10, health: 120 }];
+                 }
+            }
+        }
+
+        // Đảm bảo research.unlockedSoldierUpgrades tồn tại
+        research.unlockedSoldierUpgrades = research.unlockedSoldierUpgrades || { attack: 0, defense: 0, health: 0 };
+
 
         // Đảm bảo các thuộc tính capacity có sẵn nếu tải từ save cũ không có
         buildings.warehouse.capacityPerLevel = buildings.warehouse.capacityPerLevel || 500;
@@ -813,11 +1133,21 @@ function loadGame() {
         resources.stoneCapacity = resources.stoneCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
         resources.ironCapacity = resources.ironCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
 
-        // Đảm bảo workers.soldiers và workers.idleSoldiers được thiết lập đúng
-        workers.soldiers = workers.soldiers || 0;
+        // Đảm bảo workers.soldiers là một mảng
+        if (!Array.isArray(workers.soldiers)) {
+            workers.soldiers = []; // Nếu không phải mảng, khởi tạo rỗng
+        }
+        // Khôi phục currentHealth và gán tên cho binh sĩ nếu bị thiếu (từ save cũ)
+        workers.soldiers.forEach((s, index) => { // Thêm index vào đây
+            s.currentHealth = s.currentHealth === undefined ? s.health : s.currentHealth;
+            // Gán tên nếu binh sĩ chưa có tên
+            s.name = s.name || `Binh sĩ ${index + 1}`; // Gán tên Binh sĩ 1, Binh sĩ 2, ...
+        });
+
         // Tính toán lại idleSoldiers dựa trên tổng lính và lính đang đi thám hiểm
-        workers.idleSoldiers = workers.soldiers - exploration.emptyLand.assignedSoldiers - exploration.fortress.assignedSoldiers;
-        if (workers.idleSoldiers < 0) workers.idleSoldiers = 0; // Đảm bảo không âm
+        const assignedSoldiersCount = exploration.emptyLand.assignedSoldiers.length + exploration.fortress.assignedSoldiers.length;
+        workers.idleSoldiers = workers.soldiers.length - assignedSoldiersCount;
+        if (workers.idleSoldiers < 0) workers.idleSoldiers = 0;
 
         if (research.unlockedTechnologies.includes('Chế tạo Áo Giáp')) {
             document.getElementById('unlock-armor-crafting-btn').textContent = 'Đã mở khóa';
@@ -833,8 +1163,8 @@ function loadGame() {
 
         alert('Game đã được tải thành công!');
         updateUI();
-        clearInterval(gameInterval);
-        startGameLoop();
+        clearInterval(gameInterval); // Dừng game loop cũ
+        startGameLoop(); // Bắt đầu game loop mới
     } catch (e) {
         alert('Dữ liệu tải game không hợp lệ! Vui lòng kiểm tra lại.');
         console.error('Lỗi khi tải game:', e);
@@ -844,7 +1174,6 @@ function loadGame() {
 // --- Các hàm Hack (Chỉ dùng cho mục đích test) ---
 
 function hackResources() {
-    // Đặt tài nguyên bằng giới hạn
     resources.wood = resources.woodCapacity;
     resources.grain = resources.grainCapacity;
     resources.gold = resources.goldCapacity;
@@ -855,9 +1184,8 @@ function hackResources() {
     alert(`Đã làm đầy tài nguyên đến giới hạn (${resources.woodCapacity}), thêm 1000 điểm nghiên cứu và 100 áo giáp!`);
     updateUI();
 }
-// Hàm Hack (Chỉ dùng cho mục đích test)
+
 function hackTrainingAndCrafting() {
-    // Hoàn thành huấn luyện nhà nghiên cứu
     if (training.researcher.inProgress) {
         training.researcher.timeRemaining = 1;
         alert('Huấn luyện Nhà nghiên cứu sẽ hoàn thành ngay lập tức!');
@@ -867,17 +1195,24 @@ function hackTrainingAndCrafting() {
         alert('Đã thêm 1 Nhà nghiên cứu!');
     }
 
-    // Hoàn thành huấn luyện binh sĩ
     if (training.soldier.inProgress) {
         training.soldier.timeRemaining = 1;
         alert('Huấn luyện Binh sĩ sẽ hoàn thành ngay lập tức!');
     } else {
-        workers.soldiers++;
-        workers.idleSoldiers++; // Đảm bảo lính hack cũng rảnh
+        // Tạo một binh sĩ mới với thuộc tính mặc định (hoặc từ nâng cấp nếu muốn hack nâng cấp luôn)
+        const newSoldier = {
+            id: Date.now() + Math.random(),
+            name: `Binh sĩ ${workers.soldiers.length + 1}`, // Đảm bảo binh sĩ hack cũng có tên
+            attack: training.soldier.baseAttack,
+            defense: training.soldier.baseDefense,
+            health: training.soldier.baseHealth,
+            currentHealth: training.soldier.baseHealth
+        };
+        workers.soldiers.push(newSoldier);
+        workers.idleSoldiers++;
         alert('Đã thêm 1 Binh sĩ!');
     }
 
-    // Hoàn thành chế tạo Áo giáp
     if (crafting.armor.inProgress) {
         crafting.armor.timeRemaining = 1;
         alert('Chế tạo Áo giáp sẽ hoàn thành ngay lập tức!');
@@ -891,11 +1226,10 @@ function hackTrainingAndCrafting() {
         alert('Công nghệ Chế tạo Áo Giáp đã được mở khóa!');
     }
 
-    // THÊM LOGIC HOÀN THÀNH NHANH THÁM HIỂM TẠI ĐÂY
     let explorationHackMessage = '';
     for (const type in exploration) {
         if (exploration[type].inProgress) {
-            exploration[type].timeRemaining = 1; // Đặt thời gian còn lại về 1 giây
+            exploration[type].timeRemaining = 1;
             explorationHackMessage += `\nChuyến thám hiểm ${type === 'emptyLand' ? 'Vùng Đất Trống' : 'Thành Trì Lân Cận'} sẽ hoàn thành ngay lập tức!`;
         }
     }
@@ -908,6 +1242,7 @@ function hackTrainingAndCrafting() {
     updateUI();
 }
 
+
 // Biến để lưu trữ ID của setInterval
 let gameInterval;
 
@@ -918,7 +1253,7 @@ function startGameLoop() {
         advanceTrainingResearcher();
         advanceTrainingSoldier();
         advanceCraftingArmor();
-        advanceExploration(); // Thêm vào game loop
+        advanceExploration();
     }, 1000);
 }
 
@@ -935,18 +1270,14 @@ function showMainTab(tabId) {
     document.getElementById(tabId).classList.add('active');
     document.querySelector(`.main-tabs .tab-button[onclick="showMainTab('${tabId}')"]`).classList.add('active');
 
-    // Lấy tham chiếu đến các phần tử tài nguyên và công nhân
     const resourcesSection = document.querySelector('.resources');
     const workersSection = document.querySelector('.workers');
 
-    // Logic ẩn/hiện dựa trên tab được chọn
     if (tabId === 'world-tab') {
-        // Nếu là tab Thế Giới, hiển thị Tài Nguyên và Công Nhân
         if (resourcesSection) resourcesSection.style.display = 'block';
         if (workersSection) workersSection.style.display = 'block';
-        showSubTab('mining-tab'); // Hiển thị tab con Khai Thác mặc định
+        showSubTab('mining-tab');
     } else if (tabId === 'settings-tab') {
-        // Nếu là tab Cài Đặt, ẩn Tài Nguyên và Công Nhân
         if (resourcesSection) resourcesSection.style.display = 'none';
         if (workersSection) workersSection.style.display = 'none';
     }
@@ -965,50 +1296,87 @@ function showSubTab(tabId) {
     document.getElementById(tabId).classList.add('active');
     document.querySelector(`.sub-tabs .sub-tab-button[onclick="showSubTab('${tabId}')"]`).classList.add('active');
 
-    // Cập nhật các giá trị input binh sĩ thám hiểm khi chuyển tab
+    // Cập nhật các giá trị input soldiersToAssign để nó không bị lỗi khi chuyển tab
     if (tabId === 'exploration-tab') {
-        // Đảm bảo số lính trong input khớp với số lính được giao nếu đang trong quá trình thám hiểm
-        if (exploration.emptyLand.inProgress) {
-            document.getElementById('soldiers-empty-land').value = exploration.emptyLand.assignedSoldiers;
-        } else {
-            document.getElementById('soldiers-empty-land').value = 0; // Đặt về 0 nếu không thám hiểm
+        const emptyLandInput = document.getElementById('soldiers-empty-land');
+        if (parseInt(emptyLandInput.value) === 0 || emptyLandInput.value === '') {
+            emptyLandInput.value = 0;
         }
-        if (exploration.fortress.inProgress) {
-            document.getElementById('soldiers-fortress').value = exploration.fortress.assignedSoldiers;
-        } else {
-            document.getElementById('soldiers-fortress').value = 0; // Đặt về 0 nếu không thám hiểm
+        
+        const fortressInput = document.getElementById('soldiers-fortress');
+        if (parseInt(fortressInput.value) === 0 || fortressInput.value === '') {
+            fortressInput.value = 0;
         }
-
-        updateExplorationSuccessRate('emptyLand');
-        updateExplorationSuccessRate('fortress');
     }
 }
-   // Khởi tạo trò chơi
-    window.onload = () => {
-        // Đảm bảo các thuộc tính capacity được khởi tạo nếu chưa có (khi tải save cũ)
-        buildings.warehouse.capacityPerLevel = buildings.warehouse.capacityPerLevel || 500;
-        resources.woodCapacity = resources.woodCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
-        resources.grainCapacity = resources.grainCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
-        resources.goldCapacity = resources.goldCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
-        resources.stoneCapacity = resources.stoneCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
-        resources.ironCapacity = resources.ironCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
 
-        // Đảm bảo workers.idleSoldiers được khởi tạo đúng khi tải game hoặc mới bắt đầu
-        workers.soldiers = workers.soldiers || 0;
-        workers.idleSoldiers = workers.soldiers - exploration.emptyLand.assignedSoldiers - exploration.fortress.assignedSoldiers;
-        if (workers.idleSoldiers < 0) workers.idleSoldiers = 0;
+// Khởi tạo trò chơi
+window.onload = () => {
+    buildings.warehouse.capacityPerLevel = buildings.warehouse.capacityPerLevel || 500;
+    resources.woodCapacity = resources.woodCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
+    resources.grainCapacity = resources.grainCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
+    resources.goldCapacity = resources.goldCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
+    resources.stoneCapacity = resources.stoneCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
+    resources.ironCapacity = resources.ironCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
 
-        updateUI();
-        startGameLoop();
-        showMainTab('world-tab');
+    // Đảm bảo workers.soldiers là một mảng khi game mới khởi tạo
+    workers.soldiers = workers.soldiers || [];
+    // Khôi phục currentHealth và gán tên cho binh sĩ nếu nó bị thiếu
+    workers.soldiers.forEach((s, index) => { // Thêm index vào đây
+        s.currentHealth = s.currentHealth === undefined ? s.health : s.currentHealth;
+        s.name = s.name || `Binh sĩ ${index + 1}`; // Gán tên Binh sĩ 1, Binh sĩ 2, ...
+    });
 
-        // Logic để ẩn phần hack nếu URL chứa '.github.io'
-        const developerHackSection = document.getElementById('developer-hack-section');
-        if (developerHackSection) {
-            if (window.location.hostname.includes('.github.io')) {
-                developerHackSection.style.display = 'none';
-            } else {
-                developerHackSection.style.display = 'block'; // Đảm bảo hiển thị nếu không phải github.io
-            }
+    // Đảm bảo exploration được khởi tạo với cấu trúc mới
+    exploration = exploration || { // Đảm bảo đối tượng exploration gốc không bị ghi đè nếu đã có
+        emptyLand: {
+            inProgress: false, timeRemaining: 0, duration: 120, assignedSoldiers: [],
+            enemyTypes: [{ name: 'Quái vật nhỏ', attack: 5, defense: 2, health: 30 }],
+            activeEnemiesInstances: [], report: []
+        },
+        fortress: {
+            inProgress: false, timeRemaining: 0, duration: 300, assignedSoldiers: [],
+            enemyTypes: [{ name: 'Lính canh', attack: 8, defense: 5, health: 60 }, { name: 'Thủ lĩnh', attack: 15, defense: 10, health: 120 }],
+            activeEnemiesInstances: [], report: []
         }
     };
+    // Đảm bảo các thuộc tính con trong exploration cũng được khởi tạo nếu thiếu khi tải từ save cũ
+    for (const type in exploration) {
+        if (exploration[type].report === undefined) exploration[type].report = [];
+        if (exploration[type].assignedSoldiers === undefined) exploration[type].assignedSoldiers = [];
+        if (exploration[type].activeEnemiesInstances === undefined) exploration[type].activeEnemiesInstances = [];
+        if (exploration[type].enemyTypes === undefined) {
+             if (type === 'emptyLand') {
+                exploration[type].enemyTypes = [{ name: 'Quái vật nhỏ', attack: 5, defense: 2, health: 30 }];
+             } else if (type === 'fortress') {
+                exploration[type].enemyTypes = [{ name: 'Lính canh', attack: 8, defense: 5, health: 60 }, { name: 'Thủ lĩnh', attack: 15, defense: 10, health: 120 }];
+             }
+        }
+        exploration[type].activeEnemiesInstances.forEach(e => { // Khôi phục currentHealth cho kẻ thù
+            e.currentHealth = e.currentHealth === undefined ? e.health : e.currentHealth;
+        });
+    }
+
+    // Tính toán lại idleSoldiers dựa trên tổng lính và lính đang đi thám hiểm
+    const assignedSoldiersCount = exploration.emptyLand.assignedSoldiers.length + exploration.fortress.assignedSoldiers.length;
+    workers.idleSoldiers = workers.soldiers.length - assignedSoldiersCount;
+    if (workers.idleSoldiers < 0) workers.idleSoldiers = 0;
+
+    // Đảm bảo research.unlockedSoldierUpgrades tồn tại
+    research.unlockedSoldierUpgrades = research.unlockedSoldierUpgrades || { attack: 0, defense: 0, health: 0 };
+
+
+    updateUI();
+    startGameLoop();
+    showMainTab('world-tab');
+
+    // Logic để ẩn phần hack nếu URL chứa '.github.io'
+    const developerHackSection = document.getElementById('developer-hack-section');
+    if (developerHackSection) {
+        if (window.location.hostname.includes('.github.io')) {
+            developerHackSection.style.display = 'none';
+        } else {
+            developerHackSection.style.display = 'block';
+        }
+    }
+};

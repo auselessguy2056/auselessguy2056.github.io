@@ -405,6 +405,49 @@ button:disabled {
     transition: width 1s ease-in-out; /* Hiệu ứng chuyển động mượt mà */
 }
 
+.settings-group {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: left; /* Căn chỉnh nội dung trong nhóm cài đặt */
+}
+
+.settings-group h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #555;
+    text-align: center;
+}
+
+.settings-group h4 {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    color: #666;
+}
+
+#achievements-list {
+    list-style: none;
+    padding: 0;
+}
+
+#achievements-list li {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.achievement-locked {
+    color: #999;
+    font-style: italic;
+    /* Có thể thêm icon khóa */
+}
+
+.achievement-unlocked {
+    color: #4CAF50; /* Màu xanh lá cây */
+    font-weight: bold;
+    /* Có thể thêm icon mở khóa/tick */
+}
 .progress-text {
     position: absolute;
     width: 100%;
@@ -412,4 +455,89 @@ button:disabled {
     line-height: 25px; /* Căn giữa chiều dọc */
     color: #333; /* Màu chữ cho countdown */
     font-weight: bold;
+}
+
+/* Achievement Styles */
+#achievements-list {
+    list-style: none;
+    padding: 0;
+}
+
+#achievements-list li {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    display: flex; /* Dùng flexbox để căn chỉnh icon và text */
+    align-items: center;
+}
+
+.achievement-locked {
+    color: #999;
+    font-style: italic;
+}
+
+.achievement-unlocked {
+    color: #4CAF50; /* Màu xanh lá cây */
+    font-weight: bold;
+}
+
+.achievement-icon {
+    display: inline-block;
+    width: 20px; /* Kích thước của icon */
+    height: 20px;
+    margin-left: 10px;
+    background-color: transparent; /* Mặc định trong suốt */
+    border: 1px solid #ccc; /* Viền xám cho trạng thái khóa */
+    border-radius: 50%; /* Hình tròn */
+    position: relative; /* Để căn chỉnh dấu tick */
+    flex-shrink: 0; /* Ngăn icon bị co lại */
+}
+
+.achievement-unlocked-icon {
+    background-color: #4CAF50; /* Nền xanh khi mở khóa */
+    border-color: #4CAF50; /* Viền xanh khi mở khóa */
+}
+
+.achievement-unlocked-icon::before {
+    content: '✓'; /* Dấu tick */
+    color: white; /* Màu trắng cho dấu tick */
+    font-size: 1.2em; /* Kích thước dấu tick */
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Căn giữa dấu tick */
+    line-height: 1; /* Đảm bảo dấu tick không bị đẩy xuống */
+}
+
+/* Optional: Improve styling for save/load textareas and buttons */
+.settings-section textarea {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: monospace; /* Font đơn cách cho dữ liệu */
+    resize: vertical; /* Cho phép thay đổi kích thước chiều dọc */
+}
+
+.settings-section button {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s ease;
+}
+
+.settings-section button:hover {
+    background-color: #0056b3;
+}
+
+.settings-section button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
 }
