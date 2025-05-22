@@ -420,14 +420,23 @@ if (unlockedTechList) {
     });
 }
 
-// Cập nhật trạng thái nút mở khóa công nghệ Áo Giáp
-const unlockArmorCraftingBtn = document.getElementById('unlock-armor-crafting-btn');
-if (unlockArmorCraftingBtn) {
-    // Sử dụng includes để kiểm tra xem tên hiển thị có trong mảng không
-    const armorCraftingDisplayName = technologyDisplayNames['armorCrafting'];
-    unlockArmorCraftingBtn.disabled = research.unlockedTechnologies.includes(armorCraftingDisplayName) || resources.researchPoints < research.armorCraftingCost;
-    document.getElementById('armor-unlock-cost').textContent = research.armorCraftingCost;
-}
+ // MỚI: Cập nhật trạng thái nút "Tạo Áo Giáp"
+    const craftArmorBtn = document.getElementById('craft-armor-btn');
+    if (craftArmorBtn) {
+        const armorCraftingDisplayName = technologyDisplayNames['armorCrafting'];
+        const costIron = crafting.armor.cost.iron; // Lấy chi phí sắt
+
+        // Nút "Tạo Áo Giáp" sẽ BẬT (không disabled) nếu:
+        // 1. Công nghệ "Chế tạo Áo Giáp" đã được mở khóa.
+        // 2. Người chơi có đủ Sắt.
+        // 3. Không có quá trình tạo Áo Giáp nào đang diễn ra.
+        craftArmorBtn.disabled = !research.unlockedTechnologies.includes(armorCraftingDisplayName) ||
+                                 resources.iron < costIron ||
+                                 crafting.armor.inProgress;
+
+        // Cập nhật số lượng áo giáp và chi phí sắt (nếu bạn có ID cho chi phí)
+        document.getElementById('armor').textContent = resources.armor; // Sử dụng resources.armor
+    }
 
 // Cập nhật Thành Tựu
   // Cập nhật Thành Tựu
@@ -1066,7 +1075,7 @@ function unlockTechnology(techName) {
 
 // Bắt đầu tạo Áo Giáp
 function startCraftingArmor() {
-    const isUnlocked = research.unlockedTechnologies.armorCrafting;
+    const isUnlocked = research.unlockedTechnologies.includes("Chế tạo Áo Giáp");
     if (!isUnlocked) {
         alert('Chưa mở khóa công nghệ "Chế tạo Áo Giáp"!');
         return;
@@ -1392,7 +1401,9 @@ function saveGame() {
         research: research,
         crafting: crafting,
         exploration: exploration,
-  	achievements: achievements // THÊM DÒNG NÀY
+  	achievements: achievements, // THÊM DÒNG NÀY
+        resetBonus: resetBonus,
+wonder: wonder
     };
     const jsonString = JSON.stringify(gameState);
 
@@ -1438,6 +1449,8 @@ function loadGame() {
         training = loadedState.training;
         research = loadedState.research;
         crafting = loadedState.crafting;
+resetBonus = loadedState.resetBonus;
+wonder = loadedState.wonder;
            // Đảm bảo achievements được tải, nếu không có thì khởi tạo mặc định
         achievements = loadedState.achievements || {
             warehouseLevel10: false,
@@ -1536,6 +1549,7 @@ research.unlockCosts = loadedState.research.unlockCosts || {
     soldierTraining: 50,
     armorCrafting: 50
 };
+
 
         alert('Game đã được tải thành công!');
         updateUI();
