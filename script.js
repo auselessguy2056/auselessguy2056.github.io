@@ -14,6 +14,34 @@ let resources = {
     ironCapacity: 500
 };
 
+// NEW: Reset Bonus State
+let resetBonus = {
+    multiplier: 1, // Base multiplier, increases after each reset
+    initialWorkersBonus: 0,
+    initialResourcesBonus: 0
+};
+
+
+const technologyDisplayNames = {
+    soldierTraining: 'Huấn luyện Binh sĩ',
+    armorCrafting: 'Chế tạo Áo Giáp',
+    // Thêm các công nghệ khác vào đây nếu bạn có, ví dụ:
+    // 'newTechnologyKey': 'Tên hiển thị công nghệ mới'
+};
+// NEW: Wonder State
+let wonder = {
+    segments: 0,
+    totalSegments: 100,
+    isBuilt: false,
+    segmentCost: {
+        wood: 1000,
+        stone: 1000,
+        iron: 500,
+        gold: 500,
+        researchPoints: 100
+    }
+};
+
 let workers = {
     total: 5,
     idle: 5,
@@ -198,6 +226,34 @@ function updateUI() {
         document.getElementById('library-cost-stone').textContent = buildings.library.upgradeCost.stone;
     }
 
+
+   // NEW: Kỳ Quan
+    document.getElementById('wonder-segments').textContent = wonder.segments;
+    document.getElementById('wonder-wood-cost').textContent = wonder.segmentCost.wood;
+    document.getElementById('wonder-stone-cost').textContent = wonder.segmentCost.stone;
+    document.getElementById('wonder-iron-cost').textContent = wonder.segmentCost.iron;
+    document.getElementById('wonder-gold-cost').textContent = wonder.segmentCost.gold;
+    document.getElementById('wonder-research-cost').textContent = wonder.segmentCost.researchPoints;
+
+    const buildWonderSegmentBtn = document.getElementById('build-wonder-segment-btn');
+    if (wonder.isBuilt) {
+        buildWonderSegmentBtn.disabled = true;
+        buildWonderSegmentBtn.textContent = 'Kỳ Quan Đã Hoàn Thành!';
+    } else {
+        buildWonderSegmentBtn.disabled =
+            resources.wood < wonder.segmentCost.wood ||
+            resources.stone < wonder.segmentCost.stone ||
+            resources.iron < wonder.segmentCost.iron ||
+            resources.gold < wonder.segmentCost.gold ||
+            resources.researchPoints < wonder.segmentCost.researchPoints;
+        buildWonderSegmentBtn.textContent = 'Xây Mảnh Ghép Kỳ Quan';
+    }
+
+    const resetGameBtn = document.getElementById('reset-game-btn');
+    resetGameBtn.disabled = !wonder.isBuilt;
+
+
+
     // Cập nhật thông tin Nhà Kho
     document.getElementById('warehouse-level').textContent = buildings.warehouse.level;
     document.getElementById('warehouse-upgrade-cost-wood').textContent = buildings.warehouse.upgradeCost.wood;
@@ -240,14 +296,14 @@ function updateUI() {
 
     // Cập nhật nút mở khóa công nghệ
     document.getElementById('armor-unlock-cost').textContent = research.armorCraftingCost;
-    const isArmorCraftingUnlocked = research.unlockedTechnologies.includes('Chế tạo Áo Giáp');
+    const isArmorCraftingUnlocked = research.unlockedTechnologies.armorCrafting;
     document.getElementById('unlock-armor-crafting-btn').disabled = !research.canUnlockArmorCrafting || isArmorCraftingUnlocked;
     if (isArmorCraftingUnlocked) {
         document.getElementById('unlock-armor-crafting-btn').textContent = 'Đã mở khóa';
     }
     
     // Cập nhật Lò Rèn
-    const isCraftingArmorUnlocked = research.unlockedTechnologies.includes('Chế tạo Áo Giáp');
+    const isCraftingArmorUnlocked = research.unlockedTechnologies.armorCrafting;
     document.getElementById('craft-armor-btn').disabled = !isCraftingArmorUnlocked || crafting.armor.inProgress || resources.iron < crafting.armor.cost.iron;
 
     document.getElementById('armor-crafting-countdown').textContent = crafting.armor.timeRemaining + ' giây';
@@ -260,25 +316,15 @@ function updateUI() {
         document.getElementById('armor-crafting-progress-container').style.display = 'none';
     }
     
-    // Cập nhật danh sách công nghệ đã mở khóa
-    const unlockedTechList = document.getElementById('unlocked-technologies');
-    unlockedTechList.innerHTML = '';
-    if (research.unlockedTechnologies.length === 0) {
-        unlockedTechList.innerHTML = '<li>Chưa có công nghệ nào được mở khóa.</li>';
-    } else {
-        research.unlockedTechnologies.forEach(tech => {
-            const li = document.createElement('li');
-            li.textContent = tech;
-            unlockedTechList.appendChild(li);
-        });
-    }
-
+ 
     // Cập nhật cho tab Thám Hiểm
     // Tính toán lại idleSoldiers dựa trên tổng lính và lính đang đi thám hiểm
     const assignedSoldiersCount = exploration.emptyLand.assignedSoldiers.length + exploration.fortress.assignedSoldiers.length;
     workers.idleSoldiers = workers.soldiers.length - assignedSoldiersCount;
     document.getElementById('idle-soldiers-explore-empty').textContent = workers.idleSoldiers;
     document.getElementById('idle-soldiers-explore-fortress').textContent = workers.idleSoldiers;
+
+
 
     // Cập nhật lại các input soldiersToAssign để nó không bị lỗi khi chuyển tab
     if (exploration.emptyLand.inProgress) {
@@ -359,6 +405,30 @@ function updateUI() {
             });
         }
     }
+
+
+  // Cập nhật danh sách công nghệ đã mở khóa
+const unlockedTechList = document.getElementById('unlocked-technologies');
+if (unlockedTechList) {
+    unlockedTechList.innerHTML = ''; // Xóa danh sách cũ để cập nhật
+
+    // Lặp qua MẢNG các công nghệ đã mở khóa
+    research.unlockedTechnologies.forEach(techName => { // Dùng forEach cho mảng
+        const li = document.createElement('li');
+        li.textContent = techName; // techName đã là tên hiển thị rồi
+        unlockedTechList.appendChild(li);
+    });
+}
+
+// Cập nhật trạng thái nút mở khóa công nghệ Áo Giáp
+const unlockArmorCraftingBtn = document.getElementById('unlock-armor-crafting-btn');
+if (unlockArmorCraftingBtn) {
+    // Sử dụng includes để kiểm tra xem tên hiển thị có trong mảng không
+    const armorCraftingDisplayName = technologyDisplayNames['armorCrafting'];
+    unlockArmorCraftingBtn.disabled = research.unlockedTechnologies.includes(armorCraftingDisplayName) || resources.researchPoints < research.armorCraftingCost;
+    document.getElementById('armor-unlock-cost').textContent = research.armorCraftingCost;
+}
+
 // Cập nhật Thành Tựu
   // Cập nhật Thành Tựu
     const achievementWarehouseLevel10 = document.getElementById('achievement-warehouse-level-10');
@@ -412,6 +482,25 @@ function addExplorationReport(type, message) {
     updateUI();
 }
 
+function unlockTechnology(techKey) {
+    const cost = research.unlockCosts[techKey];
+    const techDisplayName = technologyDisplayNames[techKey] || techKey; // Lấy tên hiển thị
+
+    // Kiểm tra xem công nghệ đã có trong mảng chưa
+    if (research.unlockedTechnologies.includes(techDisplayName)) {
+        alert('Công nghệ này đã được mở khóa rồi!');
+        return;
+    }
+
+    if (resources.researchPoints >= cost) {
+        resources.researchPoints -= cost;
+        research.unlockedTechnologies.push(techDisplayName); // THÊM TÊN HIỂN THỊ VÀO MẢNG
+        alert(`Đã mở khóa công nghệ "${techDisplayName}"!`);
+        updateUI();
+    } else {
+        alert(`Không đủ điểm nghiên cứu để mở khóa ${techDisplayName}! Cần: ${cost - resources.researchPoints}`);
+    }
+}
 
 // Gửi công nhân đến một khu vực
 function assignWorker(location) {
@@ -439,6 +528,269 @@ function removeWorker(location) {
         alert('Không có công nhân nào ở khu vực này để rút!');
     }
 }
+
+
+// NEW: Build Wonder Segment
+function buildWonderSegment() {
+    if (wonder.isBuilt) {
+        alert('Kỳ quan đã được hoàn thành!');
+        return;
+    }
+
+    const cost = wonder.segmentCost;
+    if (resources.wood >= cost.wood &&
+        resources.stone >= cost.stone &&
+        resources.iron >= cost.iron &&
+        resources.gold >= cost.gold &&
+        resources.researchPoints >= cost.researchPoints) {
+
+        resources.wood -= cost.wood;
+        resources.stone -= cost.stone;
+        resources.iron -= cost.iron;
+        resources.gold -= cost.gold;
+        resources.researchPoints -= cost.researchPoints;
+
+        wonder.segments++;
+        alert(`Đã xây dựng thành công mảnh ghép Kỳ quan thứ ${wonder.segments}!`);
+
+        if (wonder.segments >= wonder.totalSegments) {
+            wonder.isBuilt = true;
+            alert('Chúc mừng! Kỳ quan đã hoàn thành!');
+        }
+        updateUI();
+    } else {
+        let missing = [];
+        if (resources.wood < cost.wood) missing.push(`Gỗ: ${cost.wood - resources.wood}`);
+        if (resources.stone < cost.stone) missing.push(`Đá: ${cost.stone - resources.stone}`);
+        if (resources.iron < cost.iron) missing.push(`Sắt: ${cost.iron - resources.iron}`);
+        if (resources.gold < cost.gold) missing.push(`Vàng: ${cost.gold - resources.gold}`);
+        if (resources.researchPoints < cost.researchPoints) missing.push(`Điểm Nghiên Cứu: ${cost.researchPoints - resources.researchPoints}`);
+        alert(`Không đủ tài nguyên để xây mảnh ghép Kỳ quan! Cần thêm: ${missing.join(', ')}`);
+    }
+}
+
+
+// NEW: Reset Game
+function resetGame() {
+    if (!wonder.isBuilt) {
+        alert('Bạn phải hoàn thành Kỳ quan trước khi tái thiết thế giới!');
+        return;
+    }
+
+    if (!confirm('Bạn có chắc chắn muốn tái thiết thế giới? Mọi tiến độ sẽ bị mất, nhưng bạn sẽ nhận được phần thưởng cho lần chơi tiếp theo!')) {
+        return;
+    }
+
+    // Increase bonus for the next game
+   resetBonus.multiplier += 0.1; // Example: 10% bonus each reset
+    resetBonus.initialWorkersBonus += 1; // Example: 1 extra worker each reset
+    resetBonus.initialResourcesBonus += 50; // Example: 50 extra of each base resource
+
+    // Reset game state
+    resources = {
+        wood: resetBonus.initialResourcesBonus,
+        grain: resetBonus.initialResourcesBonus,
+        gold: resetBonus.initialResourcesBonus,
+        stone: resetBonus.initialResourcesBonus,
+        iron: resetBonus.initialResourcesBonus,
+        researchPoints: resetBonus.initialResourcesBonus,
+        armor: 0,
+        woodCapacity: 500,
+        grainCapacity: 500,
+        goldCapacity: 500,
+        stoneCapacity: 500,
+        ironCapacity: 500
+    };
+
+    workers = {
+        total: 5 + resetBonus.initialWorkersBonus,
+        idle: 5 + resetBonus.initialWorkersBonus,
+        assigned: {
+            forest: 0,
+            farm: 0,
+            mine: 0,
+            quarry: 0,
+            ironMine: 0
+        },
+        researchers: 0,
+        idleResearchers: 0,
+        assignedResearchers: 0,
+        soldiers: [],
+        idleSoldiers: 0
+    };
+
+    buildings = {
+        house: {
+            level: 1,
+            maxWorkers: 5 + resetBonus.initialWorkersBonus,
+            upgradeCost: {
+                wood: 50,
+                stone: 30
+            }
+        },
+        library: {
+            level: 0,
+            maxResearchers: 0,
+            buildCost: {
+                wood: 100,
+                stone: 70
+            },
+            upgradeCost: {
+                wood: 50,
+                stone: 40
+            }
+        },
+        warehouse: {
+            level: 1,
+            capacityPerLevel: 500,
+            upgradeCost: {
+                wood: 150,
+                stone: 100
+            },
+            baseCapacity: 500
+        },
+        barracks: {
+            level: 0,
+            maxSoldiers: 0,
+            buildCost: {
+                wood: 200,
+                stone: 150
+            },
+            upgradeCost: {
+                wood: 100,
+                stone: 80
+            }
+        }
+    };
+
+    training = {
+        researcher: {
+            inProgress: false,
+            timeRemaining: 0,
+            cost: {
+                grain: 10,
+                gold: 5
+            },
+            duration: 60
+        },
+        soldier: {
+            inProgress: false,
+            timeRemaining: 0,
+            cost: {
+                grain: 20,
+                gold: 15,
+                armor: 1
+            },
+            duration: 300
+        }
+    };
+
+    research = {
+        pointsPerResearcher: 1,
+        woodEfficiency: {
+            level: 0,
+            baseCost: 10,
+            costMultiplier: 1.5,
+            productionBonus: 0.1
+        },
+        grainEfficiency: {
+            level: 0,
+            baseCost: 10,
+            costMultiplier: 1.5,
+            productionBonus: 0.1
+        },
+        goldEfficiency: {
+            level: 0,
+            baseCost: 10,
+            costMultiplier: 1.5,
+            productionBonus: 0.1
+        },
+        stoneEfficiency: {
+            level: 0,
+            baseCost: 10,
+            costMultiplier: 1.5,
+            productionBonus: 0.1
+        },
+        ironEfficiency: {
+            level: 0,
+            baseCost: 10,
+            costMultiplier: 1.5,
+            productionBonus: 0.1
+        },
+        unlockedTechnologies: [], // Reset về mảng rỗng
+        unlockCosts: {
+            soldierTraining: 50,
+            armorCrafting: 50
+        },
+          armorCraftingCost: 50,
+        unlockedSoldierUpgrades: {
+            attack: 0,
+            defense: 0,
+            health: 0
+        }
+    };
+
+    crafting = {
+        armor: {
+            inProgress: false,
+            timeRemaining: 0,
+            cost: {
+                iron: 50
+            },
+            duration: 60,
+            count: 0
+        }
+    };
+
+    exploration = {
+        emptyLand: {
+            inProgress: false,
+            timeRemaining: 0,
+            duration: 300,
+            assignedSoldiers: [],
+            activeEnemiesInstances: [],
+            enemyTypes: [
+                { name: 'Quái vật nhỏ', baseHealth: 50, attack: 10, defense: 5, rewards: { wood: 20, grain: 10 } },
+                { name: 'Người sói', baseHealth: 80, attack: 15, defense: 8, rewards: { wood: 30, gold: 15 } }
+            ],
+            report: []
+        },
+        fortress: {
+            inProgress: false,
+            timeRemaining: 0,
+            duration: 600,
+            assignedSoldiers: [],
+            activeEnemiesInstances: [],
+            enemyTypes: [
+                { name: 'Lính canh', baseHealth: 100, attack: 20, defense: 10, rewards: { stone: 50, iron: 20 } },
+                { name: 'Thủ lĩnh', baseHealth: 200, attack: 30, defense: 15, rewards: { gold: 100, iron: 50 } }
+            ],
+            report: []
+        }
+    };
+
+    wonder = {
+        segments: 0,
+        totalSegments: 100,
+        isBuilt: false,
+        segmentCost: {
+            wood: 1000,
+            stone: 1000,
+            iron: 500,
+            gold: 500,
+            researchPoints: 100
+        }
+    };
+
+    // Apply the bonus multiplier to relevant starting stats
+    // This is already handled by including resetBonus.initialWorkersBonus and resetBonus.initialResourcesBonus
+    // directly in the initial state definitions above.
+
+    alert(`Thế giới đã được tái thiết! Bạn nhận được bonus cho lần chơi tiếp theo (x${resetBonus.multiplier.toFixed(1)} tài nguyên ban đầu, +${resetBonus.initialWorkersBonus} công nhân)!`);
+    updateUI();
+}
+
+
 
 // Xây dựng công trình (nếu có)
 function buildBuilding(buildingName) {
@@ -683,7 +1035,7 @@ function gatherResources() {
     resources.researchPoints += workers.assignedResearchers * 1;
     resources.researchPoints = Math.floor(resources.researchPoints);
 
-    if (resources.researchPoints >= research.armorCraftingCost && !research.unlockedTechnologies.includes('Chế tạo Áo Giáp')) {
+    if (resources.researchPoints >= research.armorCraftingCost && !research.unlockedTechnologies.includes("Chế tạo Áo Giáp")) {
         research.canUnlockArmorCrafting = true;
     } else {
         research.canUnlockArmorCrafting = false;
@@ -696,7 +1048,7 @@ function gatherResources() {
 function unlockTechnology(techName) {
     if (techName === 'armorCrafting') {
         if (resources.researchPoints >= research.armorCraftingCost) {
-            const isUnlocked = research.unlockedTechnologies.includes('Chế tạo Áo Giáp');
+            const isUnlocked = research.unlockedTechnologies.armorCrafting;
             if (!isUnlocked) {
                 resources.researchPoints -= research.armorCraftingCost;
                 research.unlockedTechnologies.push('Chế tạo Áo Giáp');
@@ -714,7 +1066,7 @@ function unlockTechnology(techName) {
 
 // Bắt đầu tạo Áo Giáp
 function startCraftingArmor() {
-    const isUnlocked = research.unlockedTechnologies.includes('Chế tạo Áo Giáp');
+    const isUnlocked = research.unlockedTechnologies.armorCrafting;
     if (!isUnlocked) {
         alert('Chưa mở khóa công nghệ "Chế tạo Áo Giáp"!');
         return;
@@ -1160,6 +1512,30 @@ function loadGame() {
         const isCraftingArmorUnlocked = research.unlockedTechnologies.includes('Chế tạo Áo Giáp');
         document.getElementById('craft-armor-btn').disabled = !isCraftingArmorUnlocked || crafting.armor.inProgress || resources.iron < crafting.armor.cost.iron;
 
+// Xử lý unlockedTechnologies: Chuyển đổi từ object sang array nếu cần
+if (loadedState.research && loadedState.research.unlockedTechnologies !== undefined) {
+    if (Array.isArray(loadedState.research.unlockedTechnologies)) {
+        research.unlockedTechnologies = loadedState.research.unlockedTechnologies;
+    } else if (typeof loadedState.research.unlockedTechnologies === 'object' && loadedState.research.unlockedTechnologies !== null) {
+        // Đây là cấu trúc object cũ, cần chuyển đổi
+        research.unlockedTechnologies = [];
+        for (const techKey in loadedState.research.unlockedTechnologies) {
+            if (loadedState.research.unlockedTechnologies.hasOwnProperty(techKey) && loadedState.research.unlockedTechnologies[techKey]) {
+                // Thêm tên hiển thị vào mảng
+                research.unlockedTechnologies.push(technologyDisplayNames[techKey] || techKey);
+            }
+        }
+    }
+} else {
+    // Nếu không có dữ liệu hoặc không xác định, khởi tạo là mảng rỗng
+    research.unlockedTechnologies = [];
+}
+
+// Đảm bảo unlockCosts tồn tại
+research.unlockCosts = loadedState.research.unlockCosts || {
+    soldierTraining: 50,
+    armorCrafting: 50
+};
 
         alert('Game đã được tải thành công!');
         updateUI();

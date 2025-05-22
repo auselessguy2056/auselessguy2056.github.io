@@ -42,6 +42,7 @@
                 <button class="sub-tab-button" onclick="showSubTab('military-tab')">Quân Đội</button>
                 <button class="sub-tab-button" onclick="showSubTab('blacksmith-tab')">Lò Rèn</button>
                 <button class="sub-tab-button" onclick="showSubTab('exploration-tab')">Thám Hiểm</button>
+ 		<button class="sub-tab-button" onclick="showSubTab('wonder-tab')">Kỳ Quan</button>
             </div>
 
             <div id="mining-tab" class="sub-tab-content active">
@@ -249,6 +250,25 @@
                 </div>
             </div>
 
+ <div id="wonder-tab" class="sub-tab-content">
+                <h2>Kỳ Quan</h2>
+                <div class="wonder-construction">
+                    <p>Mảnh ghép đã hoàn thành: <span id="wonder-segments">0</span> / 100</p>
+                    <p>Chi phí xây dựng 1 mảnh ghép:</p>
+                    <ul>
+                        <li>Gỗ: <span id="wonder-wood-cost">1000</span></li>
+                        <li>Đá: <span id="wonder-stone-cost">1000</span></li>
+                        <li>Sắt: <span id="wonder-iron-cost">500</span></li>
+                        <li>Vàng: <span id="wonder-gold-cost">500</span></li>
+                        <li>Điểm Nghiên Cứu: <span id="wonder-research-cost">100</span></li>
+                    </ul>
+                    <button id="build-wonder-segment-btn" onclick="buildWonderSegment()">Xây Mảnh Ghép Kỳ Quan</button>
+                    <p style="margin-top: 20px;">Khi Kỳ quan hoàn thành, bạn có thể tái thiết thế giới để bắt đầu lại với những phần thưởng đặc biệt!</p>
+                    <button id="reset-game-btn" onclick="resetGame()" disabled>Tái Thiết Thế Giới (Reset Game)</button>
+                </div>
+            </div>
+
+
         </div>
 
      <div id="settings-tab" class="tab-content">
@@ -270,7 +290,7 @@
 
     <div class="settings-group"> <h3>Đóng Góp</h3>
         <div class="settings-section">
-            <p>Tác giả: auselessguy2056@gmail.com</p>
+            <p>Tác giả: auselessguy2056@gmail.com. This is also his paypal account</p>
         </div>
     </div>
 
