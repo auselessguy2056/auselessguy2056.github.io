@@ -153,8 +153,8 @@
     <div class="resource-section" style="background-color: #e3f2fd; border-color: #90caf9;">
         <h2>Game Stats</h2>
         <p>Time Played: <span id="timePlayed">00:00:00</span></p>
-        <button id="saveGameBtn">Save Game</button>
-        <button id="loadGameBtn">Load Game</button>
+        <button id="saveGameBtn">Lưu Game</button>
+        <button id="loadGameBtn">Tải Game</button>
     </div>
 
     <hr>
@@ -306,7 +306,7 @@
         <p>Omniscience per second: <span id="omnisciencePerSecond">0</span></p>
         <button id="buyOmniscience">Convert 1000 Multiverse to 1 Omniscience</button>
         <button class="generate-lore-btn" data-resource="Toàn Tri">Tạo Lore ✨</button>
-        <div id="omniscienceLore" class="lore-display"></div>
+        <div id="omniscienceLore" class = "lore-display"></div>
     </div>
 
     <hr>
@@ -401,6 +401,12 @@
     <script>
         // Game State: Defines all resources and their properties
         let resources = {
+
+            timePlayed: { // NEW RESOURCE: The Architect's Will
+                hour: 0,
+                minute: 0,
+                second: 0
+                        },
             wood: {
                 count: 0,
                 perSecond: 0,
@@ -548,6 +554,9 @@
                 perUnitProduction: 1
             }
         };
+
+        // NEW: Variable to store the start time of the game for saving/loading
+        let gameStartTime = Date.now();
 
         // DOM Elements: References to all interactive and display elements
         const woodCountSpan = document.getElementById('woodCount');
@@ -887,7 +896,11 @@
          */
         function saveGame() {
             try {
-                localStorage.setItem('incrementalGameSave', JSON.stringify(resources));
+                // Store both resources and gameStartTime
+                const saveData = {
+                    resources: resources
+                };
+                localStorage.setItem('incrementalGameSave', JSON.stringify(saveData));
                 alert('Tiến độ trò chơi đã được lưu!');
             } catch (e) {
                 console.error("Lỗi khi lưu game:", e);
@@ -902,8 +915,10 @@
             try {
                 const savedData = localStorage.getItem('incrementalGameSave');
                 if (savedData) {
-                    const loadedResources = JSON.parse(savedData);
-                    // Merge loaded data with existing resources, retaining default values if new properties are added later
+                    const parsedData = JSON.parse(savedData);
+
+                    // Load resources
+                    const loadedResources = parsedData.resources;
                     for (const key in resources) {
                         if (loadedResources[key] !== undefined) {
                             Object.assign(resources[key], loadedResources[key]);
@@ -1140,9 +1155,6 @@
 
 
         // --- Game Loop ---
-        // Store the game start time
-        const gameStartTime = Date.now();
-
         /**
          * Formats milliseconds into HH:MM:SS string.
          * @param {number} ms - Milliseconds to format.
@@ -1160,7 +1172,23 @@
 
             return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
         }
+        function updateTimePlayed() {
+        
+      
+       resources.timePlayed.second += 1;
+       if(  resources.timePlayed.second == 60)
+{
+    resources.timePlayed.second = 0;
+     resources.timePlayed.minute += 1;
+}
+      if(  resources.timePlayed.minute == 60)
+{
+    resources.timePlayed.minute = 0;
+     resources.timePlayed.hour += 1;
+}
+       timePlayedSpan.textContent =    resources.timePlayed.hour.toString() + ":" + resources.timePlayed.minute.toString() + ":" +      resources.timePlayed.second.toString();
 
+}
         /**
          * The main game loop that updates resources based on their per-second production.
          * Runs every 100 milliseconds.
@@ -1191,14 +1219,15 @@
 
             // Update Time Played
             const currentTime = Date.now();
-            const elapsedTime = currentTime - gameStartTime;
-            timePlayedSpan.textContent = formatTime(elapsedTime);
+            const elapsedTime = resources.timePlayed;
+       //     timePlayedSpan.textContent = formatTime(elapsedTime);
 
             updateDisplay(); // Update the UI after resources are calculated
         }
 
         // Start the game loop
         setInterval(gameLoop, 100);
+setInterval(updateTimePlayed,1000);
 
         // Initial display update and load game when the page loads
         updateDisplay();
