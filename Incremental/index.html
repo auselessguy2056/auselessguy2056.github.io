@@ -153,8 +153,8 @@
     <div class="resource-section" style="background-color: #e3f2fd; border-color: #90caf9;">
         <h2>Game Stats</h2>
         <p>Time Played: <span id="timePlayed">00:00:00</span></p>
-        <button id="saveGameBtn">Lưu Game</button>
-        <button id="loadGameBtn">Tải Game</button>
+        <button id="saveGameBtn">Save Game</button>
+        <button id="loadGameBtn">Load Game</button>
     </div>
 
     <hr>
@@ -560,7 +560,7 @@
         const woodPerSecondCostSpan = document.getElementById('woodPerSecondCost');
 
         const stoneCountSpan = document.getElementById('stoneCount');
-        const stonePerSecondSpan = document = document.getElementById('stonePerSecond');
+        const stonePerSecondSpan = document.getElementById('stonePerSecond');
         const buyStoneButton = document.getElementById('buyStone');
 
         const ironCountSpan = document.getElementById('ironCount');
@@ -1117,14 +1117,26 @@
         // Event listener for the critical feedback close button
         closeCriticalFeedbackButton.addEventListener('click', dismissCriticalFeedback);
 
-        // Event listeners for Lore buttons
-        loreButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const resourceName = button.dataset.resource;
-                const loreDisplayElement = loreDisplays[resourceName];
-                generateLore(resourceName, loreDisplayElement);
+        // Conditional display for Lore buttons
+        const isGitHubPages = window.location.hostname.includes('github.io') || window.location.hostname.includes('github.com');
+        if (isGitHubPages) {
+            loreButtons.forEach(button => {
+                button.style.display = 'none'; // Hide the lore buttons
+                const loreDisplayElement = loreDisplays[button.dataset.resource];
+                if (loreDisplayElement) {
+                    loreDisplayElement.style.display = 'none'; // Hide the lore display area too
+                }
             });
-        });
+        } else {
+            // Only add event listeners if not on GitHub Pages (i.e., when buttons are visible)
+            loreButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const resourceName = button.dataset.resource;
+                    const loreDisplayElement = loreDisplays[resourceName];
+                    generateLore(resourceName, loreDisplayElement);
+                });
+            });
+        }
 
 
         // --- Game Loop ---
