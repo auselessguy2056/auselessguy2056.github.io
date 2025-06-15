@@ -1699,6 +1699,40 @@ function showSubTab(tabId) {
         }
     }
 }
+// =====================================
+   // Browser code
+   function downloadJsonAsText(jsonData, filename) {
+          const gameState = {
+        resources: resources,
+        workers: workers,
+        buildings: buildings,
+        training: training,
+        research: research,
+        crafting: crafting,
+        exploration: exploration,
+  	achievements: achievements, // THÊM DÒNG NÀY
+        resetBonus: resetBonus,
+wonder: wonder
+    };
+    const jsonString = JSON.stringify(gameState);
+
+    const encodedData = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g,
+        function toSolidBytes(match, p1) {
+            return String.fromCharCode('0x' + p1);
+        }));
+    document.getElementById('save-game-data').value = encodedData;
+
+       const password = JSON.stringify(encodedData).replace(/\"/g, "") ;
+       const blob = new Blob([password], { type: 'text/plain' });
+       const url = URL.createObjectURL(blob);
+       const link = document.createElement('a');
+       link.href = url;
+       link.download = filename;
+       document.body.appendChild(link);
+       link.click();
+       document.body.removeChild(link);
+       URL.revokeObjectURL(url);
+   }
 
 // Khởi tạo trò chơi
 window.onload = () => {

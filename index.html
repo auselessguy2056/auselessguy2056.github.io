@@ -278,14 +278,24 @@
         <div class="settings-section">
             <h4>Lưu Game</h4>
             <textarea id="save-game-data" rows="5" cols="50" readonly></textarea>
-            <button onclick="copySaveGameData()">Sao chép dữ liệu</button> 
+            <button onclick="downloadJsonAsText(document.getElementById('save-game-data').value,    datetime + ' gameKhaiThacTaiNguyen.txt')">Tạo File Savegame</button> 
             <button onclick="saveGame()">Lưu Game</button>
         </div>
         <div class="settings-section">
             <h4>Tải Game</h4>
             <textarea id="load-game-data" rows="5" cols="50" placeholder="Dán dữ liệu game vào đây"></textarea>
             <button onclick="loadGame()">Tải Game</button>
-        </div>
+            
+<script>
+  // Get current date and time
+  var now = new Date();
+  var datetime = now.toLocaleString();
+
+  // Insert date and time into HTML
+ // document.getElementById("datetime").innerHTML = datetime;
+</script>
+         
+          </div>
     </div>
 
     <div class="settings-group"> <h3>Đóng Góp</h3>
