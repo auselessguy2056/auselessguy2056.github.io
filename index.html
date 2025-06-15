@@ -1,312 +1,1197 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Khai Thác Tài Nguyên</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Ultimate Incremental Resource Game</title>
+    <style>
+        /* Basic CSS for styling the game interface */
+        body {
+            font-family: 'Inter', Arial, sans-serif; /* Using Inter font as per instructions */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+            background-color: #e0f2f7; /* Lighter blue background */
+            color: #263238; /* Darker text */
+            line-height: 1.6;
+        }
+
+        h1 {
+            color: #007bff; /* Blue heading */
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .resource-section {
+            background-color: #ffffff;
+            border: 1px solid #b3e5fc; /* Light blue border */
+            border-radius: 12px; /* More rounded corners */
+            padding: 25px;
+            margin: 15px 0;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+            text-align: center;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .resource-section:hover {
+            transform: translateY(-3px); /* Slight lift on hover */
+        }
+
+        h2 {
+            color: #0056b3; /* Darker blue for resource titles */
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        button {
+            background-color: #2196f3; /* Medium blue button */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px; /* Rounded buttons */
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            background-color: #1976d2; /* Darker blue on hover */
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        hr {
+            border: 0;
+            height: 2px; /* Thicker HR */
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
+            width: 70%;
+            margin: 30px 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .resource-section {
+                width: 95%;
+                padding: 18px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            h2 {
+                font-size: 1.4em;
+            }
+            button {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+        }
+        /* Critical hit feedback */
+        .critical-feedback {
+            color: #ff0000; /* Red color for critical hit */
+            font-weight: bold;
+            position: relative; /* Changed to relative to better position close button */
+            top: 5px; /* Adjust vertical position */
+            display: flex; /* Use flexbox for alignment */
+            align-items: center; /* Vertically align items */
+            justify-content: center; /* Center horizontally */
+            opacity: 0;
+            transition: opacity 0.3s ease-out; /* Only fade in/out, no transform transition for critical text */
+        }
+        .critical-feedback .close-btn {
+            background: none;
+            border: none;
+            color: #ff0000; /* Red color for close button */
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px; /* Space between text and button */
+            padding: 0 5px;
+            line-height: 1; /* Adjust line height for better alignment */
+            transition: color 0.2s ease;
+        }
+        .critical-feedback .close-btn:hover {
+            color: #cc0000;
+        }
+
+        /* Lore display styles */
+        .lore-display {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background-color: #e8f5e9; /* Light green for lore */
+            border: 1px solid #c8e6c9; /* Green border */
+            border-radius: 8px;
+            font-style: italic;
+            color: #388e3c; /* Darker green text */
+            font-size: 0.95em;
+            text-align: left;
+            min-height: 30px; /* Ensure space even if empty */
+            display: flex;
+            align-items: center; /* Vertically center content */
+            justify-content: center; /* Horizontally center content */
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Trò Chơi Khai Thác Tài Nguyên</h1>
+    <h1>Ultimate Incremental Resource Game</h1>
 
-        <div class="resources">
-            <h2>Tài Nguyên</h2>
-            <p>Gỗ: <span id="wood">0 / 500</span></p>
-            <p>Lúa: <span id="grain">0 / 500</span></p>
-            <p>Vàng: <span id="gold">0 / 500</span></p>
-            <p>Đá: <span id="stone">0 / 500</span></p>
-            <p>Sắt: <span id="iron">0 / 500</span></p>
-            <p>Điểm Nghiên Cứu: <span id="research-points">0</span></p>
-            <p>Áo Giáp: <span id="armor">0</span></p>
-        </div>
-
-        <div class="workers">
-            <h2>Công Nhân</h2>
-            <p>Tổng số công nhân: <span id="total-workers">5</span></p>
-            <p>Công nhân rảnh: <span id="idle-workers">5</span></p>
-            <p>Nhà nghiên cứu: <span id="researchers">0</span></p>
-            <p>Binh sĩ: <span id="soldiers">0</span></p>
-        </div>
-
-        <div class="main-tabs">
-            <button class="tab-button active" onclick="showMainTab('world-tab')">Thế Giới</button>
-            <button class="tab-button" onclick="showMainTab('settings-tab')">Cài Đặt</button>
-        </div>
-
-        <div id="world-tab" class="tab-content active">
-            <div class="sub-tabs">
-                <button class="sub-tab-button active" onclick="showSubTab('mining-tab')">Khai Thác</button>
-                <button class="sub-tab-button" onclick="showSubTab('buildings-tab')">Công Trình</button>
-                <button class="sub-tab-button" onclick="showSubTab('training-research-tab')">Huấn Luyện & Nghiên Cứu</button>
-                <button class="sub-tab-button" onclick="showSubTab('military-tab')">Quân Đội</button>
-                <button class="sub-tab-button" onclick="showSubTab('blacksmith-tab')">Lò Rèn</button>
-                <button class="sub-tab-button" onclick="showSubTab('exploration-tab')">Thám Hiểm</button>
- 		<button class="sub-tab-button" onclick="showSubTab('wonder-tab')">Kỳ Quan</button>
-            </div>
-
-            <div id="mining-tab" class="sub-tab-content active">
-                <h2>Khu Vực Khai Thác</h2>
-                <div class="locations">
-                    <div class="location-item">
-                        <h3>Rừng (Gỗ)</h3>
-                        <p>Công nhân đang làm: <span id="workers-forest">0</span></p>
-                        <div class="button-group">
-                            <button onclick="assignWorker('forest')">Gửi công nhân</button>
-                            <button onclick="removeWorker('forest')">Rút công nhân</button>
-                        </div>
-                    </div>
-                    <div class="location-item">
-                        <h3>Nông Trại (Lúa)</h3>
-                        <p>Công nhân đang làm: <span id="workers-farm">0</span></p>
-                        <div class="button-group">
-                            <button onclick="assignWorker('farm')">Gửi công nhân</button>
-                            <button onclick="removeWorker('farm')">Rút công nhân</button>
-                        </div>
-                    </div>
-                    <div class="location-item">
-                        <h3>Mỏ Vàng (Vàng)</h3>
-                        <p>Công nhân đang làm: <span id="workers-mine">0</span></p>
-                        <div class="button-group">
-                            <button onclick="assignWorker('mine')">Gửi công nhân</button>
-                            <button onclick="removeWorker('mine')">Rút công nhân</button>
-                        </div>
-                    </div>
-                    <div class="location-item">
-                        <h3>Quặng Đá (Đá)</h3>
-                        <p>Công nhân đang làm: <span id="workers-quarry">0</span></p>
-                        <div class="button-group">
-                            <button onclick="assignWorker('quarry')">Gửi công nhân</button>
-                            <button onclick="removeWorker('quarry')">Rút công nhân</button>
-                        </div>
-                    </div>
-                    <div class="location-item">
-                        <h3>Mỏ Sắt (Sắt)</h3>
-                        <p>Công nhân đang làm: <span id="workers-iron-mine">0</span></p>
-                        <div class="button-group">
-                            <button onclick="assignWorker('ironMine')">Gửi công nhân</button>
-                            <button onclick="removeWorker('ironMine')">Rút công nhân</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="buildings-tab" class="sub-tab-content">
-                <h2>Công Trình</h2>
-                <div class="building-grid">
-                    <div class="building-item">
-                        <h3>Nhà ở</h3>
-                        <p>Cấp độ: <span id="house-level">1</span></p>
-                        <p>Công nhân tối đa: <span id="house-max-workers">5</span></p>
-                        <p>Chi phí nâng cấp:</p>
-                        <ul>
-                            <li>Gỗ: <span id="house-upgrade-cost-wood">50</span></li>
-                            <li>Đá: <span id="house-upgrade-cost-stone">30</span></li>
-                        </ul>
-                        <button onclick="upgradeBuilding('house')">Nâng cấp</button>
-                    </div>
-                    <div class="building-item">
-                        <h3>Thư Viện</h3>
-                        <p>Cấp độ: <span id="library-level">0</span></p>
-                        <p>Nhà nghiên cứu tối đa: <span id="library-max-researchers">0</span></p>
-                        <p id="library-cost-label">Chi phí xây dựng:</p>
-                        <ul>
-                            <li>Gỗ: <span id="library-cost-wood">100</span></li>
-                            <li>Đá: <span id="library-cost-stone">70</span></li>
-                        </ul>
-                        <button id="build-library-btn" onclick="buildBuilding('library')">Xây dựng</button>
-                        <button id="upgrade-library-btn" style="display:none;" onclick="upgradeBuilding('library')">Nâng cấp</button>
-                    </div>
-                    <div class="building-item">
-                        <h3>Nhà Kho</h3>
-                        <p>Cấp độ: <span id="warehouse-level">1</span></p>
-                        <p>Chi phí nâng cấp:</p>
-                        <ul>
-                            <li>Gỗ: <span id="warehouse-upgrade-cost-wood">150</span></li>
-                            <li>Đá: <span id="warehouse-upgrade-cost-stone">100</span></li>
-                        </ul>
-                        <button onclick="upgradeBuilding('warehouse')">Nâng cấp</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="training-research-tab" class="sub-tab-content">
-                <h2>Huấn Luyện & Nghiên Cứu</h2>
-                <div class="training-research-grid">
-                    <div class="training-item">
-                        <h3>Huấn Luyện Nhà Nghiên Cứu</h3>
-                        <p>Công nhân rảnh: <span id="idle-workers-for-researcher-training">5</span></p>
-                        <p>Chi phí huấn luyện:</p>
-                        <ul>
-                            <li>Lúa: 10</li>
-                            <li>Vàng: 5</li>
-                        </ul>
-                        <button id="train-researcher-btn" onclick="startTrainingResearcher()">Huấn luyện (60s)</button>
-                        <div class="progress-bar-container" id="researcher-training-progress-container" style="display:none;">
-                            <div class="progress-bar" id="researcher-training-progress" style="width:0%;"></div>
-                            <span class="progress-text" id="researcher-training-countdown">0 giây</span>
-                        </div>
-                    </div>
-
-                    <div class="research-item">
-                        <h3>Phân Bổ Nhà Nghiên Cứu</h3>
-                        <p>Nhà nghiên cứu rảnh: <span id="idle-researchers">0</span></p>
-                        <p>Nhà nghiên cứu đang làm việc: <span id="assigned-researchers">0</span></p>
-                        <div class="button-group">
-                            <button onclick="assignResearcher()">Gửi</button>
-                            <button onclick="removeResearcher()">Rút</button>
-                        </div>
-                    </div>
-
-                    <div class="research-item">
-                        <h3>Nghiên Cứu</h3>
-                        <p>Điểm Nghiên Cứu mỗi giây: <span id="research-points-per-sec">0</span></p>
-                        <p>Tổng điểm nghiên cứu: <span id="total-research-points">0</span></p>
-                        <h4>Công nghệ cần mở khóa:</h4>
-                        <ul>
-                            <li>Chế tạo Áo Giáp: <span id="armor-unlock-cost">50</span> điểm</li>
-                        </ul>
-                        <button id="unlock-armor-crafting-btn" onclick="unlockTechnology('armorCrafting')" disabled>Mở khóa Chế tạo Áo Giáp</button>
-                        <h4>Công nghệ đã mở khóa:</h4>
-                        <ul id="unlocked-technologies">
-                            </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div id="military-tab" class="sub-tab-content">
-                <h2>Quân Đội</h2>
-                <div class="training-research-grid">
-                    <div class="training-item">
-                        <h3>Huấn Luyện Binh Sĩ</h3>
-                        <p>Công nhân rảnh: <span id="idle-workers-for-soldier-training">5</span></p>
-                        <p>Chi phí huấn luyện:</p>
-                        <ul>
-                            <li>Lúa: 20</li>
-                            <li>Vàng: 15</li>
-                            <li>Áo Giáp: 1</li>
-                        </ul>
-                        <button id="train-soldier-btn" onclick="startTrainingSoldier()">Huấn luyện (300s)</button>
-                        <div class="progress-bar-container" id="soldier-training-progress-container" style="display:none;">
-                            <div class="progress-bar" id="soldier-training-progress" style="width:0%;"></div>
-                            <span class="progress-text" id="soldier-training-countdown">0 giây</span>
-                        </div>
-                        <p>Binh sĩ: <span id="current-soldiers-info">0</span></p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="blacksmith-tab" class="sub-tab-content">
-                <h2>Lò Rèn</h2>
-                <div class="crafting-grid">
-                    <div class="crafting-item">
-                        <h3>Tạo Áo Giáp</h3>
-                        <p>Chi phí:</p>
-                        <ul>
-                            <li>Sắt: 50</li>
-                        </ul>
-                        <button id="craft-armor-btn" onclick="startCraftingArmor()" disabled>Tạo Áo Giáp (60s)</button>
-                        <div class="progress-bar-container" id="armor-crafting-progress-container" style="display:none;">
-                            <div class="progress-bar" id="armor-crafting-progress" style="width:0%;"></div>
-                            <span class="progress-text" id="armor-crafting-countdown">0 giây</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="exploration-tab" class="sub-tab-content">
-                <h2>Thám Hiểm</h2>
-                <div class="exploration-grid">
-                    <div class="exploration-item">
-                        <h3>Vùng Đất Trống</h3>
-                        <p>Phần thưởng: Tài nguyên cơ bản</p>
-                        <p>Rủi ro binh sĩ: Thấp</p>
-                        <p>Binh sĩ rảnh: <span id="idle-soldiers-explore-empty">0</span></p>
-                        <p>Số binh sĩ cử đi: <input type="number" id="soldiers-empty-land" value="0" min="0" oninput="updateExplorationSuccessRate('emptyLand')"></p>
-                                              <button onclick="startExploration('emptyLand')">Thám hiểm</button>
-                        <div class="progress-bar-container" id="empty-land-exploration-progress-container" style="display:none;">
-                            <div class="progress-bar" id="empty-land-exploration-progress" style="width:0%;"></div>
-                            <span class="progress-text" id="empty-land-exploration-countdown">0 giây</span>
-                        </div>
-                    </div>
-                    <div class="exploration-item">
-                        <h3>Thành Trì Lân Cận</h3>
-                        <p>Phần thưởng: Tài nguyên cao cấp, Vàng</p>
-                        <p>Rủi ro binh sĩ: Cao</p>
-                        <p>Binh sĩ rảnh: <span id="idle-soldiers-explore-fortress">0</span></p>
-                        <p>Số binh sĩ cử đi: <input type="number" id="soldiers-fortress" value="0" min="0" oninput="updateExplorationSuccessRate('fortress')"></p>
-                                              <button onclick="startExploration('fortress')">Thám hiểm</button>
-                        <div class="progress-bar-container" id="fortress-exploration-progress-container" style="display:none;">
-                            <div class="progress-bar" id="fortress-exploration-progress" style="width:0%;"></div>
-                            <span class="progress-text" id="fortress-exploration-countdown">0 giây</span>
-                        </div>
-                    </div>
-                </div>
-                <div id="exploration-report-container" style="margin-top: 30px; text-align: left; background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
-                    <h3>Báo Cáo Thám Hiểm</h3>
-                    <div id="exploration-report-content" style="max-height: 300px; overflow-y: auto; background-color: #fff; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
-                        <p>Chưa có báo cáo nào.</p>
-                    </div>
-                </div>
-            </div>
-
- <div id="wonder-tab" class="sub-tab-content">
-                <h2>Kỳ Quan</h2>
-                <div class="wonder-construction">
-                    <p>Mảnh ghép đã hoàn thành: <span id="wonder-segments">0</span> / 100</p>
-                    <p>Chi phí xây dựng 1 mảnh ghép:</p>
-                    <ul>
-                        <li>Gỗ: <span id="wonder-wood-cost">1000</span></li>
-                        <li>Đá: <span id="wonder-stone-cost">1000</span></li>
-                        <li>Sắt: <span id="wonder-iron-cost">500</span></li>
-                        <li>Vàng: <span id="wonder-gold-cost">500</span></li>
-                        <li>Điểm Nghiên Cứu: <span id="wonder-research-cost">100</span></li>
-                    </ul>
-                    <button id="build-wonder-segment-btn" onclick="buildWonderSegment()">Xây Mảnh Ghép Kỳ Quan</button>
-                    <p style="margin-top: 20px;">Khi Kỳ quan hoàn thành, bạn có thể tái thiết thế giới để bắt đầu lại với những phần thưởng đặc biệt!</p>
-                    <button id="reset-game-btn" onclick="resetGame()" disabled>Tái Thiết Thế Giới (Reset Game)</button>
-                </div>
-            </div>
-
-
-        </div>
-
-     <div id="settings-tab" class="tab-content">
-    <h2>Cài Đặt</h2>
-
-    <div class="settings-group"> <h3>Lưu & Tải Game</h3>
-        <div class="settings-section">
-            <h4>Lưu Game</h4>
-            <textarea id="save-game-data" rows="5" cols="50" readonly></textarea>
-            <button onclick="downloadJsonAsText(document.getElementById('save-game-data').value,    datetime + ' gameKhaiThacTaiNguyen.txt')">Tạo File Savegame</button> 
-            <button onclick="saveGame()">Lưu Game</button>
-        </div>
-        <div class="settings-section">
-            <h4>Tải Game</h4>
-            <textarea id="load-game-data" rows="5" cols="50" placeholder="Dán dữ liệu game vào đây"></textarea>
-            <button onclick="loadGame()">Tải Game</button>
-            
-<script>
-  // Get current date and time
-  var now = new Date();
-  var datetime = now.toLocaleString();
-
-  // Insert date and time into HTML
- // document.getElementById("datetime").innerHTML = datetime;
-</script>
-         
-          </div>
+    <div class="resource-section" style="background-color: #e3f2fd; border-color: #90caf9;">
+        <h2>Game Stats</h2>
+        <p>Time Played: <span id="timePlayed">00:00:00</span></p>
+        <button id="saveGameBtn">Lưu Game</button>
+        <button id="loadGameBtn">Tải Game</button>
     </div>
 
-    <div class="settings-group"> <h3>Đóng Góp</h3>
-        <div class="settings-section">
-            <p>Tác giả: auselessguy2056@gmail.com. This is also his paypal account</p>
-        </div>
+    <hr>
+
+    <!-- New Quiz Section -->
+    <div class="resource-section" style="background-color: #ffe0b2; border-color: #ffcc80;">
+        <h2>Quiz Time!</h2>
+        <p id="quizQuestion">Loading question...</p>
+        <input type="text" id="quizAnswerInput" placeholder="Type your answer here" style="padding: 8px; width: 80%; border-radius: 5px; border: 1px solid #ccc; margin-bottom: 10px;">
+        <button id="submitQuizAnswer">Submit Answer</button>
+        <p id="quizFeedback" style="font-weight: bold; margin-top: 10px;"></p>
     </div>
 
-    
- </div>
+    <hr>
 
-    <script src="script.js"></script>
+    <div class="resource-section">
+        <h2>Wood</h2>
+        <p>Current Wood: <span id="woodCount">0</span></p>
+        <p>Wood per second: <span id="woodPerSecond">0</span></p>
+        <button id="addWood">Chop Wood (<span id="chopPowerDisplay">+1</span>)</button>
+        <br>
+        <button id="upgradeChopPower">Upgrade Chop Power (Cost: <span id="chopUpgradeCost">10</span> Wood)</button>
+        <br>
+        <button id="buyWoodPerSecond">Automate Wood (+1 Wood/sec) (Cost: <span id="woodPerSecondCost">10000</span> Wood)</button>
+        <!-- Critical hit feedback display with close button -->
+        <div id="criticalHitFeedback" class="critical-feedback" style="opacity: 0;">
+            <span id="criticalHitText"></span>
+            <button class="close-btn" id="closeCriticalFeedback">X</button>
+        </div>
+        <button class="generate-lore-btn" data-resource="Gỗ">Tạo Lore ✨</button>
+        <div id="woodLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Stone</h2>
+        <p>Current Stone: <span id="stoneCount">0</span></p>
+        <p>Stone per second: <span id="stonePerSecond">0</span></p>
+        <button id="buyStone">Convert 1000 Wood to 1 Stone</button>
+        <button class="generate-lore-btn" data-resource="Đá">Tạo Lore ✨</button>
+        <div id="stoneLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Iron</h2>
+        <p>Current Iron: <span id="ironCount">0</span></p>
+        <p>Iron per second: <span id="ironPerSecond">0</span></p>
+        <button id="buyIron">Convert 1000 Stone to 1 Iron</button>
+        <button class="generate-lore-btn" data-resource="Sắt">Tạo Lore ✨</button>
+        <div id="ironLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Alloy</h2>
+        <p>Current Alloy: <span id="alloyCount">0</span></p>
+        <p>Alloy per second: <span id="alloyPerSecond">0</span></p>
+        <button id="buyAlloy">Convert 1000 Iron to 1 Alloy</button>
+        <button class="generate-lore-btn" data-resource="Hợp Kim">Tạo Lore ✨</button>
+        <div id="alloyLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Circuitry</h2>
+        <p>Current Circuitry: <span id="circuitryCount">0</span></p>
+        <p>Circuitry per second: <span id="circuitryPerSecond">0</span></p>
+        <button id="buyCircuitry">Convert 1000 Alloy to 1 Circuitry</button>
+        <button class="generate-lore-btn" data-resource="Mạch Điện">Tạo Lore ✨</button>
+        <div id="circuitryLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>AI Core</h2>
+        <p>Current AI Core: <span id="aiCoreCount">0</span></p>
+        <p>AI Core per second: <span id="aiCorePerSecond">0</span></p>
+        <button id="buyAICore">Convert 1000 Circuitry to 1 AI Core</button>
+        <button class="generate-lore-btn" data-resource="Lõi AI">Tạo Lore ✨</button>
+        <div id="aiCoreLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Consciousness</h2>
+        <p>Current Consciousness: <span id="consciousnessCount">0</span></p>
+        <p>Consciousness per second: <span id="consciousnessPerSecond">0</span></p>
+        <button id="buyConsciousness">Convert 1000 AI Core to 1 Consciousness</button>
+        <button class="generate-lore-btn" data-resource="Ý Thức">Tạo Lore ✨</button>
+        <div id="consciousnessLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Reality Shard</h2>
+        <p>Current Reality Shard: <span id="realityShardCount">0</span></p>
+        <p>Reality Shard per second: <span id="realityShardPerSecond">0</span></p>
+        <button id="buyRealityShard">Convert 1000 Consciousness to 1 Reality Shard</button>
+        <button class="generate-lore-btn" data-resource="Mảnh Vỡ Thực Tại">Tạo Lore ✨</button>
+        <div id="realityShardLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Paradox</h2>
+        <p>Current Paradox: <span id="paradoxCount">0</span></p>
+        <p>Paradox per second: <span id="paradoxPerSecond">0</span></p>
+        <button id="buyParadox">Convert 1000 Reality Shard to 1 Paradox</button>
+        <button class="generate-lore-btn" data-resource="Nghịch Lý">Tạo Lore ✨</button>
+        <div id="paradoxLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Singularity</h2>
+        <p>Current Singularity: <span id="singularityCount">0</span></p>
+        <p>Singularity per second: <span id="singularityPerSecond">0</span></p>
+        <button id="buySingularity">Convert 1000 Paradox to 1 Singularity</button>
+        <button class="generate-lore-btn" data-resource="Điểm Kỳ Dị">Tạo Lore ✨</button>
+        <div id="singularityLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Multiverse</h2>
+        <p>Current Multiverse: <span id="multiverseCount">0</span></p>
+        <p>Multiverse per second: <span id="multiversePerSecond">0</span></p>
+        <button id="buyMultiverse">Convert 1000 Singularity to 1 Multiverse</button>
+        <button class="generate-lore-btn" data-resource="Đa Vũ Trụ">Tạo Lore ✨</button>
+        <div id="multiverseLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Omniscience</h2>
+        <p>Current Omniscience: <span id="omniscienceCount">0</span></p>
+        <p>Omniscience per second: <span id="omnisciencePerSecond">0</span></p>
+        <button id="buyOmniscience">Convert 1000 Multiverse to 1 Omniscience</button>
+        <button class="generate-lore-btn" data-resource="Toàn Tri">Tạo Lore ✨</button>
+        <div id="omniscienceLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Genesis</h2>
+        <p>Current Genesis: <span id="genesisCount">0</span></p>
+        <p>Genesis per second: <span id="genesisPerSecond">0</span></p>
+        <button id="buyGenesis">Convert 1000 Omniscience to 1 Genesis</button>
+        <button class="generate-lore-btn" data-resource="Sáng Thế">Tạo Lore ✨</button>
+        <div id="genesisLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Void</h2>
+        <p>Current Void: <span id="voidCount">0</span></p>
+        <p>Void per second: <span id="voidPerSecond">0</span></p>
+        <button id="buyVoid">Convert 1000 Genesis to 1 Void</button>
+        <button class="generate-lore-btn" data-resource="Hư Không">Tạo Lore ✨</button>
+        <div id="voidLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>The All</h2>
+        <p>Current The All: <span id="theAllCount">0</span></p>
+        <p>The All per second: <span id="theAllPerSecond">0</span></p>
+        <button id="buyTheAll">Convert 1000 Void to 1 The All</button>
+        <button class="generate-lore-btn" data-resource="Vạn Vật Toàn Thể">Tạo Lore ✨</button>
+        <div id="theAllLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Transcendence</h2>
+        <p>Current Transcendence: <span id="transcendenceCount">0</span></p>
+        <p>Transcendence per second: <span id="transcendencePerSecond">0</span></p>
+        <button id="buyTranscendence">Convert 1000 The All to 1 Transcendence</button>
+        <button class="generate-lore-btn" data-resource="Siêu Việt">Tạo Lore ✨</button>
+        <div id="transcendenceLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>The Absolute</h2>
+        <p>Current The Absolute: <span id="theAbsoluteCount">0</span></p>
+        <p>The Absolute per second: <span id="theAbsolutePerSecond">0</span></p>
+        <button id="buyTheAbsolute">Convert 1000 Transcendence to 1 The Absolute</button>
+        <button class="generate-lore-btn" data-resource="Tuyệt Đối">Tạo Lore ✨</button>
+        <div id="theAbsoluteLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>The End</h2>
+        <p>Current The End: <span id="theEndCount">0</span></p>
+        <p>The End per second: <span id="theEndPerSecond">0</span></p>
+        <button id="buyTheEnd">Convert 1000 The Absolute to 1 The End</button>
+        <button class="generate-lore-btn" data-resource="Điểm Kết Thúc">Tạo Lore ✨</button>
+        <div id="theEndLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>The New Beginning</h2>
+        <p>Current The New Beginning: <span id="theNewBeginningCount">0</span></p>
+        <p>The New Beginning per second: <span id="theNewBeginningPerSecond">0</span></p>
+        <button id="buyTheNewBeginning">Convert 1000 The End to 1 The New Beginning</button>
+        <button class="generate-lore-btn" data-resource="Khởi Nguyên Mới">Tạo Lore ✨</button>
+        <div id="theNewBeginningLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>The Architect's Will</h2>
+        <p>Current The Architect's Will: <span id="theArchitectsWillCount">0</span></p>
+        <p>The Architect's Will per second: <span id="theArchitectsWillPerSecond">0</span></p>
+        <button id="buyTheArchitectsWill">Convert 1000 The New Beginning to 1 The Architect's Will</button>
+        <button class="generate-lore-btn" data-resource="Ý Chí Kiến Trúc Sư">Tạo Lore ✨</button>
+        <div id="theArchitectsWillLore" class="lore-display"></div>
+    </div>
+
+
+    <script>
+        // Game State: Defines all resources and their properties
+        let resources = {
+            wood: {
+                count: 0,
+                perSecond: 0,
+                manualClickAmount: 1, // Amount added per manual click
+                upgradeCost: 10, // Cost to upgrade manual click power
+                upgradeMultiplier: 2, // How much upgrade cost increases
+                upgradeAmount: 1, // How much manualClickAmount increases per upgrade
+                automationCost: 10000, // Cost to get +1 Wood/sec
+                automationMultiplier: 1.5, // How much automation cost increases
+                automationAmount: 5, // Increased from 1 to 5 for faster automation
+                criticalChance: 0.10, // 10% chance for a critical strike
+                criticalMultiplier: 5 // 5x normal wood on critical strike
+            },
+            stone: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in previous resource
+                produces: 'stone', // What this resource itself produces
+                perUnitProduction: 1 // How much 1 unit of this resource produces per second
+            },
+            iron: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000,
+                produces: 'iron',
+                perUnitProduction: 1
+            },
+            alloy: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in Iron
+                produces: 'alloy',
+                perUnitProduction: 1
+            },
+            circuitry: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in Alloy
+                produces: 'circuitry',
+                perUnitProduction: 1
+            },
+            aiCore: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in Circuitry
+                produces: 'aiCore',
+                perUnitProduction: 1
+            },
+            consciousness: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in AI Core
+                produces: 'consciousness',
+                perUnitProduction: 1
+            },
+            realityShard: { // New resource
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in Consciousness
+                produces: 'realityShard',
+                perUnitProduction: 1
+            },
+            paradox: { // New resource
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in Reality Shard
+                produces: 'paradox',
+                perUnitProduction: 1
+            },
+            singularity: { // New resource
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in Paradox
+                produces: 'singularity',
+                perUnitProduction: 1
+            },
+            multiverse: { // New resource
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in Singularity
+                produces: 'multiverse',
+                perUnitProduction: 1
+            },
+            omniscience: { // New resource
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in Multiverse
+                produces: 'omniscience',
+                perUnitProduction: 1
+            },
+            genesis: { // New resource
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in Omniscience
+                produces: 'genesis',
+                perUnitProduction: 1
+            },
+            void: { // New resource
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in Genesis
+                produces: 'void',
+                perUnitProduction: 1
+            },
+            theAll: { // NEW RESOURCE: The All
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in Void
+                produces: 'theAll',
+                perUnitProduction: 1
+            },
+            transcendence: { // NEW RESOURCE: Transcendence
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in The All
+                produces: 'transcendence',
+                perUnitProduction: 1
+            },
+            theAbsolute: { // NEW RESOURCE: The Absolute
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in Transcendence
+                produces: 'theAbsolute',
+                perUnitProduction: 1
+            },
+            theEnd: { // NEW RESOURCE: The End
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in The Absolute
+                produces: 'theEnd',
+                perUnitProduction: 1
+            },
+            theNewBeginning: { // NEW RESOURCE: The New Beginning
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in The End
+                produces: 'theNewBeginning',
+                perUnitProduction: 1
+            },
+            theArchitectsWill: { // NEW RESOURCE: The Architect's Will
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000, // Cost in The New Beginning
+                produces: 'theArchitectsWill',
+                perUnitProduction: 1
+            }
+        };
+
+        // DOM Elements: References to all interactive and display elements
+        const woodCountSpan = document.getElementById('woodCount');
+        const woodPerSecondSpan = document.getElementById('woodPerSecond');
+        const addWoodButton = document.getElementById('addWood');
+        const chopPowerDisplay = document.getElementById('chopPowerDisplay');
+        const upgradeChopPowerButton = document.getElementById('upgradeChopPower');
+        const chopUpgradeCostSpan = document.getElementById('chopUpgradeCost');
+        const buyWoodPerSecondButton = document.getElementById('buyWoodPerSecond');
+        const woodPerSecondCostSpan = document.getElementById('woodPerSecondCost');
+
+        const stoneCountSpan = document.getElementById('stoneCount');
+        const stonePerSecondSpan = document = document.getElementById('stonePerSecond');
+        const buyStoneButton = document.getElementById('buyStone');
+
+        const ironCountSpan = document.getElementById('ironCount');
+        const ironPerSecondSpan = document.getElementById('ironPerSecond');
+        const buyIronButton = document.getElementById('buyIron');
+
+        const alloyCountSpan = document.getElementById('alloyCount');
+        const alloyPerSecondSpan = document.getElementById('alloyPerSecond');
+        const buyAlloyButton = document.getElementById('buyAlloy');
+
+        const circuitryCountSpan = document.getElementById('circuitryCount');
+        const circuitryPerSecondSpan = document.getElementById('circuitryPerSecond');
+        const buyCircuitryButton = document.getElementById('buyCircuitry');
+
+        const aiCoreCountSpan = document.getElementById('aiCoreCount');
+        const aiCorePerSecondSpan = document.getElementById('aiCorePerSecond');
+        const buyAICoreButton = document.getElementById('buyAICore');
+
+        const consciousnessCountSpan = document.getElementById('consciousnessCount');
+        const consciousnessPerSecondSpan = document.getElementById('consciousnessPerSecond');
+        const buyConsciousnessButton = document.getElementById('buyConsciousness');
+
+        // New DOM elements for new resources
+        const realityShardCountSpan = document.getElementById('realityShardCount');
+        const realityShardPerSecondSpan = document.getElementById('realityShardPerSecond');
+        const buyRealityShardButton = document.getElementById('buyRealityShard');
+
+        const paradoxCountSpan = document.getElementById('paradoxCount');
+        const paradoxPerSecondSpan = document.getElementById('paradoxPerSecond');
+        const buyParadoxButton = document.getElementById('buyParadox');
+
+        const singularityCountSpan = document.getElementById('singularityCount');
+        const singularityPerSecondSpan = document.getElementById('singularityPerSecond');
+        const buySingularityButton = document.getElementById('buySingularity');
+
+        const multiverseCountSpan = document.getElementById('multiverseCount');
+        const multiversePerSecondSpan = document.getElementById('multiversePerSecond');
+        const buyMultiverseButton = document.getElementById('buyMultiverse');
+
+        const omniscienceCountSpan = document.getElementById('omniscienceCount');
+        const omnisciencePerSecondSpan = document.getElementById('omnisciencePerSecond');
+        const buyOmniscienceButton = document.getElementById('buyOmniscience');
+
+        const genesisCountSpan = document.getElementById('genesisCount');
+        const genesisPerSecondSpan = document.getElementById('genesisPerSecond');
+        const buyGenesisButton = document.getElementById('buyGenesis');
+
+        const voidCountSpan = document.getElementById('voidCount');
+        const voidPerSecondSpan = document.getElementById('voidPerSecond');
+        const buyVoidButton = document.getElementById('buyVoid');
+
+        // The All DOM elements
+        const theAllCountSpan = document.getElementById('theAllCount');
+        const theAllPerSecondSpan = document.getElementById('theAllPerSecond');
+        const buyTheAllButton = document.getElementById('buyTheAll');
+
+        // Transcendence DOM elements
+        const transcendenceCountSpan = document.getElementById('transcendenceCount');
+        const transcendencePerSecondSpan = document.getElementById('transcendencePerSecond');
+        const buyTranscendenceButton = document.getElementById('buyTranscendence');
+
+        // The Absolute DOM elements
+        const theAbsoluteCountSpan = document.getElementById('theAbsoluteCount');
+        const theAbsolutePerSecondSpan = document.getElementById('theAbsolutePerSecond');
+        const buyTheAbsoluteButton = document.getElementById('buyTheAbsolute');
+
+        // The End DOM elements
+        const theEndCountSpan = document.getElementById('theEndCount');
+        const theEndPerSecondSpan = document.getElementById('theEndPerSecond');
+        const buyTheEndButton = document.getElementById('buyTheEnd');
+
+        // The New Beginning DOM elements
+        const theNewBeginningCountSpan = document.getElementById('theNewBeginningCount');
+        const theNewBeginningPerSecondSpan = document.getElementById('theNewBeginningPerSecond');
+        const buyTheNewBeginningButton = document.getElementById('buyTheNewBeginning');
+
+        // The Architect's Will DOM elements
+        const theArchitectsWillCountSpan = document.getElementById('theArchitectsWillCount');
+        const theArchitectsWillPerSecondSpan = document.getElementById('theArchitectsWillPerSecond');
+        const buyTheArchitectsWillButton = document.getElementById('buyTheArchitectsWill');
+
+
+        // New DOM element for time played
+        const timePlayedSpan = document.getElementById('timePlayed');
+
+        // Quiz DOM elements
+        const quizQuestionParagraph = document.getElementById('quizQuestion');
+        const quizAnswerInput = document.getElementById('quizAnswerInput');
+        const submitQuizAnswerButton = document.getElementById('submitQuizAnswer');
+        const quizFeedbackParagraph = document.getElementById('quizFeedback');
+
+        // Critical hit feedback DOM elements
+        const criticalHitFeedbackDiv = document.getElementById('criticalHitFeedback');
+        const criticalHitTextSpan = document.getElementById('criticalHitText');
+        const closeCriticalFeedbackButton = document.getElementById('closeCriticalFeedback');
+
+        // Save/Load buttons
+        const saveGameBtn = document.getElementById('saveGameBtn');
+        const loadGameBtn = document.getElementById('loadGameBtn');
+
+        // Lore buttons and display divs
+        const loreButtons = document.querySelectorAll('.generate-lore-btn');
+        const loreDisplays = {
+            "Gỗ": document.getElementById('woodLore'),
+            "Đá": document.getElementById('stoneLore'),
+            "Sắt": document.getElementById('ironLore'),
+            "Hợp Kim": document.getElementById('alloyLore'),
+            "Mạch Điện": document.getElementById('circuitryLore'),
+            "Lõi AI": document.getElementById('aiCoreLore'),
+            "Ý Thức": document.getElementById('consciousnessLore'),
+            "Mảnh Vỡ Thực Tại": document.getElementById('realityShardLore'),
+            "Nghịch Lý": document.getElementById('paradoxLore'),
+            "Điểm Kỳ Dị": document.getElementById('singularityLore'),
+            "Đa Vũ Trụ": document.getElementById('multiverseLore'),
+            "Toàn Tri": document.getElementById('omniscienceLore'),
+            "Sáng Thế": document.getElementById('genesisLore'),
+            "Hư Không": document.getElementById('voidLore'),
+            "Vạn Vật Toàn Thể": document.getElementById('theAllLore'),
+            "Siêu Việt": document.getElementById('transcendenceLore'),
+            "Tuyệt Đối": document.getElementById('theAbsoluteLore'),
+            "Điểm Kết Thúc": document.getElementById('theEndLore'),
+            "Khởi Nguyên Mới": document.getElementById('theNewBeginningLore'),
+            "Ý Chí Kiến Trúc Sư": document.getElementById('theArchitectsWillLore')
+        };
+
+
+        // --- Game Logic Functions ---
+
+        /**
+         * Updates all resource counts, per second rates, and button states on the display.
+         */
+        function updateDisplay() {
+            // Wood
+            woodCountSpan.textContent = resources.wood.count.toFixed(0);
+            woodPerSecondSpan.textContent = resources.wood.perSecond.toFixed(1);
+            chopPowerDisplay.textContent = `+${resources.wood.manualClickAmount}`;
+            chopUpgradeCostSpan.textContent = resources.wood.upgradeCost;
+            upgradeChopPowerButton.disabled = resources.wood.count < resources.wood.upgradeCost;
+            woodPerSecondCostSpan.textContent = resources.wood.automationCost.toFixed(0);
+            buyWoodPerSecondButton.disabled = resources.wood.count < resources.wood.automationCost;
+
+            // Stone
+            stoneCountSpan.textContent = resources.stone.count.toFixed(0);
+            stonePerSecondSpan.textContent = resources.stone.perSecond.toFixed(1);
+            buyStoneButton.disabled = resources.wood.count < resources.stone.conversionCost;
+
+            // Iron
+            ironCountSpan.textContent = resources.iron.count.toFixed(0);
+            ironPerSecondSpan.textContent = resources.iron.perSecond.toFixed(1);
+            buyIronButton.disabled = resources.stone.count < resources.iron.conversionCost;
+
+            // Alloy
+            alloyCountSpan.textContent = resources.alloy.count.toFixed(0);
+            alloyPerSecondSpan.textContent = resources.alloy.perSecond.toFixed(1);
+            buyAlloyButton.disabled = resources.iron.count < resources.alloy.conversionCost;
+
+            // Circuitry
+            circuitryCountSpan.textContent = resources.circuitry.count.toFixed(0);
+            circuitryPerSecondSpan.textContent = resources.circuitry.perSecond.toFixed(1);
+            buyCircuitryButton.disabled = resources.alloy.count < resources.circuitry.conversionCost;
+
+            // AI Core
+            aiCoreCountSpan.textContent = resources.aiCore.count.toFixed(0);
+            aiCorePerSecondSpan.textContent = resources.aiCore.perSecond.toFixed(1);
+            buyAICoreButton.disabled = resources.circuitry.count < resources.aiCore.conversionCost;
+
+            // Consciousness
+            consciousnessCountSpan.textContent = resources.consciousness.count.toFixed(0);
+            consciousnessPerSecondSpan.textContent = resources.consciousness.perSecond.toFixed(1);
+            buyConsciousnessButton.disabled = resources.aiCore.count < resources.consciousness.conversionCost;
+
+            // Reality Shard
+            realityShardCountSpan.textContent = resources.realityShard.count.toFixed(0);
+            realityShardPerSecondSpan.textContent = resources.realityShard.perSecond.toFixed(1);
+            buyRealityShardButton.disabled = resources.consciousness.count < resources.realityShard.conversionCost;
+
+            // Paradox
+            paradoxCountSpan.textContent = resources.paradox.count.toFixed(0);
+            paradoxPerSecondSpan.textContent = resources.paradox.perSecond.toFixed(1);
+            buyParadoxButton.disabled = resources.realityShard.count < resources.paradox.conversionCost;
+
+            // Singularity
+            singularityCountSpan.textContent = resources.singularity.count.toFixed(0);
+            singularityPerSecondSpan.textContent = resources.singularity.perSecond.toFixed(1);
+            buySingularityButton.disabled = resources.paradox.count < resources.singularity.conversionCost;
+
+            // Multiverse
+            multiverseCountSpan.textContent = resources.multiverse.count.toFixed(0);
+            multiversePerSecondSpan.textContent = resources.multiverse.perSecond.toFixed(1);
+            buyMultiverseButton.disabled = resources.singularity.count < resources.multiverse.conversionCost;
+
+            // Omniscience
+            omniscienceCountSpan.textContent = resources.omniscience.count.toFixed(0);
+            omnisciencePerSecondSpan.textContent = resources.omniscience.perSecond.toFixed(1);
+            buyOmniscienceButton.disabled = resources.multiverse.count < resources.omniscience.conversionCost;
+
+            // Genesis
+            genesisCountSpan.textContent = resources.genesis.count.toFixed(0);
+            genesisPerSecondSpan.textContent = resources.genesis.perSecond.toFixed(1);
+            buyGenesisButton.disabled = resources.omniscience.count < resources.genesis.conversionCost;
+
+            // Void
+            voidCountSpan.textContent = resources.void.count.toFixed(0);
+            voidPerSecondSpan.textContent = resources.void.perSecond.toFixed(1);
+            buyVoidButton.disabled = resources.genesis.count < resources.void.conversionCost;
+
+            // The All
+            theAllCountSpan.textContent = resources.theAll.count.toFixed(0);
+            theAllPerSecondSpan.textContent = resources.theAll.perSecond.toFixed(1);
+            buyTheAllButton.disabled = resources.void.count < resources.theAll.conversionCost;
+
+            // Transcendence
+            transcendenceCountSpan.textContent = resources.transcendence.count.toFixed(0);
+            transcendencePerSecondSpan.textContent = resources.transcendence.perSecond.toFixed(1);
+            buyTranscendenceButton.disabled = resources.theAll.count < resources.transcendence.conversionCost;
+
+            // The Absolute
+            theAbsoluteCountSpan.textContent = resources.theAbsolute.count.toFixed(0);
+            theAbsolutePerSecondSpan.textContent = resources.theAbsolute.perSecond.toFixed(1);
+            buyTheAbsoluteButton.disabled = resources.transcendence.count < resources.theAbsolute.conversionCost;
+
+            // The End
+            theEndCountSpan.textContent = resources.theEnd.count.toFixed(0);
+            theEndPerSecondSpan.textContent = resources.theEnd.perSecond.toFixed(1);
+            buyTheEndButton.disabled = resources.theAbsolute.count < resources.theEnd.conversionCost;
+
+            // The New Beginning
+            theNewBeginningCountSpan.textContent = resources.theNewBeginning.count.toFixed(0);
+            theNewBeginningPerSecondSpan.textContent = resources.theNewBeginning.perSecond.toFixed(1);
+            buyTheNewBeginningButton.disabled = resources.theEnd.count < resources.theNewBeginning.conversionCost;
+
+            // The Architect's Will (NEW)
+            theArchitectsWillCountSpan.textContent = resources.theArchitectsWill.count.toFixed(0);
+            theArchitectsWillPerSecondSpan.textContent = resources.theArchitectsWill.perSecond.toFixed(1);
+            buyTheArchitectsWillButton.disabled = resources.theNewBeginning.count < resources.theArchitectsWill.conversionCost;
+        }
+
+        /**
+         * Adds wood based on current manual click amount, with a chance for critical strike.
+         */
+        function addWood() {
+            let woodEarned = resources.wood.manualClickAmount;
+            let isCritical = false;
+
+            // Check for critical strike
+            if (Math.random() < resources.wood.criticalChance) {
+                woodEarned *= resources.wood.criticalMultiplier;
+                isCritical = true;
+            }
+
+            resources.wood.count += woodEarned;
+            updateDisplay();
+
+            // Display critical hit feedback immediately, without auto-fading
+            if (isCritical) {
+                criticalHitTextSpan.textContent = `CRITICAL! +${woodEarned.toFixed(0)} Wood!`;
+                criticalHitFeedbackDiv.style.opacity = 1;
+                // No setTimeout to fade out, user will dismiss manually
+            } else {
+                // If not critical, ensure the message is hidden.
+                // This is important if a critical message was previously shown and not dismissed.
+                criticalHitFeedbackDiv.style.opacity = 0;
+            }
+        }
+
+        /**
+         * Dismisses the critical hit feedback message.
+         */
+        function dismissCriticalFeedback() {
+            criticalHitFeedbackDiv.style.opacity = 0;
+            criticalHitTextSpan.textContent = ''; // Clear text
+        }
+
+        /**
+         * Upgrades the manual wood chop power.
+         */
+        function upgradeChopPower() {
+            const cost = resources.wood.upgradeCost;
+            if (resources.wood.count >= cost) {
+                resources.wood.count -= cost;
+                resources.wood.manualClickAmount += resources.wood.upgradeAmount;
+                resources.wood.upgradeCost = Math.round(resources.wood.upgradeCost * resources.wood.upgradeMultiplier);
+                updateDisplay();
+            } else {
+                // Using an alert for simplicity, in a real game use a custom modal or message
+                alert(`Not enough Wood to upgrade Chop Power! You need ${cost} Wood.`);
+            }
+        }
+
+        /**
+         * Buys +1 Wood/sec automation.
+         */
+        function buyWoodPerSecondAutomation() {
+            const cost = resources.wood.automationCost;
+            if (resources.wood.count >= cost) {
+                resources.wood.count -= cost;
+                resources.wood.perSecond += resources.wood.automationAmount; // Updated to 5 per purchase
+                resources.wood.automationCost = Math.round(resources.wood.automationCost * resources.wood.automationMultiplier);
+                updateDisplay();
+            } else {
+                alert(`Not enough Wood to automate production! You need ${cost} Wood.`);
+            }
+        }
+
+        /**
+         * Generic function to buy a higher-tier resource using a previous resource.
+         * @param {string} resourceToBuy - The key name of the resource to buy (e.g., 'stone', 'iron').
+         * @param {string} previousResource - The key name of the resource used as currency.
+         */
+        function buyResource(resourceToBuy, previousResource) {
+            const cost = resources[resourceToBuy].conversionCost;
+            if (resources[previousResource].count >= cost) {
+                resources[previousResource].count -= cost;
+                resources[resourceToBuy].count += 1;
+                resources[resourceToBuy].perSecond += resources[resourceToBuy].perUnitProduction; // Each unit adds to its own per second production
+                updateDisplay();
+            } else {
+                alert(`Not enough ${previousResource} to buy ${resourceToBuy}! You need ${cost} ${previousResource}.`);
+            }
+        }
+
+        /**
+         * Saves the current game progress to local storage.
+         */
+        function saveGame() {
+            try {
+                localStorage.setItem('incrementalGameSave', JSON.stringify(resources));
+                alert('Tiến độ trò chơi đã được lưu!');
+            } catch (e) {
+                console.error("Lỗi khi lưu game:", e);
+                alert('Không thể lưu game. Vui lòng kiểm tra dung lượng lưu trữ của trình duyệt.');
+            }
+        }
+
+        /**
+         * Loads game progress from local storage.
+         */
+        function loadGame() {
+            try {
+                const savedData = localStorage.getItem('incrementalGameSave');
+                if (savedData) {
+                    const loadedResources = JSON.parse(savedData);
+                    // Merge loaded data with existing resources, retaining default values if new properties are added later
+                    for (const key in resources) {
+                        if (loadedResources[key] !== undefined) {
+                            Object.assign(resources[key], loadedResources[key]);
+                        }
+                    }
+                    updateDisplay();
+                    alert('Tiến độ trò chơi đã được tải!');
+                } else {
+                    alert('Không tìm thấy dữ liệu lưu trò chơi nào.');
+                }
+            } catch (e) {
+                console.error("Lỗi khi tải game:", e);
+                alert('Không thể tải game. Dữ liệu lưu có thể bị hỏng.');
+            }
+        }
+
+        // --- Cheat Code Logic ---
+        let cheatCodeSequence = [];
+        const cheatCode = "add10kwood"; // The secret cheat code
+
+        document.addEventListener('keydown', (event) => {
+            // Add the pressed key to the sequence
+            cheatCodeSequence.push(event.key.toLowerCase()); // Convert to lowercase to be case-insensitive
+
+            // Keep the sequence length limited to the cheat code length
+            if (cheatCodeSequence.length > cheatCode.length) {
+                cheatCodeSequence.shift(); // Remove the oldest key
+            }
+
+            // Check if the current sequence matches the cheat code
+            if (cheatCodeSequence.join('') === cheatCode) {
+                resources.wood.count += 10000; // Add 10,000 wood
+                updateDisplay();
+                alert("CHEAT ACTIVATED! +10,000 Wood!"); // Notify the user
+                cheatCodeSequence = []; // Reset the sequence after activation
+            }
+        });
+
+        // --- Quiz Logic ---
+        const quizQuestions = [
+            { question: "What is the first resource you collect?", answer: "wood", reward: 500 },
+            { question: "What resource comes after Stone?", answer: "iron", reward: 750 },
+            { question: "How many Wood do you need to buy 1 Stone?", answer: "1000", reward: 1000 },
+            { question: "What is the next resource after Alloy?", answer: "circuitry", reward: 1500 },
+            { question: "What material is produced after AI Core?", answer: "consciousness", reward: 2000 },
+            { question: "Which resource is obtained after Genesis?", answer: "void", reward: 5000 },
+            { question: "How much Wood do you get per second after automating it once?", answer: "5", reward: 1000 },
+            { question: "What comes after Singularity?", answer: "multiverse", reward: 2500 },
+            { question: "What is the resource after Omniscience?", answer: "genesis", reward: 3000 },
+            { question: "What is the final resource after The Absolute?", answer: "the end", reward: 10000 },
+            { question: "What is the resource after The End?", answer: "the new beginning", reward: 15000 },
+            { question: "What is the resource after The New Beginning?", answer: "the architect's will", reward: 20000 }
+        ];
+
+        let currentQuestion = null;
+        let answeredQuestions = []; // To keep track of questions already asked in current session
+        const QUIZ_COOLDOWN_MS = 5000; // 5 seconds cooldown before next question
+        let quizCooldownTimer = 0;
+
+        /**
+         * Loads a new random question into the quiz section.
+         */
+        function loadNewQuestion() {
+            if (quizQuestions.length === 0) {
+                quizQuestionParagraph.textContent = "No more questions available!";
+                quizAnswerInput.disabled = true;
+                submitQuizAnswerButton.disabled = true;
+                return;
+            }
+
+            // Ensure we don't repeat questions until all have been asked
+            if (answeredQuestions.length === quizQuestions.length) {
+                answeredQuestions = []; // Reset if all questions have been asked
+            }
+
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * quizQuestions.length);
+            } while (answeredQuestions.includes(randomIndex));
+
+            answeredQuestions.push(randomIndex);
+            currentQuestion = quizQuestions[randomIndex];
+
+            quizQuestionParagraph.textContent = currentQuestion.question;
+            quizAnswerInput.value = ''; // Clear previous answer
+            quizFeedbackParagraph.textContent = ''; // Clear feedback
+            quizAnswerInput.disabled = false;
+            submitQuizAnswerButton.disabled = false;
+        }
+
+        /**
+         * Checks the user's answer for the current quiz question.
+         */
+        function checkAnswer() {
+            if (!currentQuestion) return;
+
+            const userAnswer = quizAnswerInput.value.trim().toLowerCase();
+            const correctAnswer = String(currentQuestion.answer).toLowerCase(); // Ensure answer is string and lowercase
+
+            if (userAnswer === correctAnswer) {
+                resources.wood.count += currentQuestion.reward;
+                quizFeedbackParagraph.textContent = `Correct! You gained ${currentQuestion.reward} Wood.`;
+                quizFeedbackParagraph.style.color = 'green';
+                updateDisplay();
+            } else {
+                quizFeedbackParagraph.textContent = `Incorrect. The answer was "${currentQuestion.answer}".`;
+                quizFeedbackParagraph.style.color = 'red';
+            }
+
+            quizAnswerInput.disabled = true;
+            submitQuizAnswerButton.disabled = true;
+
+            // Load a new question after a cooldown
+            quizCooldownTimer = Date.now();
+            setTimeout(() => {
+                loadNewQuestion();
+            }, QUIZ_COOLDOWN_MS);
+        }
+
+        // Event listener for quiz submit button and Enter key
+        submitQuizAnswerButton.addEventListener('click', checkAnswer);
+        quizAnswerInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        // --- Gemini API Lore Generation ---
+        /**
+         * Generates lore for a given resource using the Gemini API.
+         * @param {string} resourceName - The name of the resource to generate lore for.
+         * @param {HTMLElement} loreDisplayElement - The DOM element to display the lore.
+         */
+        async function generateLore(resourceName, loreDisplayElement) {
+            loreDisplayElement.textContent = 'Đang tạo lore...'; // Loading message
+            loreDisplayElement.style.color = '#555';
+
+            try {
+                const prompt = `Viết một đoạn văn ngắn, giàu trí tưởng tượng (khoảng 30-50 từ) về tài nguyên "${resourceName}" trong một trò chơi incremental. Tập trung vào ý nghĩa, cách nó được sử dụng, hoặc cảm giác khi thu thập nó trong bối cảnh trò chơi phiêu lưu khoa học viễn tưởng.`;
+
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // Canvas will automatically provide the API key at runtime
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    loreDisplayElement.textContent = text;
+                    loreDisplayElement.style.color = '#388e3c'; // Reset to green on success
+                } else {
+                    loreDisplayElement.textContent = 'Không thể tạo lore. Cấu trúc phản hồi không mong muốn.';
+                    loreDisplayElement.style.color = 'orange'; // Indicate warning
+                }
+            } catch (error) {
+                console.error("Lỗi khi gọi Gemini API:", error);
+                loreDisplayElement.textContent = 'Lỗi khi tạo lore. Vui lòng thử lại. (Kiểm tra console để biết chi tiết)';
+                loreDisplayElement.style.color = 'red';
+            }
+        }
+
+
+        // --- Event Listeners (Existing) ---
+        addWoodButton.addEventListener('click', addWood);
+        upgradeChopPowerButton.addEventListener('click', upgradeChopPower);
+        buyWoodPerSecondButton.addEventListener('click', buyWoodPerSecondAutomation);
+
+        // Event listeners for resource conversions
+        buyStoneButton.addEventListener('click', () => buyResource('stone', 'wood'));
+        buyIronButton.addEventListener('click', () => buyResource('iron', 'stone'));
+        buyAlloyButton.addEventListener('click', () => buyResource('alloy', 'iron'));
+        buyCircuitryButton.addEventListener('click', () => buyResource('circuitry', 'alloy'));
+        buyAICoreButton.addEventListener('click', () => buyResource('aiCore', 'circuitry'));
+        buyConsciousnessButton.addEventListener('click', () => buyResource('consciousness', 'aiCore'));
+        buyRealityShardButton.addEventListener('click', () => buyResource('realityShard', 'consciousness'));
+        buyParadoxButton.addEventListener('click', () => buyResource('paradox', 'realityShard'));
+        buySingularityButton.addEventListener('click', () => buyResource('singularity', 'paradox'));
+        buyMultiverseButton.addEventListener('click', () => buyResource('multiverse', 'singularity'));
+        buyOmniscienceButton.addEventListener('click', () => buyResource('omniscience', 'multiverse'));
+        buyGenesisButton.addEventListener('click', () => buyResource('genesis', 'omniscience'));
+        buyVoidButton.addEventListener('click', () => buyResource('void', 'genesis'));
+        buyTheAllButton.addEventListener('click', () => buyResource('theAll', 'void'));
+        buyTranscendenceButton.addEventListener('click', () => buyResource('transcendence', 'theAll'));
+        buyTheAbsoluteButton.addEventListener('click', () => buyResource('theAbsolute', 'transcendence'));
+        buyTheEndButton.addEventListener('click', () => buyResource('theEnd', 'theAbsolute'));
+        buyTheNewBeginningButton.addEventListener('click', () => buyResource('theNewBeginning', 'theEnd'));
+        buyTheArchitectsWillButton.addEventListener('click', () => buyResource('theArchitectsWill', 'theNewBeginning'));
+
+
+        // Event listeners for save/load buttons
+        saveGameBtn.addEventListener('click', saveGame);
+        loadGameBtn.addEventListener('click', loadGame);
+
+        // Event listener for the critical feedback close button
+        closeCriticalFeedbackButton.addEventListener('click', dismissCriticalFeedback);
+
+        // Event listeners for Lore buttons
+        loreButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const resourceName = button.dataset.resource;
+                const loreDisplayElement = loreDisplays[resourceName];
+                generateLore(resourceName, loreDisplayElement);
+            });
+        });
+
+
+        // --- Game Loop ---
+        // Store the game start time
+        const gameStartTime = Date.now();
+
+        /**
+         * Formats milliseconds into HH:MM:SS string.
+         * @param {number} ms - Milliseconds to format.
+         * @returns {string} Formatted time string.
+         */
+        function formatTime(ms) {
+            let seconds = Math.floor(ms / 1000);
+            let minutes = Math.floor(seconds / 60);
+            let hours = Math.floor(minutes / 60);
+
+            seconds = seconds % 60;
+            minutes = minutes % 60;
+
+            const pad = (num) => num < 10 ? '0' + num : num;
+
+            return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+        }
+
+        /**
+         * The main game loop that updates resources based on their per-second production.
+         * Runs every 100 milliseconds.
+         */
+        function gameLoop() {
+            // Update all resources based on their perSecond rates
+            // Divide by 10 because the loop runs 10 times per second (1000ms / 100ms = 10)
+            resources.wood.count += resources.wood.perSecond / 10;
+            resources.stone.count += resources.stone.perSecond / 10;
+            resources.iron.count += resources.iron.perSecond / 10;
+            resources.alloy.count += resources.alloy.perSecond / 10;
+            resources.circuitry.count += resources.circuitry.perSecond / 10;
+            resources.aiCore.count += resources.aiCore.perSecond / 10;
+            resources.consciousness.count += resources.consciousness.perSecond / 10;
+            resources.realityShard.count += resources.realityShard.perSecond / 10;
+            resources.paradox.count += resources.paradox.perSecond / 10;
+            resources.singularity.count += resources.singularity.perSecond / 10;
+            resources.multiverse.count += resources.multiverse.perSecond / 10;
+            resources.omniscience.count += resources.omniscience.perSecond / 10;
+            resources.genesis.count += resources.genesis.perSecond / 10;
+            resources.void.count += resources.void.perSecond / 10;
+            resources.theAll.count += resources.theAll.perSecond / 10;
+            resources.transcendence.count += resources.transcendence.perSecond / 10;
+            resources.theAbsolute.count += resources.theAbsolute.perSecond / 10;
+            resources.theEnd.count += resources.theEnd.perSecond / 10;
+            resources.theNewBeginning.count += resources.theNewBeginning.perSecond / 10;
+            resources.theArchitectsWill.count += resources.theArchitectsWill.perSecond / 10;
+
+            // Update Time Played
+            const currentTime = Date.now();
+            const elapsedTime = currentTime - gameStartTime;
+            timePlayedSpan.textContent = formatTime(elapsedTime);
+
+            updateDisplay(); // Update the UI after resources are calculated
+        }
+
+        // Start the game loop
+        setInterval(gameLoop, 100);
+
+        // Initial display update and load game when the page loads
+        updateDisplay();
+        loadGame(); // Attempt to load game progress on startup
+        loadNewQuestion(); // Load the first quiz question
+    </script>
 </body>
 </html>
