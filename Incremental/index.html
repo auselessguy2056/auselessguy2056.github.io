@@ -5,6 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ultimate Incremental Resource Game</title>
     <style>
+
+#notification-area {
+  position:fixed;
+  bottom:0px;
+  right:10px;
+  width:250px;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+}
+#notification-area .notification {
+  position:relative;
+  padding:15px 10px;
+  background:#111;
+  color:#f5f5f5;
+  font-family:"Raleway";
+  font-size:14px;
+  font-weight:600;
+  border-radius:5px;
+  margin:5px 0px;
+  opacity:0;
+  left:20px;
+  animation:showNotification 500ms ease-in-out forwards;
+}
+
+@-webkit-keyframes fadeInFromNone {
+     0% {
+         display: none;
+         opacity: 1;
+     }
+
+     50% {
+         display: none;
+         opacity: 1;
+     }
+
+    100% {
+        display: block;
+        opacity: 0;
+    }
+}
+
+#notification-area .fade_out {
+  -webkit-animation: fadeInFromNone 5s ease-out;
+}
+
+@keyframes showNotification {
+  to {
+    opacity:1;
+    left:0px;
+  }
+}
+#notification-area .notification.success {
+  background:#389838;
+}
         /* Basic CSS for styling the game interface */
         body {
             font-family: 'Inter', Arial, sans-serif; /* Using Inter font as per instructions */
@@ -169,7 +225,8 @@
     </div>
 
     <hr>
-
+    <div id="notification-area">
+</div>
     <div class="resource-section">
         <h2>Wood</h2>
         <p>Current Wood: <span id="woodCount">0</span></p>
@@ -894,14 +951,17 @@
         /**
          * Saves the current game progress to local storage.
          */
-        function saveGame() {
+        function saveGame(integer) {
             try {
                 // Store both resources and gameStartTime
                 const saveData = {
                     resources: resources
                 };
                 localStorage.setItem('incrementalGameSave', JSON.stringify(saveData));
+                if (integer != 1)
+                 {
                 alert('Tiến độ trò chơi đã được lưu!');
+                 }
             } catch (e) {
                 console.error("Lỗi khi lưu game:", e);
                 alert('Không thể lưu game. Vui lòng kiểm tra dung lượng lưu trữ của trình duyệt.');
@@ -1189,6 +1249,37 @@
        timePlayedSpan.textContent =    resources.timePlayed.hour.toString() + ":" + resources.timePlayed.minute.toString() + ":" +      resources.timePlayed.second.toString();
 
 }
+
+function notify(type,message){
+  (()=>{
+    let n = document.createElement("div");
+    let id = Math.random().toString(36).substr(2,10);
+    n.setAttribute("id",id);
+    n.classList.add("notification",type);
+    n.classList.add("fade_out")
+    n.innerText = message;
+    document.getElementById("notification-area").appendChild(n);
+    setTimeout(()=>{
+      var notifications = document.getElementById("notification-area").getElementsByClassName("notification");
+      for(let i=0;i<notifications.length;i++){
+        if(notifications[i].getAttribute("id") == id){
+          notifications[i].remove();
+          break;
+        }
+      }
+    },5000);
+  })();
+}
+
+function notifySuccess(){
+  notify("success","The game has been saved.");
+}
+
+
+function autoSave(){
+saveGame(1);
+notifySuccess();
+}
         /**
          * The main game loop that updates resources based on their per-second production.
          * Runs every 100 milliseconds.
@@ -1228,6 +1319,7 @@
         // Start the game loop
         setInterval(gameLoop, 100);
 setInterval(updateTimePlayed,1000);
+setInterval(autoSave,30000);
 
         // Initial display update and load game when the page loads
         updateDisplay();
