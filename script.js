@@ -1390,6 +1390,24 @@ function handleExplorationEnd(type, success) {
     updateUI();
 }
 
+function autoSaveGame() {
+ const gameState = {
+        resources: resources,
+        workers: workers,
+        buildings: buildings,
+        training: training,
+        research: research,
+        crafting: crafting,
+        exploration: exploration,
+  	achievements: achievements, // THÊM DÒNG NÀY
+        resetBonus: resetBonus,
+wonder: wonder
+    };
+  //  const jsonString = JSON.stringify(gameState);
+
+ localStorage.setItem('khaiThacTaiNguyenGameSave', JSON.stringify(gameState));
+
+}
 
 // Hàm lưu game
 function saveGame() {
@@ -1561,6 +1579,191 @@ research.unlockCosts = loadedState.research.unlockCosts || {
     }
 }
 
+function autoLoadGame(){
+         const savedData = localStorage.getItem('khaiThacTaiNguyenGameSave');
+      /*          if (savedData) {
+                    const loadedState = JSON.parse(savedData);
+
+                    // Load resources
+                    const loadedResources = parsedData.resources;
+                    for (const key in resources) {
+                        if (loadedResources[key] !== undefined) {
+                            Object.assign(resources[key], loadedResources[key]);
+  alert(loadedResources.wood);
+                        }
+                                                 }
+                   //Load workers
+                    
+                    const loadedWorkers = parsedData.workers;
+                    for (const key in workers) {
+                        if (loadedWorkers[key] !== undefined) {
+                            Object.assign(workers[key], loadedWorkers[key]);
+                        }
+}
+   //Load buildings
+                    
+                    const loadedBuildings = parsedData.buildings;
+                    for (const key in buildings) {
+                        if (loadedBuildings[key] !== undefined) {
+                            Object.assign(buildings[key], loadedBuildings[key]);
+                        }
+                    }
+
+ //Load training
+                    
+                    const loadedTraining = parsedData.training;
+                    for (const key in training) {
+                        if (loadedTraining[key] !== undefined) {
+                            Object.assign(training[key], loadedTraining[key]);
+                        }
+                    }
+
+ //Load crafting
+                    
+                    const loadedCrafting = parsedData.crafting;
+                    for (const key in crafting) {
+                        if (loadedCrafting[key] !== undefined) {
+                            Object.assign(crafting[key], loadedCrafting[key]);
+                        }
+                    }
+
+ //Load research
+                    
+                    const loadedResearch = parsedData.research;
+                    for (const key in research) {
+                        if (loadedResearch[key] !== undefined) {
+                            Object.assign(research[key], loadedResearch[key]);
+                        }
+                    }
+ //Load resetBonus
+                    
+                    const loadedResetBonus = parsedData.resetBonus;
+                    for (const key in resetBonus) {
+                        if (loadedResetBonus[key] !== undefined) {
+                            Object.assign(resetBonus[key], loadedResetBonus[key]);
+                        }
+                    }
+//Load wonder
+                    
+                    const loadedWonder = parsedData.wonder;
+                    for (const key in wonder) {
+                        if (loadedWonder[key] !== undefined) {
+                            Object.assign(wonder[key], loadedWonder[key]);
+                        }
+                    }
+                    
+
+}*/
+          const loadedState = JSON.parse(savedData);
+        resources = loadedState.resources;
+        workers = loadedState.workers;
+        buildings = loadedState.buildings;
+        training = loadedState.training;
+        research = loadedState.research;
+        crafting = loadedState.crafting;
+resetBonus = loadedState.resetBonus;
+wonder = loadedState.wonder;
+           // Đảm bảo achievements được tải, nếu không có thì khởi tạo mặc định
+        achievements = loadedState.achievements || {
+            warehouseLevel10: false,
+            soldiers100: false,
+            successfulExplorations50: false,
+            successfulExplorationsCount: 0
+};
+        // Đảm bảo exploration được khởi tạo với cấu trúc mới nếu tải từ save cũ
+        exploration = loadedState.exploration || {
+            emptyLand: {
+                inProgress: false, timeRemaining: 0, duration: 120, assignedSoldiers: [],
+                enemyTypes: [{ name: 'Quái vật nhỏ', attack: 5, defense: 2, health: 30 }], // Tăng HP
+                activeEnemiesInstances: [], report: []
+            },
+            fortress: {
+                inProgress: false, timeRemaining: 0, duration: 300, assignedSoldiers: [],
+                enemyTypes: [{ name: 'Lính canh', attack: 8, defense: 5, health: 60 }, { name: 'Thủ lĩnh', attack: 15, defense: 10, health: 120 }], // Tăng HP
+                activeEnemiesInstances: [], report: []
+            }
+        };
+
+        // Đảm bảo các thuộc tính con trong exploration cũng được khởi tạo
+        for (const type in exploration) {
+            if (exploration[type].report === undefined) exploration[type].report = [];
+            if (exploration[type].assignedSoldiers === undefined) exploration[type].assignedSoldiers = [];
+            if (exploration[type].activeEnemiesInstances === undefined) exploration[type].activeEnemiesInstances = [];
+            if (exploration[type].enemyTypes === undefined) { // Cập nhật enemyTypes nếu thiếu
+                 if (type === 'emptyLand') {
+                    exploration[type].enemyTypes = [{ name: 'Quái vật nhỏ', attack: 5, defense: 2, health: 30 }];
+                 } else if (type === 'fortress') {
+                    exploration[type].enemyTypes = [{ name: 'Lính canh', attack: 8, defense: 5, health: 60 }, { name: 'Thủ lĩnh', attack: 15, defense: 10, health: 120 }];
+                 }
+            }
+        }
+
+        // Đảm bảo research.unlockedSoldierUpgrades tồn tại
+        research.unlockedSoldierUpgrades = research.unlockedSoldierUpgrades || { attack: 0, defense: 0, health: 0 };
+
+
+        // Đảm bảo các thuộc tính capacity có sẵn nếu tải từ save cũ không có
+        buildings.warehouse.capacityPerLevel = buildings.warehouse.capacityPerLevel || 500;
+        resources.woodCapacity = resources.woodCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
+        resources.grainCapacity = resources.grainCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
+        resources.goldCapacity = resources.goldCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
+        resources.stoneCapacity = resources.stoneCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
+        resources.ironCapacity = resources.ironCapacity || (500 + (buildings.warehouse.level - 1) * buildings.warehouse.capacityPerLevel);
+
+        // Đảm bảo workers.soldiers là một mảng
+        if (!Array.isArray(workers.soldiers)) {
+            workers.soldiers = []; // Nếu không phải mảng, khởi tạo rỗng
+        }
+        // Khôi phục currentHealth và gán tên cho binh sĩ nếu bị thiếu (từ save cũ)
+        workers.soldiers.forEach((s, index) => { // Thêm index vào đây
+            s.currentHealth = s.currentHealth === undefined ? s.health : s.currentHealth;
+            // Gán tên nếu binh sĩ chưa có tên
+            s.name = s.name || `Binh sĩ ${index + 1}`; // Gán tên Binh sĩ 1, Binh sĩ 2, ...
+        });
+
+        // Tính toán lại idleSoldiers dựa trên tổng lính và lính đang đi thám hiểm
+        const assignedSoldiersCount = exploration.emptyLand.assignedSoldiers.length + exploration.fortress.assignedSoldiers.length;
+        workers.idleSoldiers = workers.soldiers.length - assignedSoldiersCount;
+        if (workers.idleSoldiers < 0) workers.idleSoldiers = 0;
+
+        if (research.unlockedTechnologies.includes('Chế tạo Áo Giáp')) {
+            document.getElementById('unlock-armor-crafting-btn').textContent = 'Đã mở khóa';
+            document.getElementById('unlock-armor-crafting-btn').disabled = true;
+        } else {
+            document.getElementById('unlock-armor-crafting-btn').textContent = 'Mở khóa Chế tạo Áo Giáp';
+            document.getElementById('unlock-armor-crafting-btn').disabled = !research.canUnlockArmorCrafting;
+        }
+        
+        const isCraftingArmorUnlocked = research.unlockedTechnologies.includes('Chế tạo Áo Giáp');
+        document.getElementById('craft-armor-btn').disabled = !isCraftingArmorUnlocked || crafting.armor.inProgress || resources.iron < crafting.armor.cost.iron;
+
+// Xử lý unlockedTechnologies: Chuyển đổi từ object sang array nếu cần
+if (loadedState.research && loadedState.research.unlockedTechnologies !== undefined) {
+    if (Array.isArray(loadedState.research.unlockedTechnologies)) {
+        research.unlockedTechnologies = loadedState.research.unlockedTechnologies;
+    } else if (typeof loadedState.research.unlockedTechnologies === 'object' && loadedState.research.unlockedTechnologies !== null) {
+        // Đây là cấu trúc object cũ, cần chuyển đổi
+        research.unlockedTechnologies = [];
+        for (const techKey in loadedState.research.unlockedTechnologies) {
+            if (loadedState.research.unlockedTechnologies.hasOwnProperty(techKey) && loadedState.research.unlockedTechnologies[techKey]) {
+                // Thêm tên hiển thị vào mảng
+                research.unlockedTechnologies.push(technologyDisplayNames[techKey] || techKey);
+            }
+        }
+    }
+} else {
+    // Nếu không có dữ liệu hoặc không xác định, khởi tạo là mảng rỗng
+    research.unlockedTechnologies = [];
+}
+
+// Đảm bảo unlockCosts tồn tại
+research.unlockCosts = loadedState.research.unlockCosts || {
+    soldierTraining: 50,
+    armorCrafting: 50
+};
+
+  }
+
 // --- Các hàm Hack (Chỉ dùng cho mục đích test) ---
 
 function hackResources() {
@@ -1644,6 +1847,7 @@ function startGameLoop() {
         advanceTrainingSoldier();
         advanceCraftingArmor();
         advanceExploration();
+        autoSaveGame();
     }, 1000);
 }
 
@@ -1791,6 +1995,7 @@ window.onload = () => {
 
 
     updateUI();
+    autoLoadGame();
     startGameLoop();
     showMainTab('world-tab');
 
