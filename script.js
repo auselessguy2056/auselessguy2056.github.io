@@ -1655,6 +1655,7 @@ function autoLoadGame(){
 
 }*/
           const loadedState = JSON.parse(savedData);
+        if (loadedState) {
         resources = loadedState.resources;
         workers = loadedState.workers;
         buildings = loadedState.buildings;
@@ -1761,7 +1762,7 @@ research.unlockCosts = loadedState.research.unlockCosts || {
     soldierTraining: 50,
     armorCrafting: 50
 };
-
+}
   }
 
 // --- Các hàm Hack (Chỉ dùng cho mục đích test) ---
