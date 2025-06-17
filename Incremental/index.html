@@ -209,8 +209,8 @@
     <div class="resource-section" style="background-color: #e3f2fd; border-color: #90caf9;">
         <h2>Game Stats</h2>
         <p>Time Played: <span id="timePlayed">00:00:00</span></p>
-        <button id="saveGameBtn">Lưu Game</button>
-        <button id="loadGameBtn">Tải Game</button>
+        <button id="saveGameBtn">Save Game</button>
+        <button id="loadGameBtn">Load Game</button>
     </div>
 
     <hr>
@@ -227,6 +227,14 @@
     <hr>
     <div id="notification-area">
 </div>
+    <!-- Stage 1 Section -->
+    <div class="resource-section" style="background-color: #c8e6c9; border-color: #a5d6a7;">
+        <h2>Stage 1</h2>
+        <p>Collect Basic Resources</p>
+    </div>
+
+    <hr>
+
     <div class="resource-section">
         <h2>Wood</h2>
         <p>Current Wood: <span id="woodCount">0</span></p>
@@ -390,80 +398,238 @@
 
     <hr>
 
-    <div class="resource-section">
+    <div class="resource-section" style="background-color: #c3e6cb; border-color: #81c784;">
+        <h2>Stage 2: Reality Transformation</h2>
+        <p>You are shaping the universe! The cost of high-level resources has increased significantly.</p>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #d4edda; border-color: #28a745;">
         <h2>The All</h2>
         <p>Current The All: <span id="theAllCount">0</span></p>
         <p>The All per second: <span id="theAllPerSecond">0</span></p>
-        <button id="buyTheAll">Convert 1000 Void to 1 The All</button>
+        <button id="buyTheAll">Convert <span id="theAllCost">10000</span> Void to 1 The All</button>
         <button class="generate-lore-btn" data-resource="Vạn Vật Toàn Thể">Tạo Lore ✨</button>
         <div id="theAllLore" class="lore-display"></div>
     </div>
 
     <hr>
 
-    <div class="resource-section">
+    <div class="resource-section" style="background-color: #d4edda; border-color: #28a745;">
         <h2>Transcendence</h2>
         <p>Current Transcendence: <span id="transcendenceCount">0</span></p>
         <p>Transcendence per second: <span id="transcendencePerSecond">0</span></p>
-        <button id="buyTranscendence">Convert 1000 The All to 1 Transcendence</button>
+        <button id="buyTranscendence">Convert <span id="transcendenceCost">10000</span> The All to 1 Transcendence</button>
         <button class="generate-lore-btn" data-resource="Siêu Việt">Tạo Lore ✨</button>
         <div id="transcendenceLore" class="lore-display"></div>
     </div>
 
     <hr>
 
-    <div class="resource-section">
+    <div class="resource-section" style="background-color: #d4edda; border-color: #28a745;">
         <h2>The Absolute</h2>
         <p>Current The Absolute: <span id="theAbsoluteCount">0</span></p>
         <p>The Absolute per second: <span id="theAbsolutePerSecond">0</span></p>
-        <button id="buyTheAbsolute">Convert 1000 Transcendence to 1 The Absolute</button>
+        <button id="buyTheAbsolute">Convert <span id="theAbsoluteCost">10000</span> Transcendence to 1 The Absolute</button>
         <button class="generate-lore-btn" data-resource="Tuyệt Đối">Tạo Lore ✨</button>
         <div id="theAbsoluteLore" class="lore-display"></div>
     </div>
 
     <hr>
 
-    <div class="resource-section">
+    <div class="resource-section" style="background-color: #d4edda; border-color: #28a745;">
         <h2>The End</h2>
         <p>Current The End: <span id="theEndCount">0</span></p>
         <p>The End per second: <span id="theEndPerSecond">0</span></p>
-        <button id="buyTheEnd">Convert 1000 The Absolute to 1 The End</button>
+        <button id="buyTheEnd">Convert <span id="theEndCost">10000</span> The Absolute to 1 The End</button>
         <button class="generate-lore-btn" data-resource="Điểm Kết Thúc">Tạo Lore ✨</button>
         <div id="theEndLore" class="lore-display"></div>
     </div>
 
     <hr>
 
-    <div class="resource-section">
+    <div class="resource-section" style="background-color: #d4edda; border-color: #28a745;">
         <h2>The New Beginning</h2>
         <p>Current The New Beginning: <span id="theNewBeginningCount">0</span></p>
         <p>The New Beginning per second: <span id="theNewBeginningPerSecond">0</span></p>
-        <button id="buyTheNewBeginning">Convert 1000 The End to 1 The New Beginning</button>
+        <button id="buyTheNewBeginning">Convert <span id="theNewBeginningCost">10000</span> The End to 1 The New Beginning</button>
         <button class="generate-lore-btn" data-resource="Khởi Nguyên Mới">Tạo Lore ✨</button>
         <div id="theNewBeginningLore" class="lore-display"></div>
     </div>
 
     <hr>
 
-    <div class="resource-section">
+    <div class="resource-section" style="background-color: #d4edda; border-color: #28a745;">
         <h2>The Architect's Will</h2>
         <p>Current The Architect's Will: <span id="theArchitectsWillCount">0</span></p>
         <p>The Architect's Will per second: <span id="theArchitectsWillPerSecond">0</span></p>
-        <button id="buyTheArchitectsWill">Convert 1000 The New Beginning to 1 The Architect's Will</button>
+        <button id="buyTheArchitectsWill">Convert <span id="theArchitectsWillCost">10000</span> The New Beginning to 1 The Architect's Will</button>
         <button class="generate-lore-btn" data-resource="Ý Chí Kiến Trúc Sư">Tạo Lore ✨</button>
         <div id="theArchitectsWillLore" class="lore-display"></div>
     </div>
 
+    <hr>
+
+    <!-- NEW RESOURCE SECTION: The Omniverse -->
+    <div class="resource-section" style="background-color: #d4edda; border-color: #28a745;">
+        <h2>The Omniverse</h2>
+        <p>Current The Omniverse: <span id="theOmniverseCount">0</span></p>
+        <p>The Omniverse per second: <span id="theOmniversePerSecond">0</span></p>
+        <button id="buyTheOmniverse">Convert <span id="theOmniverseCost">10000</span> The Architect's Will to 1 The Omniverse</button>
+        <button class="generate-lore-btn" data-resource="The Omniverse">Tạo Lore ✨</button>
+        <div id="theOmniverseLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <!-- Stage 3 Section -->
+    <div class="resource-section" style="background-color: #fff3cd; border-color: #ffc107;">
+        <h2>Stage 3: Universal Unification</h2>
+        <p>The final frontier of creation. Your will becomes reality!</p>
+    </div>
+
+    <hr>
+
+    <!-- NEW RESOURCES BELOW -->
+
+    <div class="resource-section" style="background-color: #ffe0b2; border-color: #ffcc80;">
+        <h2>The Boundless Void</h2>
+        <p>Current The Boundless Void: <span id="theBoundlessVoidCount">0</span></p>
+        <p>The Boundless Void per second: <span id="theBoundlessVoidPerSecond">0</span></p>
+        <button id="buyTheBoundlessVoid">Convert <span id="theBoundlessVoidCost">100000</span> The Omniverse to 1 The Boundless Void</button>
+        <button class="generate-lore-btn" data-resource="The Boundless Void">Tạo Lore ✨</button>
+        <div id="theBoundlessVoidLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #ffe0b2; border-color: #ffcc80;">
+        <h2>Cosmic Fabric</h2>
+        <p>Current Cosmic Fabric: <span id="cosmicFabricCount">0</span></p>
+        <p>Cosmic Fabric per second: <span id="cosmicFabricPerSecond">0</span></p>
+        <button id="buyCosmicFabric">Convert <span id="cosmicFabricCost">100000</span> The Boundless Void to 1 Cosmic Fabric</button>
+        <button class="generate-lore-btn" data-resource="Cosmic Fabric">Tạo Lore ✨</button>
+        <div id="cosmicFabricLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #ffe0b2; border-color: #ffcc80;">
+        <h2>Infinite Nexus</h2>
+        <p>Current Infinite Nexus: <span id="infiniteNexusCount">0</span></p>
+        <p>Infinite Nexus per second: <span id="infiniteNexusPerSecond">0</span></p>
+        <button id="buyInfiniteNexus">Convert <span id="infiniteNexusCost">100000</span> Cosmic Fabric to 1 Infinite Nexus</button>
+        <button class="generate-lore-btn" data-resource="Infinite Nexus">Tạo Lore ✨</button>
+        <div id="infiniteNexusLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #ffe0b2; border-color: #ffcc80;">
+        <h2>Eternal Echo</h2>
+        <p>Current Eternal Echo: <span id="eternalEchoCount">0</span></p>
+        <p>Eternal Echo per second: <span id="eternalEchoPerSecond">0</span></p>
+        <button id="buyEternalEcho">Convert <span id="eternalEchoCost">100000</span> Infinite Nexus to 1 Eternal Echo</button>
+        <button class="generate-lore-btn" data-resource="Eternal Echo">Tạo Lore ✨</button>
+        <div id="eternalEchoLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #ffe0b2; border-color: #ffcc80;">
+        <h2>Zenith of Creation</h2>
+        <p>Current Zenith of Creation: <span id="zenithOfCreationCount">0</span></p>
+        <p>Zenith of Creation per second: <span id="zenithOfCreationPerSecond">0</span></p>
+        <button id="buyZenithOfCreation">Convert <span id="zenithOfCreationCost">100000</span> Eternal Echo to 1 Zenith of Creation</button>
+        <button class="generate-lore-btn" data-resource="Zenith of Creation">Tạo Lore ✨</button>
+        <div id="zenithOfCreationLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <!-- Stage 4 Section -->
+    <div class="resource-section" style="background-color: #f8d7da; border-color: #dc3545;">
+        <h2>Stage 4: Cosmic Awakening</h2>
+        <p>Unraveling the ultimate secrets of existence!</p>
+    </div>
+
+    <hr>
+
+    <!-- EVEN MORE NEW RESOURCES BELOW -->
+
+    <div class="resource-section" style="background-color: #f8d7da; border-color: #dc3545;">
+        <h2>Universal Singularity</h2>
+        <p>Current Universal Singularity: <span id="universalSingularityCount">0</span></p>
+        <p>Universal Singularity per second: <span id="universalSingularityPerSecond">0</span></p>
+        <button id="buyUniversalSingularity">Convert <span id="universalSingularityCost">1000000</span> Zenith of Creation to 1 Universal Singularity</button>
+        <button class="generate-lore-btn" data-resource="Universal Singularity">Tạo Lore ✨</button>
+        <div id="universalSingularityLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #f8d7da; border-color: #dc3545;">
+        <h2>Existential Fabric</h2>
+        <p>Current Existential Fabric: <span id="existentialFabricCount">0</span></p>
+        <p>Existential Fabric per second: <span id="existentialFabricPerSecond">0</span></p>
+        <button id="buyExistentialFabric">Convert <span id="existentialFabricCost">1000000</span> Universal Singularity to 1 Existential Fabric</button>
+        <button class="generate-lore-btn" data-resource="Existential Fabric">Tạo Lore ✨</button>
+        <div id="existentialFabricLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #f8d7da; border-color: #dc3545;">
+        <h2>Temporal Flux</h2>
+        <p>Current Temporal Flux: <span id="temporalFluxCount">0</span></p>
+        <p>Temporal Flux per second: <span id="temporalFluxPerSecond">0</span></p>
+        <button id="buyTemporalFlux">Convert <span id="temporalFluxCost">1000000</span> Existential Fabric to 1 Temporal Flux</button>
+        <button class="generate-lore-btn" data-resource="Temporal Flux">Tạo Lore ✨</button>
+        <div id="temporalFluxLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #f8d7da; border-color: #dc3545;">
+        <h2>Multidimensional Harmony</h2>
+        <p>Current Multidimensional Harmony: <span id="multidimensionalHarmonyCount">0</span></p>
+        <p>Multidimensional Harmony per second: <span id="multidimensionalHarmonyPerSecond">0</span></p>
+        <button id="buyMultidimensionalHarmony">Convert <span id="multidimensionalHarmonyCost">1000000</span> Temporal Flux to 1 Multidimensional Harmony</button>
+        <button class="generate-lore-btn" data-resource="Multidimensional Harmony">Tạo Lore ✨</button>
+        <div id="multidimensionalHarmonyLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #f8d7da; border-color: #dc3545;">
+        <h2>Cosmic Awakening</h2>
+        <p>Current Cosmic Awakening: <span id="cosmicAwakeningCount">0</span></p>
+        <p>Cosmic Awakening per second: <span id="cosmicAwakeningPerSecond">0</span></p>
+        <button id="buyCosmicAwakening">Convert <span id="cosmicAwakeningCost">1000000</span> Multidimensional Harmony to 1 Cosmic Awakening</button>
+        <button class="generate-lore-btn" data-resource="Cosmic Awakening">Tạo Lore ✨</button>
+        <div id="cosmicAwakeningLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #f8d7da; border-color: #dc3545;">
+        <h2>Divine Spark</h2>
+        <p>Current Divine Spark: <span id="divineSparkCount">0</span></p>
+        <p>Divine Spark per second: <span id="divineSparkPerSecond">0</span></p>
+        <button id="buyDivineSpark">Convert <span id="divineSparkCost">1000000</span> Cosmic Awakening to 1 Divine Spark</button>
+        <button class="generate-lore-btn" data-resource="Divine Spark">Tạo Lore ✨</button>
+        <div id="divineSparkLore" class="lore-display"></div>
+    </div>
 
     <script>
         // Game State: Defines all resources and their properties
         let resources = {
-
-            timePlayed: { // NEW RESOURCE: The Architect's Will
+            timePlayed: {
                 hour: 0,
                 minute: 0,
                 second: 0
-                        },
+            },
             wood: {
                 count: 0,
                 perSecond: 0,
@@ -571,49 +737,132 @@
             theAll: { // NEW RESOURCE: The All
                 count: 0,
                 perSecond: 0,
-                conversionCost: 1000, // Cost in Void
+                conversionCost: 10000, // CHANGED: Cost in Void to 10,000
                 produces: 'theAll',
                 perUnitProduction: 1
             },
             transcendence: { // NEW RESOURCE: Transcendence
                 count: 0,
                 perSecond: 0,
-                conversionCost: 1000, // Cost in The All
+                conversionCost: 10000, // CHANGED: Cost in The All to 10,000
                 produces: 'transcendence',
                 perUnitProduction: 1
             },
             theAbsolute: { // NEW RESOURCE: The Absolute
                 count: 0,
                 perSecond: 0,
-                conversionCost: 1000, // Cost in Transcendence
+                conversionCost: 10000, // CHANGED: Cost in Transcendence to 10,000
                 produces: 'theAbsolute',
                 perUnitProduction: 1
             },
             theEnd: { // NEW RESOURCE: The End
                 count: 0,
                 perSecond: 0,
-                conversionCost: 1000, // Cost in The Absolute
+                conversionCost: 10000, // CHANGED: Cost in The Absolute to 10,000
                 produces: 'theEnd',
                 perUnitProduction: 1
             },
             theNewBeginning: { // NEW RESOURCE: The New Beginning
                 count: 0,
                 perSecond: 0,
-                conversionCost: 1000, // Cost in The End
+                conversionCost: 10000, // CHANGED: Cost in The End to 10,000
                 produces: 'theNewBeginning',
                 perUnitProduction: 1
             },
             theArchitectsWill: { // NEW RESOURCE: The Architect's Will
                 count: 0,
                 perSecond: 0,
-                conversionCost: 1000, // Cost in The New Beginning
+                conversionCost: 10000, // CHANGED: Cost in The New Beginning to 10,000
                 produces: 'theArchitectsWill',
+                perUnitProduction: 1
+            },
+            theOmniverse: { // NEWLY ADDED RESOURCE
+                count: 0,
+                perSecond: 0,
+                conversionCost: 10000, // CHANGED: Cost in The Architect's Will to 10,000
+                produces: 'theOmniverse',
+                perUnitProduction: 1
+            },
+            // --- NEW RESOURCES ADDED BELOW (STAGE 3) ---
+            theBoundlessVoid: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 100000, // CHANGED: Cost in The Omniverse to 100,000
+                produces: 'theBoundlessVoid',
+                perUnitProduction: 1
+            },
+            cosmicFabric: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 100000, // CHANGED: Cost in The Boundless Void to 100,000
+                produces: 'cosmicFabric',
+                perUnitProduction: 1
+            },
+            infiniteNexus: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 100000, // CHANGED: Cost in Cosmic Fabric to 100,000
+                produces: 'infiniteNexus',
+                perUnitProduction: 1
+            },
+            eternalEcho: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 100000, // CHANGED: Cost in Infinite Nexus to 100,000
+                produces: 'eternalEcho',
+                perUnitProduction: 1
+            },
+            zenithOfCreation: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 100000, // CHANGED: Cost in Eternal Echo to 100,000
+                produces: 'zenithOfCreation',
+                perUnitProduction: 1
+            },
+            // --- EVEN MORE NEW RESOURCES ADDED BELOW (STAGE 4) ---
+            universalSingularity: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000000, // Cost in Zenith of Creation (retained)
+                produces: 'universalSingularity',
+                perUnitProduction: 1
+            },
+            existentialFabric: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000000, // Cost in Universal Singularity (retained)
+                produces: 'existentialFabric',
+                perUnitProduction: 1
+            },
+            temporalFlux: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000000, // Cost in Existential Fabric (retained)
+                produces: 'temporalFlux',
+                perUnitProduction: 1
+            },
+            multidimensionalHarmony: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000000, // Cost in Temporal Flux (retained)
+                produces: 'multidimensionalHarmony',
+                perUnitProduction: 1
+            },
+            cosmicAwakening: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000000, // Cost in Multidimensional Harmony (retained)
+                produces: 'cosmicAwakening',
+                perUnitProduction: 1
+            },
+            divineSpark: {
+                count: 0,
+                perSecond: 0,
+                conversionCost: 1000000, // Cost in Cosmic Awakening (retained)
+                produces: 'divineSpark',
                 perUnitProduction: 1
             }
         };
-
-        // NEW: Variable to store the start time of the game for saving/loading
-        let gameStartTime = Date.now();
 
         // DOM Elements: References to all interactive and display elements
         const woodCountSpan = document.getElementById('woodCount');
@@ -649,7 +898,6 @@
         const consciousnessPerSecondSpan = document.getElementById('consciousnessPerSecond');
         const buyConsciousnessButton = document.getElementById('buyConsciousness');
 
-        // New DOM elements for new resources
         const realityShardCountSpan = document.getElementById('realityShardCount');
         const realityShardPerSecondSpan = document.getElementById('realityShardPerSecond');
         const buyRealityShardButton = document.getElementById('buyRealityShard');
@@ -678,56 +926,113 @@
         const voidPerSecondSpan = document.getElementById('voidPerSecond');
         const buyVoidButton = document.getElementById('buyVoid');
 
-        // The All DOM elements
         const theAllCountSpan = document.getElementById('theAllCount');
         const theAllPerSecondSpan = document.getElementById('theAllPerSecond');
         const buyTheAllButton = document.getElementById('buyTheAll');
+        const theAllCost = document.getElementById('theAllCost');
 
-        // Transcendence DOM elements
         const transcendenceCountSpan = document.getElementById('transcendenceCount');
         const transcendencePerSecondSpan = document.getElementById('transcendencePerSecond');
         const buyTranscendenceButton = document.getElementById('buyTranscendence');
+        const transcendenceCost = document.getElementById('transcendenceCost');
 
-        // The Absolute DOM elements
         const theAbsoluteCountSpan = document.getElementById('theAbsoluteCount');
-        const theAbsolutePerSecondSpan = document.getElementById('theAbsolutePerSecond');
+        const theAbsolutePerSecondSpan = document = document.getElementById('theAbsolutePerSecond');
         const buyTheAbsoluteButton = document.getElementById('buyTheAbsolute');
+        const theAbsoluteCost = document.getElementById('theAbsoluteCost');
 
-        // The End DOM elements
         const theEndCountSpan = document.getElementById('theEndCount');
         const theEndPerSecondSpan = document.getElementById('theEndPerSecond');
         const buyTheEndButton = document.getElementById('buyTheEnd');
+        const theEndCost = document.getElementById('theEndCost');
 
-        // The New Beginning DOM elements
         const theNewBeginningCountSpan = document.getElementById('theNewBeginningCount');
         const theNewBeginningPerSecondSpan = document.getElementById('theNewBeginningPerSecond');
         const buyTheNewBeginningButton = document.getElementById('buyTheNewBeginning');
+        const theNewBeginningCostSpan = document.getElementById('theNewBeginningCost');
 
-        // The Architect's Will DOM elements
         const theArchitectsWillCountSpan = document.getElementById('theArchitectsWillCount');
         const theArchitectsWillPerSecondSpan = document.getElementById('theArchitectsWillPerSecond');
         const buyTheArchitectsWillButton = document.getElementById('buyTheArchitectsWill');
+        const theArchitectsWillCostSpan = document.getElementById('theArchitectsWillCost');
+
+        const theOmniverseCountSpan = document.getElementById('theOmniverseCount');
+        const theOmniversePerSecondSpan = document.getElementById('theOmniversePerSecond');
+        const buyTheOmniverseButton = document.getElementById('buyTheOmniverse');
+        const theOmniverseCost = document.getElementById('theOmniverseCost');
+
+        // --- NEW RESOURCE DOM ELEMENTS (STAGE 3) ---
+        const theBoundlessVoidCountSpan = document.getElementById('theBoundlessVoidCount');
+        const theBoundlessVoidPerSecondSpan = document.getElementById('theBoundlessVoidPerSecond');
+        const buyTheBoundlessVoidButton = document.getElementById('buyTheBoundlessVoid');
+        const theBoundlessVoidCost = document.getElementById('theBoundlessVoidCost');
+
+        const cosmicFabricCountSpan = document.getElementById('cosmicFabricCount');
+        const cosmicFabricPerSecondSpan = document.getElementById('cosmicFabricPerSecond');
+        const buyCosmicFabricButton = document.getElementById('buyCosmicFabric');
+        const cosmicFabricCost = document.getElementById('cosmicFabricCost');
+
+        const infiniteNexusCountSpan = document.getElementById('infiniteNexusCount');
+        const infiniteNexusPerSecondSpan = document.getElementById('infiniteNexusPerSecond');
+        const buyInfiniteNexusButton = document.getElementById('buyInfiniteNexus');
+        const infiniteNexusCost = document.getElementById('infiniteNexusCost');
+
+        const eternalEchoCountSpan = document.getElementById('eternalEchoCount');
+        const eternalEchoPerSecondSpan = document.getElementById('eternalEchoPerSecond');
+        const buyEternalEchoButton = document.getElementById('buyEternalEcho');
+        const eternalEchoCost = document.getElementById('eternalEchoCost');
+
+        const zenithOfCreationCountSpan = document.getElementById('zenithOfCreationCount');
+        const zenithOfCreationPerSecondSpan = document.getElementById('zenithOfCreationPerSecond');
+        const buyZenithOfCreationButton = document.getElementById('buyZenithOfCreation');
+        const zenithOfCreationCost = document.getElementById('zenithOfCreationCost');
+
+        // --- EVEN MORE NEW RESOURCE DOM ELEMENTS (STAGE 4) ---
+        const universalSingularityCountSpan = document.getElementById('universalSingularityCount');
+        const universalSingularityPerSecondSpan = document.getElementById('universalSingularityPerSecond');
+        const buyUniversalSingularityButton = document.getElementById('buyUniversalSingularity');
+        const universalSingularityCost = document.getElementById('universalSingularityCost');
+
+        const existentialFabricCountSpan = document.getElementById('existentialFabricCount');
+        const existentialFabricPerSecondSpan = document.getElementById('existentialFabricPerSecond');
+        const buyExistentialFabricButton = document.getElementById('buyExistentialFabric');
+        const existentialFabricCost = document.getElementById('existentialFabricCost');
+
+        const temporalFluxCountSpan = document.getElementById('temporalFluxCount');
+        const temporalFluxPerSecondSpan = document.getElementById('temporalFluxPerSecond');
+        const buyTemporalFluxButton = document.getElementById('buyTemporalFlux');
+        const temporalFluxCost = document.getElementById('temporalFluxCost');
+
+        const multidimensionalHarmonyCountSpan = document.getElementById('multidimensionalHarmonyCount');
+        const multidimensionalHarmonyPerSecondSpan = document = document.getElementById('multidimensionalHarmonyPerSecond');
+        const buyMultidimensionalHarmonyButton = document.getElementById('buyMultidimensionalHarmony');
+        const multidimensionalHarmonyCost = document.getElementById('multidimensionalHarmonyCost');
+
+        const cosmicAwakeningCountSpan = document.getElementById('cosmicAwakeningCount');
+        const cosmicAwakeningPerSecondSpan = document.getElementById('cosmicAwakeningPerSecond');
+        const buyCosmicAwakeningButton = document.getElementById('buyCosmicAwakening');
+        const cosmicAwakeningCost = document.getElementById('cosmicAwakeningCost');
+
+        const divineSparkCountSpan = document.getElementById('divineSparkCount');
+        const divineSparkPerSecondSpan = document.getElementById('divineSparkPerSecond');
+        const buyDivineSparkButton = document.getElementById('buyDivineSpark');
+        const divineSparkCost = document.getElementById('divineSparkCost');
 
 
-        // New DOM element for time played
         const timePlayedSpan = document.getElementById('timePlayed');
 
-        // Quiz DOM elements
         const quizQuestionParagraph = document.getElementById('quizQuestion');
         const quizAnswerInput = document.getElementById('quizAnswerInput');
         const submitQuizAnswerButton = document.getElementById('submitQuizAnswer');
         const quizFeedbackParagraph = document.getElementById('quizFeedback');
 
-        // Critical hit feedback DOM elements
         const criticalHitFeedbackDiv = document.getElementById('criticalHitFeedback');
         const criticalHitTextSpan = document.getElementById('criticalHitText');
         const closeCriticalFeedbackButton = document.getElementById('closeCriticalFeedback');
 
-        // Save/Load buttons
         const saveGameBtn = document.getElementById('saveGameBtn');
         const loadGameBtn = document.getElementById('loadGameBtn');
 
-        // Lore buttons and display divs
         const loreButtons = document.querySelectorAll('.generate-lore-btn');
         const loreDisplays = {
             "Gỗ": document.getElementById('woodLore'),
@@ -749,7 +1054,21 @@
             "Tuyệt Đối": document.getElementById('theAbsoluteLore'),
             "Điểm Kết Thúc": document.getElementById('theEndLore'),
             "Khởi Nguyên Mới": document.getElementById('theNewBeginningLore'),
-            "Ý Chí Kiến Trúc Sư": document.getElementById('theArchitectsWillLore')
+            "Ý Chí Kiến Trúc Sư": document.getElementById('theArchitectsWillLore'),
+            "The Omniverse": document.getElementById('theOmniverseLore'),
+            // --- NEW LORE DISPLAYS (STAGE 3) ---
+            "The Boundless Void": document.getElementById('theBoundlessVoidLore'),
+            "Cosmic Fabric": document.getElementById('cosmicFabricLore'),
+            "Infinite Nexus": document.getElementById('infiniteNexusLore'),
+            "Eternal Echo": document.getElementById('eternalEchoLore'),
+            "Zenith of Creation": document.getElementById('zenithOfCreationLore'),
+            // --- EVEN MORE NEW LORE DISPLAYS (STAGE 4) ---
+            "Universal Singularity": document.getElementById('universalSingularityLore'),
+            "Existential Fabric": document.getElementById('existentialFabricLore'),
+            "Temporal Flux": document.getElementById('temporalFluxLore'),
+            "Multidimensional Harmony": document.getElementById('multidimensionalHarmonyLore'),
+            "Cosmic Awakening": document.getElementById('cosmicAwakeningLore'),
+            "Divine Spark": document.getElementById('divineSparkLore')
         };
 
 
@@ -836,32 +1155,112 @@
             // The All
             theAllCountSpan.textContent = resources.theAll.count.toFixed(0);
             theAllPerSecondSpan.textContent = resources.theAll.perSecond.toFixed(1);
+            theAllCost.textContent = resources.theAll.conversionCost;
             buyTheAllButton.disabled = resources.void.count < resources.theAll.conversionCost;
 
             // Transcendence
             transcendenceCountSpan.textContent = resources.transcendence.count.toFixed(0);
             transcendencePerSecondSpan.textContent = resources.transcendence.perSecond.toFixed(1);
+            transcendenceCost.textContent = resources.transcendence.conversionCost;
             buyTranscendenceButton.disabled = resources.theAll.count < resources.transcendence.conversionCost;
 
             // The Absolute
             theAbsoluteCountSpan.textContent = resources.theAbsolute.count.toFixed(0);
             theAbsolutePerSecondSpan.textContent = resources.theAbsolute.perSecond.toFixed(1);
+            theAbsoluteCost.textContent = resources.theAbsolute.conversionCost;
             buyTheAbsoluteButton.disabled = resources.transcendence.count < resources.theAbsolute.conversionCost;
 
             // The End
             theEndCountSpan.textContent = resources.theEnd.count.toFixed(0);
             theEndPerSecondSpan.textContent = resources.theEnd.perSecond.toFixed(1);
+            theEndCost.textContent = resources.theEnd.conversionCost;
             buyTheEndButton.disabled = resources.theAbsolute.count < resources.theEnd.conversionCost;
 
             // The New Beginning
             theNewBeginningCountSpan.textContent = resources.theNewBeginning.count.toFixed(0);
             theNewBeginningPerSecondSpan.textContent = resources.theNewBeginning.perSecond.toFixed(1);
+            theNewBeginningCostSpan.textContent = resources.theNewBeginning.conversionCost;
             buyTheNewBeginningButton.disabled = resources.theEnd.count < resources.theNewBeginning.conversionCost;
 
-            // The Architect's Will (NEW)
+            // The Architect's Will
             theArchitectsWillCountSpan.textContent = resources.theArchitectsWill.count.toFixed(0);
             theArchitectsWillPerSecondSpan.textContent = resources.theArchitectsWill.perSecond.toFixed(1);
+            theArchitectsWillCostSpan.textContent = resources.theArchitectsWill.conversionCost;
             buyTheArchitectsWillButton.disabled = resources.theNewBeginning.count < resources.theArchitectsWill.conversionCost;
+
+            // The Omniverse
+            theOmniverseCountSpan.textContent = resources.theOmniverse.count.toFixed(0);
+            theOmniversePerSecondSpan.textContent = resources.theOmniverse.perSecond.toFixed(1);
+            theOmniverseCost.textContent = resources.theOmniverse.conversionCost;
+            buyTheOmniverseButton.disabled = resources.theArchitectsWill.count < resources.theOmniverse.conversionCost;
+
+            // --- NEW RESOURCES DISPLAY UPDATE (STAGE 3) ---
+            // The Boundless Void
+            theBoundlessVoidCountSpan.textContent = resources.theBoundlessVoid.count.toFixed(0);
+            theBoundlessVoidPerSecondSpan.textContent = resources.theBoundlessVoid.perSecond.toFixed(1);
+            theBoundlessVoidCost.textContent = resources.theBoundlessVoid.conversionCost;
+            buyTheBoundlessVoidButton.disabled = resources.theOmniverse.count < resources.theBoundlessVoid.conversionCost;
+
+            // Cosmic Fabric
+            cosmicFabricCountSpan.textContent = resources.cosmicFabric.count.toFixed(0);
+            cosmicFabricPerSecondSpan.textContent = resources.cosmicFabric.perSecond.toFixed(1);
+            cosmicFabricCost.textContent = resources.cosmicFabric.conversionCost;
+            buyCosmicFabricButton.disabled = resources.theBoundlessVoid.count < resources.cosmicFabric.conversionCost;
+
+            // Infinite Nexus
+            infiniteNexusCountSpan.textContent = resources.infiniteNexus.count.toFixed(0);
+            infiniteNexusPerSecondSpan.textContent = resources.infiniteNexus.perSecond.toFixed(1);
+            infiniteNexusCost.textContent = resources.infiniteNexus.conversionCost;
+            buyInfiniteNexusButton.disabled = resources.cosmicFabric.count < resources.infiniteNexus.conversionCost;
+
+            // Eternal Echo
+            eternalEchoCountSpan.textContent = resources.eternalEcho.count.toFixed(0);
+            eternalEchoPerSecondSpan.textContent = resources.eternalEcho.perSecond.toFixed(1);
+            eternalEchoCost.textContent = resources.eternalEcho.conversionCost;
+            buyEternalEchoButton.disabled = resources.infiniteNexus.count < resources.eternalEcho.conversionCost;
+
+            // Zenith of Creation
+            zenithOfCreationCountSpan.textContent = resources.zenithOfCreation.count.toFixed(0);
+            zenithOfCreationPerSecondSpan.textContent = resources.zenithOfCreation.perSecond.toFixed(1);
+            zenithOfCreationCost.textContent = resources.zenithOfCreation.conversionCost;
+            buyZenithOfCreationButton.disabled = resources.eternalEcho.count < resources.zenithOfCreation.conversionCost;
+
+            // --- EVEN MORE NEW RESOURCES DISPLAY UPDATE (STAGE 4) ---
+            // Universal Singularity
+            universalSingularityCountSpan.textContent = resources.universalSingularity.count.toFixed(0);
+            universalSingularityPerSecondSpan.textContent = resources.universalSingularity.perSecond.toFixed(1);
+            universalSingularityCost.textContent = resources.universalSingularity.conversionCost;
+            buyUniversalSingularityButton.disabled = resources.zenithOfCreation.count < resources.universalSingularity.conversionCost;
+
+            // Existential Fabric
+            existentialFabricCountSpan.textContent = resources.existentialFabric.count.toFixed(0);
+            existentialFabricPerSecondSpan.textContent = resources.existentialFabric.perSecond.toFixed(1);
+            existentialFabricCost.textContent = resources.existentialFabric.conversionCost;
+            buyExistentialFabricButton.disabled = resources.universalSingularity.count < resources.existentialFabric.conversionCost;
+
+            // Temporal Flux
+            temporalFluxCountSpan.textContent = resources.temporalFlux.count.toFixed(0);
+            temporalFluxPerSecondSpan.textContent = resources.temporalFlux.perSecond.toFixed(1);
+            temporalFluxCost.textContent = resources.temporalFlux.conversionCost;
+            buyTemporalFluxButton.disabled = resources.existentialFabric.count < resources.temporalFlux.conversionCost;
+
+            // Multidimensional Harmony
+            multidimensionalHarmonyCountSpan.textContent = resources.multidimensionalHarmony.count.toFixed(0);
+            multidimensionalHarmonyPerSecondSpan.textContent = resources.multidimensionalHarmony.perSecond.toFixed(1);
+            multidimensionalHarmonyCost.textContent = resources.multidimensionalHarmony.conversionCost;
+            buyMultidimensionalHarmonyButton.disabled = resources.temporalFlux.count < resources.multidimensionalHarmony.conversionCost;
+
+            // Cosmic Awakening
+            cosmicAwakeningCountSpan.textContent = resources.cosmicAwakening.count.toFixed(0);
+            cosmicAwakeningPerSecondSpan.textContent = resources.cosmicAwakening.perSecond.toFixed(1);
+            cosmicAwakeningCost.textContent = resources.cosmicAwakening.conversionCost;
+            buyCosmicAwakeningButton.disabled = resources.multidimensionalHarmony.count < resources.cosmicAwakening.conversionCost;
+
+            // Divine Spark
+            divineSparkCountSpan.textContent = resources.divineSpark.count.toFixed(0);
+            divineSparkPerSecondSpan.textContent = resources.divineSpark.perSecond.toFixed(1);
+            divineSparkCost.textContent = resources.divineSpark.conversionCost;
+            buyDivineSparkButton.disabled = resources.cosmicAwakening.count < resources.divineSpark.conversionCost;
         }
 
         /**
@@ -980,10 +1379,19 @@
                     // Load resources
                     const loadedResources = parsedData.resources;
                     for (const key in resources) {
+                        // Use Object.assign to merge properties deeply, preserving new properties if they exist in loaded data
                         if (loadedResources[key] !== undefined) {
-                            Object.assign(resources[key], loadedResources[key]);
+                            // If it's an object, merge properties
+                            if (typeof resources[key] === 'object' && resources[key] !== null &&
+                                typeof loadedResources[key] === 'object' && loadedResources[key] !== null) {
+                                Object.assign(resources[key], loadedResources[key]);
+                            } else {
+                                // Otherwise, directly assign the value
+                                resources[key] = loadedResources[key];
+                            }
                         }
                     }
+
                     updateDisplay();
                     alert('Tiến độ trò chơi đã được tải!');
                 } else {
@@ -1030,7 +1438,18 @@
             { question: "What is the resource after Omniscience?", answer: "genesis", reward: 3000 },
             { question: "What is the final resource after The Absolute?", answer: "the end", reward: 10000 },
             { question: "What is the resource after The End?", answer: "the new beginning", reward: 15000 },
-            { question: "What is the resource after The New Beginning?", answer: "the architect's will", reward: 20000 }
+            { question: "What is the resource after The New Beginning?", answer: "the architect's will", reward: 20000 },
+            { question: "What comes after The Architect's Will?", answer: "the omniverse", reward: 50000 },
+            // --- NEW QUIZ QUESTIONS (STAGE 3) ---
+            { question: "What comes after The Omniverse?", answer: "the boundless void", reward: 100000 },
+            { question: "What comes after The Boundless Void?", answer: "cosmic fabric", reward: 150000 },
+            { question: "What is the second to last resource in Stage 3?", answer: "eternal echo", reward: 200000 },
+            { question: "What is the final resource in Stage 3?", answer: "zenith of creation", reward: 250000 },
+            // --- NEW QUIZ QUESTIONS (STAGE 4) ---
+            { question: "What comes after Zenith of Creation?", answer: "universal singularity", reward: 300000 },
+            { question: "What is the resource after Universal Singularity?", answer: "existential fabric", reward: 350000 },
+            { question: "What is the resource after Temporal Flux?", answer: "multidimensional harmony", reward: 400000 },
+            { question: "What is the ultimate resource of all?", answer: "divine spark", reward: 500000 }
         ];
 
         let currentQuestion = null;
@@ -1183,10 +1602,24 @@
         buyTheEndButton.addEventListener('click', () => buyResource('theEnd', 'theAbsolute'));
         buyTheNewBeginningButton.addEventListener('click', () => buyResource('theNewBeginning', 'theEnd'));
         buyTheArchitectsWillButton.addEventListener('click', () => buyResource('theArchitectsWill', 'theNewBeginning'));
+        buyTheOmniverseButton.addEventListener('click', () => buyResource('theOmniverse', 'theArchitectsWill'));
+        // --- NEW RESOURCE EVENT LISTENERS (STAGE 3) ---
+        buyTheBoundlessVoidButton.addEventListener('click', () => buyResource('theBoundlessVoid', 'theOmniverse'));
+        buyCosmicFabricButton.addEventListener('click', () => buyResource('cosmicFabric', 'theBoundlessVoid'));
+        buyInfiniteNexusButton.addEventListener('click', () => buyResource('infiniteNexus', 'cosmicFabric'));
+        buyEternalEchoButton.addEventListener('click', () => buyResource('eternalEcho', 'infiniteNexus'));
+        buyZenithOfCreationButton.addEventListener('click', () => buyResource('zenithOfCreation', 'eternalEcho'));
+        // --- EVEN MORE NEW RESOURCE EVENT LISTENERS (STAGE 4) ---
+        buyUniversalSingularityButton.addEventListener('click', () => buyResource('universalSingularity', 'zenithOfCreation'));
+        buyExistentialFabricButton.addEventListener('click', () => buyResource('existentialFabric', 'universalSingularity'));
+        buyTemporalFluxButton.addEventListener('click', () => buyResource('temporalFlux', 'existentialFabric'));
+        buyMultidimensionalHarmonyButton.addEventListener('click', () => buyResource('multidimensionalHarmony', 'temporalFlux'));
+        buyCosmicAwakeningButton.addEventListener('click', () => buyResource('cosmicAwakening', 'multidimensionalHarmony'));
+        buyDivineSparkButton.addEventListener('click', () => buyResource('divineSpark', 'cosmicAwakening'));
 
 
         // Event listeners for save/load buttons
-        saveGameBtn.addEventListener('click', saveGame);
+        saveGameBtn.addEventListener('click', () => saveGame(0)); // Pass 0 to show alert
         loadGameBtn.addEventListener('click', loadGame);
 
         // Event listener for the critical feedback close button
@@ -1233,8 +1666,8 @@
             return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
         }
         function updateTimePlayed() {
-        
-      
+
+
        resources.timePlayed.second += 1;
        if(  resources.timePlayed.second == 60)
 {
@@ -1246,7 +1679,7 @@
     resources.timePlayed.minute = 0;
      resources.timePlayed.hour += 1;
 }
-       timePlayedSpan.textContent =    resources.timePlayed.hour.toString() + ":" + resources.timePlayed.minute.toString() + ":" +      resources.timePlayed.second.toString();
+       timePlayedSpan.textContent =    resources.timePlayed.hour.toString().padStart(2, '0') + ":" + resources.timePlayed.minute.toString().padStart(2, '0') + ":" +      resources.timePlayed.second.toString().padStart(2, '0');
 
 }
 
@@ -1271,13 +1704,14 @@ function notify(type,message){
   })();
 }
 
+
 function notifySuccess(){
   notify("success","The game has been saved.");
 }
 
 
 function autoSave(){
-saveGame(1);
+saveGame(1); // Pass 1 to suppress the alert during autosave
 notifySuccess();
 }
         /**
@@ -1307,19 +1741,28 @@ notifySuccess();
             resources.theEnd.count += resources.theEnd.perSecond / 10;
             resources.theNewBeginning.count += resources.theNewBeginning.perSecond / 10;
             resources.theArchitectsWill.count += resources.theArchitectsWill.perSecond / 10;
-
-            // Update Time Played
-            const currentTime = Date.now();
-            const elapsedTime = resources.timePlayed;
-       //     timePlayedSpan.textContent = formatTime(elapsedTime);
+            resources.theOmniverse.count += resources.theOmniverse.perSecond / 10;
+            // --- NEW RESOURCE UPDATES (STAGE 3) ---
+            resources.theBoundlessVoid.count += resources.theBoundlessVoid.perSecond / 10;
+            resources.cosmicFabric.count += resources.cosmicFabric.perSecond / 10;
+            resources.infiniteNexus.count += resources.infiniteNexus.perSecond / 10;
+            resources.eternalEcho.count += resources.eternalEcho.perSecond / 10;
+            resources.zenithOfCreation.count += resources.zenithOfCreation.perSecond / 10;
+            // --- EVEN MORE NEW RESOURCE UPDATES (STAGE 4) ---
+            resources.universalSingularity.count += resources.universalSingularity.perSecond / 10;
+            resources.existentialFabric.count += resources.existentialFabric.perSecond / 10;
+            resources.temporalFlux.count += resources.temporalFlux.perSecond / 10;
+            resources.multidimensionalHarmony.count += resources.multidimensionalHarmony.perSecond / 10;
+            resources.cosmicAwakening.count += resources.cosmicAwakening.perSecond / 10;
+            resources.divineSpark.count += resources.divineSpark.perSecond / 10;
 
             updateDisplay(); // Update the UI after resources are calculated
         }
 
         // Start the game loop
         setInterval(gameLoop, 100);
-setInterval(updateTimePlayed,1000);
-setInterval(autoSave,30000);
+        setInterval(updateTimePlayed, 1000); // Update timePlayed every second
+        setInterval(autoSave, 30000); // Auto-save every 30 seconds
 
         // Initial display update and load game when the page loads
         updateDisplay();
