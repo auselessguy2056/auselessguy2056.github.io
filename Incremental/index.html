@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ultimate Incremental Resource Game</title>
+    <meta http-equiv='cache-control' content='no-cache'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
     <style>
 
 #notification-area {
@@ -1015,7 +1018,7 @@
 
         const divineSparkCountSpan = document.getElementById('divineSparkCount');
         const divineSparkPerSecondSpan = document.getElementById('divineSparkPerSecond');
-        const buyDivineSparkButton = document.getElementById('buyDivineSpark');
+        const buyDivineSparkButton = document = document.getElementById('buyDivineSpark');
         const divineSparkCost = document.getElementById('divineSparkCost');
 
 
@@ -1499,11 +1502,11 @@
 
             if (userAnswer === correctAnswer) {
                 resources.wood.count += currentQuestion.reward;
-                quizFeedbackParagraph.textContent = `Correct! You gained ${currentQuestion.reward} Wood.`;
+                quizFeedbackParagraph.textContent = `Correct! Bạn đã nhận được ${currentQuestion.reward} Gỗ.`;
                 quizFeedbackParagraph.style.color = 'green';
                 updateDisplay();
             } else {
-                quizFeedbackParagraph.textContent = `Incorrect. The answer was "${currentQuestion.answer}".`;
+                quizFeedbackParagraph.textContent = `Không đúng. Đáp án là "${currentQuestion.answer}".`;
                 quizFeedbackParagraph.style.color = 'red';
             }
 
