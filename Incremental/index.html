@@ -204,6 +204,30 @@
             align-items: center; /* Vertically center content */
             justify-content: center; /* Horizontally center content */
         }
+
+        /* Footer styles */
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #263238; /* Dark background for footer */
+            color: #ffffff; /* White text */
+            text-align: center;
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        footer a {
+            color: #81d4fa; /* Light blue link color */
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.2s ease;
+        }
+
+        footer a:hover {
+            color: #e0f7fa; /* Lighter blue on hover */
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -214,7 +238,6 @@
         <p>Time Played: <span id="timePlayed">00:00:00</span></p>
         <button id="saveGameBtn">Save Game</button>
         <button id="loadGameBtn">Load Game</button>
-        <a href="https://discord.gg/qVhzdNcc">Discord Group</a>
     </div>
 
     <hr>
@@ -626,1152 +649,1038 @@
         <div id="divineSparkLore" class="lore-display"></div>
     </div>
 
+    <footer>
+        <p>Join our Discord server: <a href="https://discord.gg/EDjYUhmk" target="_blank">Discord Community</a></p>
+    </footer>
+
     <script>
-        // Game State: Defines all resources and their properties
-        let resources = {
-            timePlayed: {
-                hour: 0,
-                minute: 0,
-                second: 0
-            },
-            wood: {
-                count: 0,
-                perSecond: 0,
-                manualClickAmount: 1, // Amount added per manual click
-                upgradeCost: 10, // Cost to upgrade manual click power
-                upgradeMultiplier: 2, // How much upgrade cost increases
-                upgradeAmount: 1, // How much manualClickAmount increases per upgrade
-                automationCost: 10000, // Cost to get +1 Wood/sec
-                automationMultiplier: 1.5, // How much automation cost increases
-                automationAmount: 5, // Increased from 1 to 5 for faster automation
-                criticalChance: 0.10, // 10% chance for a critical strike
-                criticalMultiplier: 5 // 5x normal wood on critical strike
-            },
-            stone: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000, // Cost in previous resource
-                produces: 'stone', // What this resource itself produces
-                perUnitProduction: 1 // How much 1 unit of this resource produces per second
-            },
-            iron: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000,
-                produces: 'iron',
-                perUnitProduction: 1
-            },
-            alloy: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000, // Cost in Iron
-                produces: 'alloy',
-                perUnitProduction: 1
-            },
-            circuitry: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000, // Cost in Alloy
-                produces: 'circuitry',
-                perUnitProduction: 1
-            },
-            aiCore: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000, // Cost in Circuitry
-                produces: 'aiCore',
-                perUnitProduction: 1
-            },
-            consciousness: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000, // Cost in AI Core
-                produces: 'consciousness',
-                perUnitProduction: 1
-            },
-            realityShard: { // New resource
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000, // Cost in Consciousness
-                produces: 'realityShard',
-                perUnitProduction: 1
-            },
-            paradox: { // New resource
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000, // Cost in Reality Shard
-                produces: 'paradox',
-                perUnitProduction: 1
-            },
-            singularity: { // New resource
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000, // Cost in Paradox
-                produces: 'singularity',
-                perUnitProduction: 1
-            },
-            multiverse: { // New resource
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000, // Cost in Singularity
-                produces: 'multiverse',
-                perUnitProduction: 1
-            },
-            omniscience: { // New resource
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000, // Cost in Multiverse
-                produces: 'omniscience',
-                perUnitProduction: 1
-            },
-            genesis: { // New resource
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000, // Cost in Omniscience
-                produces: 'genesis',
-                perUnitProduction: 1
-            },
-            void: { // New resource
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000, // Cost in Genesis
-                produces: 'void',
-                perUnitProduction: 1
-            },
-            theAll: { // NEW RESOURCE: The All
-                count: 0,
-                perSecond: 0,
-                conversionCost: 10000, // CHANGED: Cost in Void to 10,000
-                produces: 'theAll',
-                perUnitProduction: 1
-            },
-            transcendence: { // NEW RESOURCE: Transcendence
-                count: 0,
-                perSecond: 0,
-                conversionCost: 10000, // CHANGED: Cost in The All to 10,000
-                produces: 'transcendence',
-                perUnitProduction: 1
-            },
-            theAbsolute: { // NEW RESOURCE: The Absolute
-                count: 0,
-                perSecond: 0,
-                conversionCost: 10000, // CHANGED: Cost in Transcendence to 10,000
-                produces: 'theAbsolute',
-                perUnitProduction: 1
-            },
-            theEnd: { // NEW RESOURCE: The End
-                count: 0,
-                perSecond: 0,
-                conversionCost: 10000, // CHANGED: Cost in The Absolute to 10,000
-                produces: 'theEnd',
-                perUnitProduction: 1
-            },
-            theNewBeginning: { // NEW RESOURCE: The New Beginning
-                count: 0,
-                perSecond: 0,
-                conversionCost: 10000, // CHANGED: Cost in The End to 10,000
-                produces: 'theNewBeginning',
-                perUnitProduction: 1
-            },
-            theArchitectsWill: { // NEW RESOURCE: The Architect's Will
-                count: 0,
-                perSecond: 0,
-                conversionCost: 10000, // CHANGED: Cost in The New Beginning to 10,000
-                produces: 'theArchitectsWill',
-                perUnitProduction: 1
-            },
-            theOmniverse: { // NEWLY ADDED RESOURCE
-                count: 0,
-                perSecond: 0,
-                conversionCost: 10000, // CHANGED: Cost in The Architect's Will to 10,000
-                produces: 'theOmniverse',
-                perUnitProduction: 1
-            },
-            // --- NEW RESOURCES ADDED BELOW (STAGE 3) ---
-            theBoundlessVoid: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 100000, // CHANGED: Cost in The Omniverse to 100,000
-                produces: 'theBoundlessVoid',
-                perUnitProduction: 1
-            },
-            cosmicFabric: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 100000, // CHANGED: Cost in The Boundless Void to 100,000
-                produces: 'cosmicFabric',
-                perUnitProduction: 1
-            },
-            infiniteNexus: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 100000, // CHANGED: Cost in Cosmic Fabric to 100,000
-                produces: 'infiniteNexus',
-                perUnitProduction: 1
-            },
-            eternalEcho: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 100000, // CHANGED: Cost in Infinite Nexus to 100,000
-                produces: 'eternalEcho',
-                perUnitProduction: 1
-            },
-            zenithOfCreation: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 100000, // CHANGED: Cost in Eternal Echo to 100,000
-                produces: 'zenithOfCreation',
-                perUnitProduction: 1
-            },
-            // --- EVEN MORE NEW RESOURCES ADDED BELOW (STAGE 4) ---
-            universalSingularity: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000000, // Cost in Zenith of Creation (retained)
-                produces: 'universalSingularity',
-                perUnitProduction: 1
-            },
-            existentialFabric: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000000, // Cost in Universal Singularity (retained)
-                produces: 'existentialFabric',
-                perUnitProduction: 1
-            },
-            temporalFlux: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000000, // Cost in Existential Fabric (retained)
-                produces: 'temporalFlux',
-                perUnitProduction: 1
-            },
-            multidimensionalHarmony: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000000, // Cost in Temporal Flux (retained)
-                produces: 'multidimensionalHarmony',
-                perUnitProduction: 1
-            },
-            cosmicAwakening: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000000, // Cost in Multidimensional Harmony (retained)
-                produces: 'cosmicAwakening',
-                perUnitProduction: 1
-            },
-            divineSpark: {
-                count: 0,
-                perSecond: 0,
-                conversionCost: 1000000, // Cost in Cosmic Awakening (retained)
-                produces: 'divineSpark',
-                perUnitProduction: 1
-            }
-        };
-
-        // DOM Elements: References to all interactive and display elements
-        const woodCountSpan = document.getElementById('woodCount');
-        const woodPerSecondSpan = document.getElementById('woodPerSecond');
-        const addWoodButton = document.getElementById('addWood');
-        const chopPowerDisplay = document.getElementById('chopPowerDisplay');
-        const upgradeChopPowerButton = document.getElementById('upgradeChopPower');
-        const chopUpgradeCostSpan = document.getElementById('chopUpgradeCost');
-        const buyWoodPerSecondButton = document.getElementById('buyWoodPerSecond');
-        const woodPerSecondCostSpan = document.getElementById('woodPerSecondCost');
-
-        const stoneCountSpan = document.getElementById('stoneCount');
-        const stonePerSecondSpan = document.getElementById('stonePerSecond');
-        const buyStoneButton = document.getElementById('buyStone');
-
-        const ironCountSpan = document.getElementById('ironCount');
-        const ironPerSecondSpan = document.getElementById('ironPerSecond');
-        const buyIronButton = document.getElementById('buyIron');
-
-        const alloyCountSpan = document.getElementById('alloyCount');
-        const alloyPerSecondSpan = document.getElementById('alloyPerSecond');
-        const buyAlloyButton = document.getElementById('buyAlloy');
-
-        const circuitryCountSpan = document.getElementById('circuitryCount');
-        const circuitryPerSecondSpan = document.getElementById('circuitryPerSecond');
-        const buyCircuitryButton = document.getElementById('buyCircuitry');
-
-        const aiCoreCountSpan = document.getElementById('aiCoreCount');
-        const aiCorePerSecondSpan = document.getElementById('aiCorePerSecond');
-        const buyAICoreButton = document.getElementById('buyAICore');
-
-        const consciousnessCountSpan = document.getElementById('consciousnessCount');
-        const consciousnessPerSecondSpan = document.getElementById('consciousnessPerSecond');
-        const buyConsciousnessButton = document.getElementById('buyConsciousness');
-
-        const realityShardCountSpan = document.getElementById('realityShardCount');
-        const realityShardPerSecondSpan = document.getElementById('realityShardPerSecond');
-        const buyRealityShardButton = document.getElementById('buyRealityShard');
-
-        const paradoxCountSpan = document.getElementById('paradoxCount');
-        const paradoxPerSecondSpan = document.getElementById('paradoxPerSecond');
-        const buyParadoxButton = document.getElementById('buyParadox');
-
-        const singularityCountSpan = document.getElementById('singularityCount');
-        const singularityPerSecondSpan = document.getElementById('singularityPerSecond');
-        const buySingularityButton = document.getElementById('buySingularity');
-
-        const multiverseCountSpan = document.getElementById('multiverseCount');
-        const multiversePerSecondSpan = document.getElementById('multiversePerSecond');
-        const buyMultiverseButton = document.getElementById('buyMultiverse');
-
-        const omniscienceCountSpan = document.getElementById('omniscienceCount');
-        const omnisciencePerSecondSpan = document.getElementById('omnisciencePerSecond');
-        const buyOmniscienceButton = document.getElementById('buyOmniscience');
-
-        const genesisCountSpan = document.getElementById('genesisCount');
-        const genesisPerSecondSpan = document.getElementById('genesisPerSecond');
-        const buyGenesisButton = document.getElementById('buyGenesis');
-
-        const voidCountSpan = document.getElementById('voidCount');
-        const voidPerSecondSpan = document.getElementById('voidPerSecond');
-        const buyVoidButton = document.getElementById('buyVoid');
-
-        const theAllCountSpan = document.getElementById('theAllCount');
-        const theAllPerSecondSpan = document.getElementById('theAllPerSecond');
-        const buyTheAllButton = document.getElementById('buyTheAll');
-        const theAllCost = document.getElementById('theAllCost');
-
-        const transcendenceCountSpan = document.getElementById('transcendenceCount');
-        const transcendencePerSecondSpan = document.getElementById('transcendencePerSecond');
-        const buyTranscendenceButton = document.getElementById('buyTranscendence');
-        const transcendenceCost = document.getElementById('transcendenceCost');
-
-        const theAbsoluteCountSpan = document.getElementById('theAbsoluteCount');
-        const theAbsolutePerSecondSpan = document = document.getElementById('theAbsolutePerSecond');
-        const buyTheAbsoluteButton = document.getElementById('buyTheAbsolute');
-        const theAbsoluteCost = document.getElementById('theAbsoluteCost');
-
-        const theEndCountSpan = document.getElementById('theEndCount');
-        const theEndPerSecondSpan = document.getElementById('theEndPerSecond');
-        const buyTheEndButton = document.getElementById('buyTheEnd');
-        const theEndCost = document.getElementById('theEndCost');
-
-        const theNewBeginningCountSpan = document.getElementById('theNewBeginningCount');
-        const theNewBeginningPerSecondSpan = document.getElementById('theNewBeginningPerSecond');
-        const buyTheNewBeginningButton = document.getElementById('buyTheNewBeginning');
-        const theNewBeginningCostSpan = document.getElementById('theNewBeginningCost');
-
-        const theArchitectsWillCountSpan = document.getElementById('theArchitectsWillCount');
-        const theArchitectsWillPerSecondSpan = document.getElementById('theArchitectsWillPerSecond');
-        const buyTheArchitectsWillButton = document.getElementById('buyTheArchitectsWill');
-        const theArchitectsWillCostSpan = document.getElementById('theArchitectsWillCost');
-
-        const theOmniverseCountSpan = document.getElementById('theOmniverseCount');
-        const theOmniversePerSecondSpan = document.getElementById('theOmniversePerSecond');
-        const buyTheOmniverseButton = document.getElementById('buyTheOmniverse');
-        const theOmniverseCost = document.getElementById('theOmniverseCost');
-
-        // --- NEW RESOURCE DOM ELEMENTS (STAGE 3) ---
-        const theBoundlessVoidCountSpan = document.getElementById('theBoundlessVoidCount');
-        const theBoundlessVoidPerSecondSpan = document.getElementById('theBoundlessVoidPerSecond');
-        const buyTheBoundlessVoidButton = document.getElementById('buyTheBoundlessVoid');
-        const theBoundlessVoidCost = document.getElementById('theBoundlessVoidCost');
-
-        const cosmicFabricCountSpan = document.getElementById('cosmicFabricCount');
-        const cosmicFabricPerSecondSpan = document.getElementById('cosmicFabricPerSecond');
-        const buyCosmicFabricButton = document.getElementById('buyCosmicFabric');
-        const cosmicFabricCost = document.getElementById('cosmicFabricCost');
-
-        const infiniteNexusCountSpan = document.getElementById('infiniteNexusCount');
-        const infiniteNexusPerSecondSpan = document.getElementById('infiniteNexusPerSecond');
-        const buyInfiniteNexusButton = document.getElementById('buyInfiniteNexus');
-        const infiniteNexusCost = document.getElementById('infiniteNexusCost');
-
-        const eternalEchoCountSpan = document.getElementById('eternalEchoCount');
-        const eternalEchoPerSecondSpan = document.getElementById('eternalEchoPerSecond');
-        const buyEternalEchoButton = document.getElementById('buyEternalEcho');
-        const eternalEchoCost = document.getElementById('eternalEchoCost');
-
-        const zenithOfCreationCountSpan = document.getElementById('zenithOfCreationCount');
-        const zenithOfCreationPerSecondSpan = document.getElementById('zenithOfCreationPerSecond');
-        const buyZenithOfCreationButton = document.getElementById('buyZenithOfCreation');
-        const zenithOfCreationCost = document.getElementById('zenithOfCreationCost');
-
-        // --- EVEN MORE NEW RESOURCE DOM ELEMENTS (STAGE 4) ---
-        const universalSingularityCountSpan = document.getElementById('universalSingularityCount');
-        const universalSingularityPerSecondSpan = document.getElementById('universalSingularityPerSecond');
-        const buyUniversalSingularityButton = document.getElementById('buyUniversalSingularity');
-        const universalSingularityCost = document.getElementById('universalSingularityCost');
-
-        const existentialFabricCountSpan = document.getElementById('existentialFabricCount');
-        const existentialFabricPerSecondSpan = document.getElementById('existentialFabricPerSecond');
-        const buyExistentialFabricButton = document.getElementById('buyExistentialFabric');
-        const existentialFabricCost = document.getElementById('existentialFabricCost');
-
-        const temporalFluxCountSpan = document.getElementById('temporalFluxCount');
-        const temporalFluxPerSecondSpan = document.getElementById('temporalFluxPerSecond');
-        const buyTemporalFluxButton = document.getElementById('buyTemporalFlux');
-        const temporalFluxCost = document.getElementById('temporalFluxCost');
-
-        const multidimensionalHarmonyCountSpan = document.getElementById('multidimensionalHarmonyCount');
-        const multidimensionalHarmonyPerSecondSpan = document = document.getElementById('multidimensionalHarmonyPerSecond');
-        const buyMultidimensionalHarmonyButton = document.getElementById('buyMultidimensionalHarmony');
-        const multidimensionalHarmonyCost = document.getElementById('multidimensionalHarmonyCost');
-
-        const cosmicAwakeningCountSpan = document.getElementById('cosmicAwakeningCount');
-        const cosmicAwakeningPerSecondSpan = document.getElementById('cosmicAwakeningPerSecond');
-        const buyCosmicAwakeningButton = document.getElementById('buyCosmicAwakening');
-        const cosmicAwakeningCost = document.getElementById('cosmicAwakeningCost');
-
-        const divineSparkCountSpan = document.getElementById('divineSparkCount');
-        const divineSparkPerSecondSpan = document.getElementById('divineSparkPerSecond');
-        const buyDivineSparkButton = document = document.getElementById('buyDivineSpark');
-        const divineSparkCost = document.getElementById('divineSparkCost');
-
-
-        const timePlayedSpan = document.getElementById('timePlayed');
-
-        const quizQuestionParagraph = document.getElementById('quizQuestion');
-        const quizAnswerInput = document.getElementById('quizAnswerInput');
-        const submitQuizAnswerButton = document.getElementById('submitQuizAnswer');
-        const quizFeedbackParagraph = document.getElementById('quizFeedback');
-
-        const criticalHitFeedbackDiv = document.getElementById('criticalHitFeedback');
-        const criticalHitTextSpan = document.getElementById('criticalHitText');
-        const closeCriticalFeedbackButton = document.getElementById('closeCriticalFeedback');
-
-        const saveGameBtn = document.getElementById('saveGameBtn');
-        const loadGameBtn = document.getElementById('loadGameBtn');
-
-        const loreButtons = document.querySelectorAll('.generate-lore-btn');
-        const loreDisplays = {
-            "Gỗ": document.getElementById('woodLore'),
-            "Đá": document.getElementById('stoneLore'),
-            "Sắt": document.getElementById('ironLore'),
-            "Hợp Kim": document.getElementById('alloyLore'),
-            "Mạch Điện": document.getElementById('circuitryLore'),
-            "Lõi AI": document.getElementById('aiCoreLore'),
-            "Ý Thức": document.getElementById('consciousnessLore'),
-            "Mảnh Vỡ Thực Tại": document.getElementById('realityShardLore'),
-            "Nghịch Lý": document.getElementById('paradoxLore'),
-            "Điểm Kỳ Dị": document.getElementById('singularityLore'),
-            "Đa Vũ Trụ": document.getElementById('multiverseLore'),
-            "Toàn Tri": document.getElementById('omniscienceLore'),
-            "Sáng Thế": document.getElementById('genesisLore'),
-            "Hư Không": document.getElementById('voidLore'),
-            "Vạn Vật Toàn Thể": document.getElementById('theAllLore'),
-            "Siêu Việt": document.getElementById('transcendenceLore'),
-            "Tuyệt Đối": document.getElementById('theAbsoluteLore'),
-            "Điểm Kết Thúc": document.getElementById('theEndLore'),
-            "Khởi Nguyên Mới": document.getElementById('theNewBeginningLore'),
-            "Ý Chí Kiến Trúc Sư": document.getElementById('theArchitectsWillLore'),
-            "The Omniverse": document.getElementById('theOmniverseLore'),
-            // --- NEW LORE DISPLAYS (STAGE 3) ---
-            "The Boundless Void": document.getElementById('theBoundlessVoidLore'),
-            "Cosmic Fabric": document.getElementById('cosmicFabricLore'),
-            "Infinite Nexus": document.getElementById('infiniteNexusLore'),
-            "Eternal Echo": document.getElementById('eternalEchoLore'),
-            "Zenith of Creation": document.getElementById('zenithOfCreationLore'),
-            // --- EVEN MORE NEW LORE DISPLAYS (STAGE 4) ---
-            "Universal Singularity": document.getElementById('universalSingularityLore'),
-            "Existential Fabric": document.getElementById('existentialFabricLore'),
-            "Temporal Flux": document.getElementById('temporalFluxLore'),
-            "Multidimensional Harmony": document.getElementById('multidimensionalHarmonyLore'),
-            "Cosmic Awakening": document.getElementById('cosmicAwakeningLore'),
-            "Divine Spark": document.getElementById('divineSparkLore')
-        };
-
-
-        // --- Game Logic Functions ---
-
-        /**
-         * Updates all resource counts, per second rates, and button states on the display.
-         */
-        function updateDisplay() {
-            // Wood
-            woodCountSpan.textContent = resources.wood.count.toFixed(0);
-            woodPerSecondSpan.textContent = resources.wood.perSecond.toFixed(1);
-            chopPowerDisplay.textContent = `+${resources.wood.manualClickAmount}`;
-            chopUpgradeCostSpan.textContent = resources.wood.upgradeCost;
-            upgradeChopPowerButton.disabled = resources.wood.count < resources.wood.upgradeCost;
-            woodPerSecondCostSpan.textContent = resources.wood.automationCost.toFixed(0);
-            buyWoodPerSecondButton.disabled = resources.wood.count < resources.wood.automationCost;
-
-            // Stone
-            stoneCountSpan.textContent = resources.stone.count.toFixed(0);
-            stonePerSecondSpan.textContent = resources.stone.perSecond.toFixed(1);
-            buyStoneButton.disabled = resources.wood.count < resources.stone.conversionCost;
-
-            // Iron
-            ironCountSpan.textContent = resources.iron.count.toFixed(0);
-            ironPerSecondSpan.textContent = resources.iron.perSecond.toFixed(1);
-            buyIronButton.disabled = resources.stone.count < resources.iron.conversionCost;
-
-            // Alloy
-            alloyCountSpan.textContent = resources.alloy.count.toFixed(0);
-            alloyPerSecondSpan.textContent = resources.alloy.perSecond.toFixed(1);
-            buyAlloyButton.disabled = resources.iron.count < resources.alloy.conversionCost;
-
-            // Circuitry
-            circuitryCountSpan.textContent = resources.circuitry.count.toFixed(0);
-            circuitryPerSecondSpan.textContent = resources.circuitry.perSecond.toFixed(1);
-            buyCircuitryButton.disabled = resources.alloy.count < resources.circuitry.conversionCost;
-
-            // AI Core
-            aiCoreCountSpan.textContent = resources.aiCore.count.toFixed(0);
-            aiCorePerSecondSpan.textContent = resources.aiCore.perSecond.toFixed(1);
-            buyAICoreButton.disabled = resources.circuitry.count < resources.aiCore.conversionCost;
-
-            // Consciousness
-            consciousnessCountSpan.textContent = resources.consciousness.count.toFixed(0);
-            consciousnessPerSecondSpan.textContent = resources.consciousness.perSecond.toFixed(1);
-            buyConsciousnessButton.disabled = resources.aiCore.count < resources.consciousness.conversionCost;
-
-            // Reality Shard
-            realityShardCountSpan.textContent = resources.realityShard.count.toFixed(0);
-            realityShardPerSecondSpan.textContent = resources.realityShard.perSecond.toFixed(1);
-            buyRealityShardButton.disabled = resources.consciousness.count < resources.realityShard.conversionCost;
-
-            // Paradox
-            paradoxCountSpan.textContent = resources.paradox.count.toFixed(0);
-            paradoxPerSecondSpan.textContent = resources.paradox.perSecond.toFixed(1);
-            buyParadoxButton.disabled = resources.realityShard.count < resources.paradox.conversionCost;
-
-            // Singularity
-            singularityCountSpan.textContent = resources.singularity.count.toFixed(0);
-            singularityPerSecondSpan.textContent = resources.singularity.perSecond.toFixed(1);
-            buySingularityButton.disabled = resources.paradox.count < resources.singularity.conversionCost;
-
-            // Multiverse
-            multiverseCountSpan.textContent = resources.multiverse.count.toFixed(0);
-            multiversePerSecondSpan.textContent = resources.multiverse.perSecond.toFixed(1);
-            buyMultiverseButton.disabled = resources.singularity.count < resources.multiverse.conversionCost;
-
-            // Omniscience
-            omniscienceCountSpan.textContent = resources.omniscience.count.toFixed(0);
-            omnisciencePerSecondSpan.textContent = resources.omniscience.perSecond.toFixed(1);
-            buyOmniscienceButton.disabled = resources.multiverse.count < resources.omniscience.conversionCost;
-
-            // Genesis
-            genesisCountSpan.textContent = resources.genesis.count.toFixed(0);
-            genesisPerSecondSpan.textContent = resources.genesis.perSecond.toFixed(1);
-            buyGenesisButton.disabled = resources.omniscience.count < resources.genesis.conversionCost;
-
-            // Void
-            voidCountSpan.textContent = resources.void.count.toFixed(0);
-            voidPerSecondSpan.textContent = resources.void.perSecond.toFixed(1);
-            buyVoidButton.disabled = resources.genesis.count < resources.void.conversionCost;
-
-            // The All
-            theAllCountSpan.textContent = resources.theAll.count.toFixed(0);
-            theAllPerSecondSpan.textContent = resources.theAll.perSecond.toFixed(1);
-            theAllCost.textContent = resources.theAll.conversionCost;
-            buyTheAllButton.disabled = resources.void.count < resources.theAll.conversionCost;
-
-            // Transcendence
-            transcendenceCountSpan.textContent = resources.transcendence.count.toFixed(0);
-            transcendencePerSecondSpan.textContent = resources.transcendence.perSecond.toFixed(1);
-            transcendenceCost.textContent = resources.transcendence.conversionCost;
-            buyTranscendenceButton.disabled = resources.theAll.count < resources.transcendence.conversionCost;
-
-            // The Absolute
-            theAbsoluteCountSpan.textContent = resources.theAbsolute.count.toFixed(0);
-            theAbsolutePerSecondSpan.textContent = resources.theAbsolute.perSecond.toFixed(1);
-            theAbsoluteCost.textContent = resources.theAbsolute.conversionCost;
-            buyTheAbsoluteButton.disabled = resources.transcendence.count < resources.theAbsolute.conversionCost;
-
-            // The End
-            theEndCountSpan.textContent = resources.theEnd.count.toFixed(0);
-            theEndPerSecondSpan.textContent = resources.theEnd.perSecond.toFixed(1);
-            theEndCost.textContent = resources.theEnd.conversionCost;
-            buyTheEndButton.disabled = resources.theAbsolute.count < resources.theEnd.conversionCost;
-
-            // The New Beginning
-            theNewBeginningCountSpan.textContent = resources.theNewBeginning.count.toFixed(0);
-            theNewBeginningPerSecondSpan.textContent = resources.theNewBeginning.perSecond.toFixed(1);
-            theNewBeginningCostSpan.textContent = resources.theNewBeginning.conversionCost;
-            buyTheNewBeginningButton.disabled = resources.theEnd.count < resources.theNewBeginning.conversionCost;
-
-            // The Architect's Will
-            theArchitectsWillCountSpan.textContent = resources.theArchitectsWill.count.toFixed(0);
-            theArchitectsWillPerSecondSpan.textContent = resources.theArchitectsWill.perSecond.toFixed(1);
-            theArchitectsWillCostSpan.textContent = resources.theArchitectsWill.conversionCost;
-            buyTheArchitectsWillButton.disabled = resources.theNewBeginning.count < resources.theArchitectsWill.conversionCost;
-
-            // The Omniverse
-            theOmniverseCountSpan.textContent = resources.theOmniverse.count.toFixed(0);
-            theOmniversePerSecondSpan.textContent = resources.theOmniverse.perSecond.toFixed(1);
-            theOmniverseCost.textContent = resources.theOmniverse.conversionCost;
-            buyTheOmniverseButton.disabled = resources.theArchitectsWill.count < resources.theOmniverse.conversionCost;
-
-            // --- NEW RESOURCES DISPLAY UPDATE (STAGE 3) ---
-            // The Boundless Void
-            theBoundlessVoidCountSpan.textContent = resources.theBoundlessVoid.count.toFixed(0);
-            theBoundlessVoidPerSecondSpan.textContent = resources.theBoundlessVoid.perSecond.toFixed(1);
-            theBoundlessVoidCost.textContent = resources.theBoundlessVoid.conversionCost;
-            buyTheBoundlessVoidButton.disabled = resources.theOmniverse.count < resources.theBoundlessVoid.conversionCost;
-
-            // Cosmic Fabric
-            cosmicFabricCountSpan.textContent = resources.cosmicFabric.count.toFixed(0);
-            cosmicFabricPerSecondSpan.textContent = resources.cosmicFabric.perSecond.toFixed(1);
-            cosmicFabricCost.textContent = resources.cosmicFabric.conversionCost;
-            buyCosmicFabricButton.disabled = resources.theBoundlessVoid.count < resources.cosmicFabric.conversionCost;
-
-            // Infinite Nexus
-            infiniteNexusCountSpan.textContent = resources.infiniteNexus.count.toFixed(0);
-            infiniteNexusPerSecondSpan.textContent = resources.infiniteNexus.perSecond.toFixed(1);
-            infiniteNexusCost.textContent = resources.infiniteNexus.conversionCost;
-            buyInfiniteNexusButton.disabled = resources.cosmicFabric.count < resources.infiniteNexus.conversionCost;
-
-            // Eternal Echo
-            eternalEchoCountSpan.textContent = resources.eternalEcho.count.toFixed(0);
-            eternalEchoPerSecondSpan.textContent = resources.eternalEcho.perSecond.toFixed(1);
-            eternalEchoCost.textContent = resources.eternalEcho.conversionCost;
-            buyEternalEchoButton.disabled = resources.infiniteNexus.count < resources.eternalEcho.conversionCost;
-
-            // Zenith of Creation
-            zenithOfCreationCountSpan.textContent = resources.zenithOfCreation.count.toFixed(0);
-            zenithOfCreationPerSecondSpan.textContent = resources.zenithOfCreation.perSecond.toFixed(1);
-            zenithOfCreationCost.textContent = resources.zenithOfCreation.conversionCost;
-            buyZenithOfCreationButton.disabled = resources.eternalEcho.count < resources.zenithOfCreation.conversionCost;
-
-            // --- EVEN MORE NEW RESOURCES DISPLAY UPDATE (STAGE 4) ---
-            // Universal Singularity
-            universalSingularityCountSpan.textContent = resources.universalSingularity.count.toFixed(0);
-            universalSingularityPerSecondSpan.textContent = resources.universalSingularity.perSecond.toFixed(1);
-            universalSingularityCost.textContent = resources.universalSingularity.conversionCost;
-            buyUniversalSingularityButton.disabled = resources.zenithOfCreation.count < resources.universalSingularity.conversionCost;
-
-            // Existential Fabric
-            existentialFabricCountSpan.textContent = resources.existentialFabric.count.toFixed(0);
-            existentialFabricPerSecondSpan.textContent = resources.existentialFabric.perSecond.toFixed(1);
-            existentialFabricCost.textContent = resources.existentialFabric.conversionCost;
-            buyExistentialFabricButton.disabled = resources.universalSingularity.count < resources.existentialFabric.conversionCost;
-
-            // Temporal Flux
-            temporalFluxCountSpan.textContent = resources.temporalFlux.count.toFixed(0);
-            temporalFluxPerSecondSpan.textContent = resources.temporalFlux.perSecond.toFixed(1);
-            temporalFluxCost.textContent = resources.temporalFlux.conversionCost;
-            buyTemporalFluxButton.disabled = resources.existentialFabric.count < resources.temporalFlux.conversionCost;
-
-            // Multidimensional Harmony
-            multidimensionalHarmonyCountSpan.textContent = resources.multidimensionalHarmony.count.toFixed(0);
-            multidimensionalHarmonyPerSecondSpan.textContent = resources.multidimensionalHarmony.perSecond.toFixed(1);
-            multidimensionalHarmonyCost.textContent = resources.multidimensionalHarmony.conversionCost;
-            buyMultidimensionalHarmonyButton.disabled = resources.temporalFlux.count < resources.multidimensionalHarmony.conversionCost;
-
-            // Cosmic Awakening
-            cosmicAwakeningCountSpan.textContent = resources.cosmicAwakening.count.toFixed(0);
-            cosmicAwakeningPerSecondSpan.textContent = resources.cosmicAwakening.perSecond.toFixed(1);
-            cosmicAwakeningCost.textContent = resources.cosmicAwakening.conversionCost;
-            buyCosmicAwakeningButton.disabled = resources.multidimensionalHarmony.count < resources.cosmicAwakening.conversionCost;
-
-            // Divine Spark
-            divineSparkCountSpan.textContent = resources.divineSpark.count.toFixed(0);
-            divineSparkPerSecondSpan.textContent = resources.divineSpark.perSecond.toFixed(1);
-            divineSparkCost.textContent = resources.divineSpark.conversionCost;
-            buyDivineSparkButton.disabled = resources.cosmicAwakening.count < resources.divineSpark.conversionCost;
-        }
-
-        /**
-         * Adds wood based on current manual click amount, with a chance for critical strike.
-         */
-        function addWood() {
-            let woodEarned = resources.wood.manualClickAmount;
-            let isCritical = false;
-
-            // Check for critical strike
-            if (Math.random() < resources.wood.criticalChance) {
-                woodEarned *= resources.wood.criticalMultiplier;
-                isCritical = true;
+        // Use an IIFE (Immediately Invoked Function Expression) to encapsulate game state
+        // This makes 'resources' and most internal functions private, preventing direct console manipulation.
+        const game = (() => {
+            let resources = {
+                timePlayed: {
+                    hour: 0,
+                    minute: 0,
+                    second: 0
+                },
+                wood: {
+                    count: 0,
+                    perSecond: 0,
+                    manualClickAmount: 1,
+                    upgradeCost: 10,
+                    upgradeMultiplier: 2,
+                    upgradeAmount: 1,
+                    automationCost: 10000,
+                    automationMultiplier: 1.5,
+                    automationAmount: 5,
+                    criticalChance: 0.10,
+                    criticalMultiplier: 5
+                },
+                stone: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'stone',
+                    perUnitProduction: 1
+                },
+                iron: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'iron',
+                    perUnitProduction: 1
+                },
+                alloy: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'alloy',
+                    perUnitProduction: 1
+                },
+                circuitry: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'circuitry',
+                    perUnitProduction: 1
+                },
+                aiCore: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'aiCore',
+                    perUnitProduction: 1
+                },
+                consciousness: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'consciousness',
+                    perUnitProduction: 1
+                },
+                realityShard: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'realityShard',
+                    perUnitProduction: 1
+                },
+                paradox: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'paradox',
+                    perUnitProduction: 1
+                },
+                singularity: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'singularity',
+                    perUnitProduction: 1
+                },
+                multiverse: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'multiverse',
+                    perUnitProduction: 1
+                },
+                omniscience: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'omniscience',
+                    perUnitProduction: 1
+                },
+                genesis: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'genesis',
+                    perUnitProduction: 1
+                },
+                void: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'void',
+                    perUnitProduction: 1
+                },
+                theAll: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 10000,
+                    produces: 'theAll',
+                    perUnitProduction: 1
+                },
+                transcendence: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 10000,
+                    produces: 'transcendence',
+                    perUnitProduction: 1
+                },
+                theAbsolute: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 10000,
+                    produces: 'theAbsolute',
+                    perUnitProduction: 1
+                },
+                theEnd: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 10000,
+                    produces: 'theEnd',
+                    perUnitProduction: 1
+                },
+                theNewBeginning: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 10000,
+                    produces: 'theNewBeginning',
+                    perUnitProduction: 1
+                },
+                theArchitectsWill: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 10000,
+                    produces: 'theArchitectsWill',
+                    perUnitProduction: 1
+                },
+                theOmniverse: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 10000,
+                    produces: 'theOmniverse',
+                    perUnitProduction: 1
+                },
+                theBoundlessVoid: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 100000,
+                    produces: 'theBoundlessVoid',
+                    perUnitProduction: 1
+                },
+                cosmicFabric: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 100000,
+                    produces: 'cosmicFabric',
+                    perUnitProduction: 1
+                },
+                infiniteNexus: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 100000,
+                    produces: 'infiniteNexus',
+                    perUnitProduction: 1
+                },
+                eternalEcho: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 100000,
+                    produces: 'eternalEcho',
+                    perUnitProduction: 1
+                },
+                zenithOfCreation: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 100000,
+                    produces: 'zenithOfCreation',
+                    perUnitProduction: 1
+                },
+                universalSingularity: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000000,
+                    produces: 'universalSingularity',
+                    perUnitProduction: 1
+                },
+                existentialFabric: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000000,
+                    produces: 'existentialFabric',
+                    perUnitProduction: 1
+                },
+                temporalFlux: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000000,
+                    produces: 'temporalFlux',
+                    perUnitProduction: 1
+                },
+                multidimensionalHarmony: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000000,
+                    produces: 'multidimensionalHarmony',
+                    perUnitProduction: 1
+                },
+                cosmicAwakening: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000000,
+                    produces: 'cosmicAwakening',
+                    perUnitProduction: 1
+                },
+                divineSpark: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000000,
+                    produces: 'divineSpark',
+                    perUnitProduction: 1
+                }
+            };
+
+            // DOM Elements: References to all interactive and display elements
+            const woodCountSpan = document.getElementById('woodCount');
+            const woodPerSecondSpan = document.getElementById('woodPerSecond');
+            const addWoodButton = document.getElementById('addWood');
+            const chopPowerDisplay = document.getElementById('chopPowerDisplay');
+            const upgradeChopPowerButton = document.getElementById('upgradeChopPower');
+            const chopUpgradeCostSpan = document.getElementById('chopUpgradeCost');
+            const buyWoodPerSecondButton = document.getElementById('buyWoodPerSecond');
+            const woodPerSecondCostSpan = document.getElementById('woodPerSecondCost');
+
+            const stoneCountSpan = document.getElementById('stoneCount');
+            const stonePerSecondSpan = document.getElementById('stonePerSecond');
+            const buyStoneButton = document.getElementById('buyStone');
+
+            const ironCountSpan = document.getElementById('ironCount');
+            const ironPerSecondSpan = document.getElementById('ironPerSecond');
+            const buyIronButton = document.getElementById('buyIron');
+
+            const alloyCountSpan = document.getElementById('alloyCount');
+            const alloyPerSecondSpan = document.getElementById('alloyPerSecond');
+            const buyAlloyButton = document.getElementById('buyAlloy');
+
+            const circuitryCountSpan = document.getElementById('circuitryCount');
+            const circuitryPerSecondSpan = document.getElementById('circuitryPerSecond');
+            const buyCircuitryButton = document.getElementById('buyCircuitry');
+
+            const aiCoreCountSpan = document.getElementById('aiCoreCount');
+            const aiCorePerSecondSpan = document.getElementById('aiCorePerSecond');
+            const buyAICoreButton = document.getElementById('buyAICore');
+
+            const consciousnessCountSpan = document.getElementById('consciousnessCount');
+            const consciousnessPerSecondSpan = document.getElementById('consciousnessPerSecond');
+            const buyConsciousnessButton = document.getElementById('buyConsciousness');
+
+            const realityShardCountSpan = document.getElementById('realityShardCount');
+            const realityShardPerSecondSpan = document.getElementById('realityShardPerSecond');
+            const buyRealityShardButton = document.getElementById('buyRealityShard');
+
+            const paradoxCountSpan = document.getElementById('paradoxCount');
+            const paradoxPerSecondSpan = document.getElementById('paradoxPerSecond');
+            const buyParadoxButton = document.getElementById('buyParadox');
+
+            const singularityCountSpan = document.getElementById('singularityCount');
+            const singularityPerSecondSpan = document.getElementById('singularityPerSecond');
+            const buySingularityButton = document.getElementById('buySingularity');
+
+            const multiverseCountSpan = document.getElementById('multiverseCount');
+            const multiversePerSecondSpan = document.getElementById('multiversePerSecond');
+            const buyMultiverseButton = document.getElementById('buyMultiverse');
+
+            const omniscienceCountSpan = document.getElementById('omniscienceCount');
+            const omnisciencePerSecondSpan = document.getElementById('omnisciencePerSecond');
+            const buyOmniscienceButton = document.getElementById('buyOmniscience');
+
+            const genesisCountSpan = document.getElementById('genesisCount');
+            const genesisPerSecondSpan = document.getElementById('genesisPerSecond');
+            const buyGenesisButton = document.getElementById('buyGenesis');
+
+            const voidCountSpan = document.getElementById('voidCount');
+            const voidPerSecondSpan = document.getElementById('voidPerSecond');
+            const buyVoidButton = document.getElementById('buyVoid');
+
+            const theAllCountSpan = document.getElementById('theAllCount');
+            const theAllPerSecondSpan = document.getElementById('theAllPerSecond');
+            const buyTheAllButton = document.getElementById('buyTheAll');
+            const theAllCost = document.getElementById('theAllCost');
+
+            const transcendenceCountSpan = document.getElementById('transcendenceCount');
+            const transcendencePerSecondSpan = document.getElementById('transcendencePerSecond');
+            const buyTranscendenceButton = document.getElementById('buyTranscendence');
+            const transcendenceCost = document.getElementById('transcendenceCost');
+
+            const theAbsoluteCountSpan = document.getElementById('theAbsoluteCount');
+            const theAbsolutePerSecondSpan = document = document.getElementById('theAbsolutePerSecond');
+            const buyTheAbsoluteButton = document.getElementById('buyTheAbsolute');
+            const theAbsoluteCost = document.getElementById('theAbsoluteCost');
+
+            const theEndCountSpan = document.getElementById('theEndCount');
+            const theEndPerSecondSpan = document.getElementById('theEndPerSecond');
+            const buyTheEndButton = document.getElementById('buyTheEnd');
+            const theEndCost = document.getElementById('theEndCost');
+
+            const theNewBeginningCountSpan = document.getElementById('theNewBeginningCount');
+            const theNewBeginningPerSecondSpan = document.getElementById('theNewBeginningPerSecond');
+            const buyTheNewBeginningButton = document.getElementById('buyTheNewBeginning');
+            const theNewBeginningCostSpan = document.getElementById('theNewBeginningCost');
+
+            const theArchitectsWillCountSpan = document.getElementById('theArchitectsWillCount');
+            const theArchitectsWillPerSecondSpan = document.getElementById('theArchitectsWillPerSecond');
+            const buyTheArchitectsWillButton = document.getElementById('buyTheArchitectsWill');
+            const theArchitectsWillCostSpan = document.getElementById('theArchitectsWillCost');
+
+            const theOmniverseCountSpan = document.getElementById('theOmniverseCount');
+            const theOmniversePerSecondSpan = document.getElementById('theOmniversePerSecond');
+            const buyTheOmniverseButton = document.getElementById('buyTheOmniverse');
+            const theOmniverseCost = document.getElementById('theOmniverseCost');
+
+            const theBoundlessVoidCountSpan = document.getElementById('theBoundlessVoidCount');
+            const theBoundlessVoidPerSecondSpan = document.getElementById('theBoundlessVoidPerSecond');
+            const buyTheBoundlessVoidButton = document.getElementById('buyTheBoundlessVoid');
+            const theBoundlessVoidCost = document.getElementById('theBoundlessVoidCost');
+
+            const cosmicFabricCountSpan = document.getElementById('cosmicFabricCount');
+            const cosmicFabricPerSecondSpan = document.getElementById('cosmicFabricPerSecond');
+            const buyCosmicFabricButton = document.getElementById('buyCosmicFabric');
+            const cosmicFabricCost = document.getElementById('cosmicFabricCost');
+
+            const infiniteNexusCountSpan = document.getElementById('infiniteNexusCount');
+            const infiniteNexusPerSecondSpan = document.getElementById('infiniteNexusPerSecond');
+            const buyInfiniteNexusButton = document.getElementById('buyInfiniteNexus');
+            const infiniteNexusCost = document.getElementById('infiniteNexusCost');
+
+            const eternalEchoCountSpan = document.getElementById('eternalEchoCount');
+            const eternalEchoPerSecondSpan = document.getElementById('eternalEchoPerSecond');
+            const buyEternalEchoButton = document.getElementById('buyEternalEcho');
+            const eternalEchoCost = document.getElementById('eternalEchoCost');
+
+            const zenithOfCreationCountSpan = document.getElementById('zenithOfCreationCount');
+            const zenithOfCreationPerSecondSpan = document.getElementById('zenithOfCreationPerSecond');
+            const buyZenithOfCreationButton = document.getElementById('buyZenithOfCreation');
+            const zenithOfCreationCost = document.getElementById('zenithOfCreationCost');
+
+            const universalSingularityCountSpan = document.getElementById('universalSingularityCount');
+            const universalSingularityPerSecondSpan = document.getElementById('universalSingularityPerSecond');
+            const buyUniversalSingularityButton = document.getElementById('buyUniversalSingularity');
+            const universalSingularityCost = document.getElementById('universalSingularityCost');
+
+            const existentialFabricCountSpan = document.getElementById('existentialFabricCount');
+            const existentialFabricPerSecondSpan = document.getElementById('existentialFabricPerSecond');
+            const buyExistentialFabricButton = document.getElementById('buyExistentialFabric');
+            const existentialFabricCost = document.getElementById('existentialFabricCost');
+
+            const temporalFluxCountSpan = document.getElementById('temporalFluxCount');
+            const temporalFluxPerSecondSpan = document = document.getElementById('temporalFluxPerSecond');
+            const buyTemporalFluxButton = document.getElementById('buyTemporalFlux');
+            const temporalFluxCost = document.getElementById('temporalFluxCost');
+
+            const multidimensionalHarmonyCountSpan = document.getElementById('multidimensionalHarmonyCount');
+            const multidimensionalHarmonyPerSecondSpan = document = document.getElementById('multidimensionalHarmonyPerSecond');
+            const buyMultidimensionalHarmonyButton = document.getElementById('buyMultidimensionalHarmony');
+            const multidimensionalHarmonyCost = document.getElementById('multidimensionalHarmonyCost');
+
+            const cosmicAwakeningCountSpan = document.getElementById('cosmicAwakeningCount');
+            const cosmicAwakeningPerSecondSpan = document.getElementById('cosmicAwakeningPerSecond');
+            const buyCosmicAwakeningButton = document.getElementById('buyCosmicAwakening');
+            const cosmicAwakeningCost = document.getElementById('cosmicAwakeningCost');
+
+            const divineSparkCountSpan = document.getElementById('divineSparkCount');
+            const divineSparkPerSecondSpan = document.getElementById('divineSparkPerSecond');
+            const buyDivineSparkButton = document = document.getElementById('buyDivineSpark');
+            const divineSparkCost = document.getElementById('divineSparkCost');
+
+
+            const timePlayedSpan = document.getElementById('timePlayed');
+
+            const quizQuestionParagraph = document.getElementById('quizQuestion');
+            const quizAnswerInput = document.getElementById('quizAnswerInput');
+            const submitQuizAnswerButton = document.getElementById('submitQuizAnswer');
+            const quizFeedbackParagraph = document.getElementById('quizFeedback');
+
+            const criticalHitFeedbackDiv = document.getElementById('criticalHitFeedback');
+            const criticalHitTextSpan = document.getElementById('criticalHitText');
+            const closeCriticalFeedbackButton = document.getElementById('closeCriticalFeedback');
+
+            const saveGameBtn = document.getElementById('saveGameBtn');
+            const loadGameBtn = document.getElementById('loadGameBtn');
+
+            const loreButtons = document.querySelectorAll('.generate-lore-btn');
+            const loreDisplays = {
+                "Gỗ": document.getElementById('woodLore'),
+                "Đá": document.getElementById('stoneLore'),
+                "Sắt": document.getElementById('ironLore'),
+                "Hợp Kim": document.getElementById('alloyLore'),
+                "Mạch Điện": document.getElementById('circuitryLore'),
+                "Lõi AI": document.getElementById('aiCoreLore'),
+                "Ý Thức": document.getElementById('consciousnessLore'),
+                "Mảnh Vỡ Thực Tại": document.getElementById('realityShardLore'),
+                "Nghịch Lý": document.getElementById('paradoxLore'),
+                "Điểm Kỳ Dị": document.getElementById('singularityLore'),
+                "Đa Vũ Trụ": document.getElementById('multiverseLore'),
+                "Toàn Tri": document.getElementById('omniscienceLore'),
+                "Sáng Thế": document.getElementById('genesisLore'),
+                "Hư Không": document.getElementById('voidLore'),
+                "Vạn Vật Toàn Thể": document.getElementById('theAllLore'),
+                "Siêu Việt": document.getElementById('transcendenceLore'),
+                "Tuyệt Đối": document.getElementById('theAbsoluteLore'),
+                "Điểm Kết Thúc": document.getElementById('theEndLore'),
+                "Khởi Nguyên Mới": document.getElementById('theNewBeginningLore'),
+                "Ý Chí Kiến Trúc Sư": document.getElementById('theArchitectsWillLore'),
+                "The Omniverse": document.getElementById('theOmniverseLore'),
+                "The Boundless Void": document.getElementById('theBoundlessVoidLore'),
+                "Cosmic Fabric": document.getElementById('cosmicFabricLore'),
+                "Infinite Nexus": document.getElementById('infiniteNexusLore'),
+                "Eternal Echo": document.getElementById('eternalEchoLore'),
+                "Zenith of Creation": document.getElementById('zenithOfCreationLore'),
+                "Universal Singularity": document.getElementById('universalSingularityLore'),
+                "Existential Fabric": document.getElementById('existentialFabricLore'),
+                "Temporal Flux": document.getElementById('temporalFluxLore'),
+                "Multidimensional Harmony": document.getElementById('multidimensionalHarmonyLore'),
+                "Cosmic Awakening": document.getElementById('cosmicAwakeningLore'),
+                "Divine Spark": document.getElementById('divineSparkLore')
+            };
+
+            // --- Game Logic Functions ---
+            function updateDisplay() {
+                // Update all resources based on their perSecond rates
+                woodCountSpan.textContent = resources.wood.count.toFixed(0);
+                woodPerSecondSpan.textContent = resources.wood.perSecond.toFixed(1);
+                chopPowerDisplay.textContent = `+${resources.wood.manualClickAmount}`;
+                chopUpgradeCostSpan.textContent = resources.wood.upgradeCost;
+                upgradeChopPowerButton.disabled = resources.wood.count < resources.wood.upgradeCost;
+                woodPerSecondCostSpan.textContent = resources.wood.automationCost.toFixed(0);
+                buyWoodPerSecondButton.disabled = resources.wood.count < resources.wood.automationCost;
+
+                stoneCountSpan.textContent = resources.stone.count.toFixed(0);
+                stonePerSecondSpan.textContent = resources.stone.perSecond.toFixed(1);
+                buyStoneButton.disabled = resources.wood.count < resources.stone.conversionCost;
+
+                ironCountSpan.textContent = resources.iron.count.toFixed(0);
+                ironPerSecondSpan.textContent = resources.iron.perSecond.toFixed(1);
+                buyIronButton.disabled = resources.stone.count < resources.iron.conversionCost;
+
+                alloyCountSpan.textContent = resources.alloy.count.toFixed(0);
+                alloyPerSecondSpan.textContent = resources.alloy.perSecond.toFixed(1);
+                buyAlloyButton.disabled = resources.iron.count < resources.alloy.conversionCost;
+
+                circuitryCountSpan.textContent = resources.circuitry.count.toFixed(0);
+                circuitryPerSecondSpan.textContent = resources.circuitry.perSecond.toFixed(1);
+                buyCircuitryButton.disabled = resources.alloy.count < resources.circuitry.conversionCost;
+
+                aiCoreCountSpan.textContent = resources.aiCore.count.toFixed(0);
+                aiCorePerSecondSpan.textContent = resources.aiCore.perSecond.toFixed(1);
+                buyAICoreButton.disabled = resources.circuitry.count < resources.aiCore.conversionCost;
+
+                consciousnessCountSpan.textContent = resources.consciousness.count.toFixed(0);
+                consciousnessPerSecondSpan.textContent = resources.consciousness.perSecond.toFixed(1);
+                buyConsciousnessButton.disabled = resources.aiCore.count < resources.consciousness.conversionCost;
+
+                realityShardCountSpan.textContent = resources.realityShard.count.toFixed(0);
+                realityShardPerSecondSpan.textContent = resources.realityShard.perSecond.toFixed(1);
+                buyRealityShardButton.disabled = resources.consciousness.count < resources.realityShard.conversionCost;
+
+                paradoxCountSpan.textContent = resources.paradox.count.toFixed(0);
+                paradoxPerSecondSpan.textContent = resources.paradox.perSecond.toFixed(1);
+                buyParadoxButton.disabled = resources.realityShard.count < resources.paradox.conversionCost;
+
+                singularityCountSpan.textContent = resources.singularity.count.toFixed(0);
+                singularityPerSecondSpan.textContent = resources.singularity.perSecond.toFixed(1);
+                buySingularityButton.disabled = resources.paradox.count < resources.singularity.conversionCost;
+
+                multiverseCountSpan.textContent = resources.multiverse.count.toFixed(0);
+                multiversePerSecondSpan.textContent = resources.multiverse.perSecond.toFixed(1);
+                buyMultiverseButton.disabled = resources.singularity.count < resources.multiverse.conversionCost;
+
+                omniscienceCountSpan.textContent = resources.omniscience.count.toFixed(0);
+                omnisciencePerSecondSpan.textContent = resources.omniscience.perSecond.toFixed(1);
+                buyOmniscienceButton.disabled = resources.multiverse.count < resources.omniscience.conversionCost;
+
+                genesisCountSpan.textContent = resources.genesis.count.toFixed(0);
+                genesisPerSecondSpan.textContent = resources.genesis.perSecond.toFixed(1);
+                buyGenesisButton.disabled = resources.omniscience.count < resources.genesis.conversionCost;
+
+                voidCountSpan.textContent = resources.void.count.toFixed(0);
+                voidPerSecondSpan.textContent = resources.void.perSecond.toFixed(1);
+                buyVoidButton.disabled = resources.genesis.count < resources.void.conversionCost;
+
+                theAllCountSpan.textContent = resources.theAll.count.toFixed(0);
+                theAllPerSecondSpan.textContent = resources.theAll.perSecond.toFixed(1);
+                theAllCost.textContent = resources.theAll.conversionCost;
+                buyTheAllButton.disabled = resources.void.count < resources.theAll.conversionCost;
+
+                transcendenceCountSpan.textContent = resources.transcendence.count.toFixed(0);
+                transcendencePerSecondSpan.textContent = resources.transcendence.perSecond.toFixed(1);
+                transcendenceCost.textContent = resources.transcendence.conversionCost;
+                buyTranscendenceButton.disabled = resources.theAll.count < resources.transcendence.conversionCost;
+
+                theAbsoluteCountSpan.textContent = resources.theAbsolute.count.toFixed(0);
+                theAbsolutePerSecondSpan.textContent = resources.theAbsolute.perSecond.toFixed(1);
+                theAbsoluteCost.textContent = resources.theAbsolute.conversionCost;
+                buyTheAbsoluteButton.disabled = resources.transcendence.count < resources.theAbsolute.conversionCost;
+
+                theEndCountSpan.textContent = resources.theEnd.count.toFixed(0);
+                theEndPerSecondSpan.textContent = resources.theEnd.perSecond.toFixed(1);
+                theEndCost.textContent = resources.theEnd.conversionCost;
+                buyTheEndButton.disabled = resources.theAbsolute.count < resources.theEnd.conversionCost;
+
+                theNewBeginningCountSpan.textContent = resources.theNewBeginning.count.toFixed(0);
+                theNewBeginningPerSecondSpan.textContent = resources.theNewBeginning.perSecond.toFixed(1);
+                theNewBeginningCostSpan.textContent = resources.theNewBeginning.conversionCost;
+                buyTheNewBeginningButton.disabled = resources.theEnd.count < resources.theNewBeginning.conversionCost;
+
+                theArchitectsWillCountSpan.textContent = resources.theArchitectsWill.count.toFixed(0);
+                theArchitectsWillPerSecondSpan.textContent = resources.theArchitectsWill.perSecond.toFixed(1);
+                theArchitectsWillCostSpan.textContent = resources.theArchitectsWill.conversionCost;
+                buyTheArchitectsWillButton.disabled = resources.theNewBeginning.count < resources.theArchitectsWill.conversionCost;
+
+                theOmniverseCountSpan.textContent = resources.theOmniverse.count.toFixed(0);
+                theOmniversePerSecondSpan.textContent = resources.theOmniverse.perSecond.toFixed(1);
+                theOmniverseCost.textContent = resources.theOmniverse.conversionCost;
+                buyTheOmniverseButton.disabled = resources.theArchitectsWill.count < resources.theOmniverse.conversionCost;
+
+                theBoundlessVoidCountSpan.textContent = resources.theBoundlessVoid.count.toFixed(0);
+                theBoundlessVoidPerSecondSpan.textContent = resources.theBoundlessVoid.perSecond.toFixed(1);
+                theBoundlessVoidCost.textContent = resources.theBoundlessVoid.conversionCost;
+                buyTheBoundlessVoidButton.disabled = resources.theOmniverse.count < resources.theBoundlessVoid.conversionCost;
+
+                cosmicFabricCountSpan.textContent = resources.cosmicFabric.count.toFixed(0);
+                cosmicFabricPerSecondSpan.textContent = resources.cosmicFabric.perSecond.toFixed(1);
+                cosmicFabricCost.textContent = resources.cosmicFabric.conversionCost;
+                buyCosmicFabricButton.disabled = resources.theBoundlessVoid.count < resources.cosmicFabric.conversionCost;
+
+                infiniteNexusCountSpan.textContent = resources.infiniteNexus.count.toFixed(0);
+                infiniteNexusPerSecondSpan.textContent = resources.infiniteNexus.perSecond.toFixed(1);
+                infiniteNexusCost.textContent = resources.infiniteNexus.conversionCost;
+                buyInfiniteNexusButton.disabled = resources.cosmicFabric.count < resources.infiniteNexus.conversionCost;
+
+                eternalEchoCountSpan.textContent = resources.eternalEcho.count.toFixed(0);
+                eternalEchoPerSecondSpan.textContent = resources.eternalEcho.perSecond.toFixed(1);
+                eternalEchoCost.textContent = resources.eternalEcho.conversionCost;
+                buyEternalEchoButton.disabled = resources.infiniteNexus.count < resources.eternalEcho.conversionCost;
+
+                zenithOfCreationCountSpan.textContent = resources.zenithOfCreation.count.toFixed(0);
+                zenithOfCreationPerSecondSpan.textContent = resources.zenithOfCreation.perSecond.toFixed(1);
+                zenithOfCreationCost.textContent = resources.zenithOfCreation.conversionCost;
+                buyZenithOfCreationButton.disabled = resources.eternalEcho.count < resources.zenithOfCreation.conversionCost;
+
+                universalSingularityCountSpan.textContent = resources.universalSingularity.count.toFixed(0);
+                universalSingularityPerSecondSpan.textContent = resources.universalSingularity.perSecond.toFixed(1);
+                universalSingularityCost.textContent = resources.universalSingularity.conversionCost;
+                buyUniversalSingularityButton.disabled = resources.zenithOfCreation.count < resources.universalSingularity.conversionCost;
+
+                existentialFabricCountSpan.textContent = resources.existentialFabric.count.toFixed(0);
+                existentialFabricPerSecondSpan.textContent = resources.existentialFabric.perSecond.toFixed(1);
+                existentialFabricCost.textContent = resources.existentialFabric.conversionCost;
+                buyExistentialFabricButton.disabled = resources.universalSingularity.count < resources.existentialFabric.conversionCost;
+
+                temporalFluxCountSpan.textContent = resources.temporalFlux.count.toFixed(0);
+                temporalFluxPerSecondSpan.textContent = resources.temporalFlux.perSecond.toFixed(1);
+                temporalFluxCost.textContent = resources.temporalFlux.conversionCost;
+                buyTemporalFluxButton.disabled = resources.existentialFabric.count < resources.temporalFlux.conversionCost;
+
+                multidimensionalHarmonyCountSpan.textContent = resources.multidimensionalHarmony.count.toFixed(0);
+                multidimensionalHarmonyPerSecondSpan.textContent = resources.multidimensionalHarmony.perSecond.toFixed(1);
+                multidimensionalHarmonyCost.textContent = resources.multidimensionalHarmony.conversionCost;
+                buyMultidimensionalHarmonyButton.disabled = resources.temporalFlux.count < resources.multidimensionalHarmony.conversionCost;
+
+                cosmicAwakeningCountSpan.textContent = resources.cosmicAwakening.count.toFixed(0);
+                cosmicAwakeningPerSecondSpan.textContent = resources.cosmicAwakening.perSecond.toFixed(1);
+                cosmicAwakeningCost.textContent = resources.cosmicAwakening.conversionCost;
+                buyCosmicAwakeningButton.disabled = resources.multidimensionalHarmony.count < resources.cosmicAwakening.conversionCost;
+
+                divineSparkCountSpan.textContent = resources.divineSpark.count.toFixed(0);
+                divineSparkPerSecondSpan.textContent = resources.divineSpark.perSecond.toFixed(1);
+                divineSparkCost.textContent = resources.divineSpark.conversionCost;
+                buyDivineSparkButton.disabled = resources.cosmicAwakening.count < resources.divineSpark.conversionCost;
             }
 
-            resources.wood.count += woodEarned;
-            updateDisplay();
+            function addWood() {
+                let woodEarned = resources.wood.manualClickAmount;
+                let isCritical = false;
 
-            // Display critical hit feedback immediately, without auto-fading
-            if (isCritical) {
-                criticalHitTextSpan.textContent = `CRITICAL! +${woodEarned.toFixed(0)} Wood!`;
-                criticalHitFeedbackDiv.style.opacity = 1;
-                // No setTimeout to fade out, user will dismiss manually
-            } else {
-                // If not critical, ensure the message is hidden.
-                // This is important if a critical message was previously shown and not dismissed.
+                if (Math.random() < resources.wood.criticalChance) {
+                    woodEarned *= resources.wood.criticalMultiplier;
+                    isCritical = true;
+                }
+
+                resources.wood.count += woodEarned;
+                updateDisplay();
+
+                if (isCritical) {
+                    criticalHitTextSpan.textContent = `CRITICAL! +${woodEarned.toFixed(0)} Wood!`;
+                    criticalHitFeedbackDiv.style.opacity = 1;
+                } else {
+                    criticalHitFeedbackDiv.style.opacity = 0;
+                }
+            }
+
+            function dismissCriticalFeedback() {
                 criticalHitFeedbackDiv.style.opacity = 0;
+                criticalHitTextSpan.textContent = '';
             }
-        }
 
-        /**
-         * Dismisses the critical hit feedback message.
-         */
-        function dismissCriticalFeedback() {
-            criticalHitFeedbackDiv.style.opacity = 0;
-            criticalHitTextSpan.textContent = ''; // Clear text
-        }
-
-        /**
-         * Upgrades the manual wood chop power.
-         */
-        function upgradeChopPower() {
-            const cost = resources.wood.upgradeCost;
-            if (resources.wood.count >= cost) {
-                resources.wood.count -= cost;
-                resources.wood.manualClickAmount += resources.wood.upgradeAmount;
-                resources.wood.upgradeCost = Math.round(resources.wood.upgradeCost * resources.wood.upgradeMultiplier);
-                updateDisplay();
-            } else {
-                // Using an alert for simplicity, in a real game use a custom modal or message
-                alert(`Not enough Wood to upgrade Chop Power! You need ${cost} Wood.`);
+            function upgradeChopPower() {
+                const cost = resources.wood.upgradeCost;
+                if (resources.wood.count >= cost) {
+                    resources.wood.count -= cost;
+                    resources.wood.manualClickAmount += resources.wood.upgradeAmount;
+                    resources.wood.upgradeCost = Math.round(resources.wood.upgradeCost * resources.wood.upgradeMultiplier);
+                    updateDisplay();
+                } else {
+                    alert(`Not enough Wood to upgrade Chop Power! You need ${cost} Wood.`);
+                }
             }
-        }
 
-        /**
-         * Buys +1 Wood/sec automation.
-         */
-        function buyWoodPerSecondAutomation() {
-            const cost = resources.wood.automationCost;
-            if (resources.wood.count >= cost) {
-                resources.wood.count -= cost;
-                resources.wood.perSecond += resources.wood.automationAmount; // Updated to 5 per purchase
-                resources.wood.automationCost = Math.round(resources.wood.automationCost * resources.wood.automationMultiplier);
-                updateDisplay();
-            } else {
-                alert(`Not enough Wood to automate production! You need ${cost} Wood.`);
+            function buyWoodPerSecondAutomation() {
+                const cost = resources.wood.automationCost;
+                if (resources.wood.count >= cost) {
+                    resources.wood.count -= cost;
+                    resources.wood.perSecond += resources.wood.automationAmount;
+                    resources.wood.automationCost = Math.round(resources.wood.automationCost * resources.wood.automationMultiplier);
+                    updateDisplay();
+                } else {
+                    alert(`Not enough Wood to automate production! You need ${cost} Wood.`);
+                }
             }
-        }
 
-        /**
-         * Generic function to buy a higher-tier resource using a previous resource.
-         * @param {string} resourceToBuy - The key name of the resource to buy (e.g., 'stone', 'iron').
-         * @param {string} previousResource - The key name of the resource used as currency.
-         */
-        function buyResource(resourceToBuy, previousResource) {
-            const cost = resources[resourceToBuy].conversionCost;
-            if (resources[previousResource].count >= cost) {
-                resources[previousResource].count -= cost;
-                resources[resourceToBuy].count += 1;
-                resources[resourceToBuy].perSecond += resources[resourceToBuy].perUnitProduction; // Each unit adds to its own per second production
-                updateDisplay();
-            } else {
-                alert(`Not enough ${previousResource} to buy ${resourceToBuy}! You need ${cost} ${previousResource}.`);
+            function buyResource(resourceToBuy, previousResource) {
+                const cost = resources[resourceToBuy].conversionCost;
+                if (resources[previousResource].count >= cost) {
+                    resources[previousResource].count -= cost;
+                    resources[resourceToBuy].count += 1;
+                    resources[resourceToBuy].perSecond += resources[resourceToBuy].perUnitProduction;
+                    updateDisplay();
+                } else {
+                    alert(`Not enough ${previousResource} to buy ${resourceToBuy}! You need ${cost} ${previousResource}.`);
+                }
             }
-        }
 
-        /**
-         * Saves the current game progress to local storage.
-         */
-        function saveGame(integer) {
-            try {
-                // Store both resources and gameStartTime
-                const saveData = {
-                    resources: resources
-                };
-                localStorage.setItem('incrementalGameSave', JSON.stringify(saveData));
-                if (integer != 1)
-                 {
-                alert('Tiến độ trò chơi đã được lưu!');
-                 }
-            } catch (e) {
-                console.error("Lỗi khi lưu game:", e);
-                alert('Không thể lưu game. Vui lòng kiểm tra dung lượng lưu trữ của trình duyệt.');
+            function saveGame(integer) {
+                try {
+                    const saveData = {
+                        resources: resources
+                    };
+                    localStorage.setItem('incrementalGameSave', JSON.stringify(saveData));
+                    if (integer !== 1) {
+                        alert('Tiến độ trò chơi đã được lưu!');
+                    }
+                } catch (e) {
+                    console.error("Lỗi khi lưu game:", e);
+                    alert('Không thể lưu game. Vui lòng kiểm tra dung lượng lưu trữ của trình duyệt.');
+                }
             }
-        }
 
-        /**
-         * Loads game progress from local storage.
-         */
-        function loadGame() {
-            try {
-                const savedData = localStorage.getItem('incrementalGameSave');
-                if (savedData) {
-                    const parsedData = JSON.parse(savedData);
+            function loadGame() {
+                try {
+                    const savedData = localStorage.getItem('incrementalGameSave');
+                    if (savedData) {
+                        const parsedData = JSON.parse(savedData);
+                        const loadedResources = parsedData.resources;
 
-                    // Load resources
-                    const loadedResources = parsedData.resources;
-                    for (const key in resources) {
-                        // Use Object.assign to merge properties deeply, preserving new properties if they exist in loaded data
-                        if (loadedResources[key] !== undefined) {
-                            // If it's an object, merge properties
-                            if (typeof resources[key] === 'object' && resources[key] !== null &&
-                                typeof loadedResources[key] === 'object' && loadedResources[key] !== null) {
-                                Object.assign(resources[key], loadedResources[key]);
-                            } else {
-                                // Otherwise, directly assign the value
-                                resources[key] = loadedResources[key];
+                        for (const key in resources) {
+                            if (loadedResources[key] !== undefined) {
+                                if (typeof resources[key] === 'object' && resources[key] !== null &&
+                                    typeof loadedResources[key] === 'object' && loadedResources[key] !== null) {
+                                    Object.assign(resources[key], loadedResources[key]);
+                                } else {
+                                    resources[key] = loadedResources[key];
+                                }
                             }
                         }
+                        updateDisplay();
+                        alert('Tiến độ trò chơi đã được tải!');
+                    } else {
+                        alert('Không tìm thấy dữ liệu lưu trò chơi nào.');
                     }
-
-                    updateDisplay();
-                    alert('Tiến độ trò chơi đã được tải!');
-                } else {
-                    alert('Không tìm thấy dữ liệu lưu trò chơi nào.');
+                } catch (e) {
+                    console.error("Lỗi khi tải game:", e);
+                    alert('Không thể tải game. Dữ liệu lưu có thể bị hỏng.');
                 }
-            } catch (e) {
-                console.error("Lỗi khi tải game:", e);
-                alert('Không thể tải game. Dữ liệu lưu có thể bị hỏng.');
-            }
-        }
-
-        // --- Cheat Code Logic ---
-        let cheatCodeSequence = [];
-        const cheatCode = "add10kwood"; // The secret cheat code
-
-        document.addEventListener('keydown', (event) => {
-            // Add the pressed key to the sequence
-            cheatCodeSequence.push(event.key.toLowerCase()); // Convert to lowercase to be case-insensitive
-
-            // Keep the sequence length limited to the cheat code length
-            if (cheatCodeSequence.length > cheatCode.length) {
-                cheatCodeSequence.shift(); // Remove the oldest key
             }
 
-            // Check if the current sequence matches the cheat code
-            if (cheatCodeSequence.join('') === cheatCode) {
-                resources.wood.count += 10000; // Add 10,000 wood
-                updateDisplay();
-                alert("CHEAT ACTIVATED! +10,000 Wood!"); // Notify the user
-                cheatCodeSequence = []; // Reset the sequence after activation
+            let cheatCodeSequence = [];
+            const cheatCode = "add10kwood";
+
+            function handleCheatCode(event) {
+                cheatCodeSequence.push(event.key.toLowerCase());
+                if (cheatCodeSequence.length > cheatCode.length) {
+                    cheatCodeSequence.shift();
+                }
+
+                if (cheatCodeSequence.join('') === cheatCode) {
+                    resources.wood.count += 10000;
+                    updateDisplay();
+                    alert("CHEAT ACTIVATED! +10,000 Wood!");
+                    cheatCodeSequence = [];
+                }
             }
-        });
 
-        // --- Quiz Logic ---
-        const quizQuestions = [
-            { question: "What is the first resource you collect?", answer: "wood", reward: 500 },
-            { question: "What resource comes after Stone?", answer: "iron", reward: 750 },
-            { question: "How many Wood do you need to buy 1 Stone?", answer: "1000", reward: 1000 },
-            { question: "What is the next resource after Alloy?", answer: "circuitry", reward: 1500 },
-            { question: "What material is produced after AI Core?", answer: "consciousness", reward: 2000 },
-            { question: "Which resource is obtained after Genesis?", answer: "void", reward: 5000 },
-            { question: "How much Wood do you get per second after automating it once?", answer: "5", reward: 1000 },
-            { question: "What comes after Singularity?", answer: "multiverse", reward: 2500 },
-            { question: "What is the resource after Omniscience?", answer: "genesis", reward: 3000 },
-            { question: "What is the final resource after The Absolute?", answer: "the end", reward: 10000 },
-            { question: "What is the resource after The End?", answer: "the new beginning", reward: 15000 },
-            { question: "What is the resource after The New Beginning?", answer: "the architect's will", reward: 20000 },
-            { question: "What comes after The Architect's Will?", answer: "the omniverse", reward: 50000 },
-            // --- NEW QUIZ QUESTIONS (STAGE 3) ---
-            { question: "What comes after The Omniverse?", answer: "the boundless void", reward: 100000 },
-            { question: "What comes after The Boundless Void?", answer: "cosmic fabric", reward: 150000 },
-            { question: "What is the second to last resource in Stage 3?", answer: "eternal echo", reward: 200000 },
-            { question: "What is the final resource in Stage 3?", answer: "zenith of creation", reward: 250000 },
-            // --- NEW QUIZ QUESTIONS (STAGE 4) ---
-            { question: "What comes after Zenith of Creation?", answer: "universal singularity", reward: 300000 },
-            { question: "What is the resource after Universal Singularity?", answer: "existential fabric", reward: 350000 },
-            { question: "What is the resource after Temporal Flux?", answer: "multidimensional harmony", reward: 400000 },
-            { question: "What is the ultimate resource of all?", answer: "divine spark", reward: 500000 }
-        ];
+            const quizQuestions = [
+                { question: "What is the first resource you collect?", answer: "wood", reward: 500 },
+                { question: "What resource comes after Stone?", answer: "iron", reward: 750 },
+                { question: "How many Wood do you need to buy 1 Stone?", answer: "1000", reward: 1000 },
+                { question: "What is the next resource after Alloy?", answer: "circuitry", reward: 1500 },
+                { question: "What material is produced after AI Core?", answer: "consciousness", reward: 2000 },
+                { question: "Which resource is obtained after Genesis?", answer: "void", reward: 5000 },
+                { question: "How much Wood do you get per second after automating it once?", answer: "5", reward: 1000 },
+                { question: "What comes after Singularity?", answer: "multiverse", reward: 2500 },
+                { question: "What is the resource after Omniscience?", answer: "genesis", reward: 3000 },
+                { question: "What is the final resource after The Absolute?", answer: "the end", reward: 10000 },
+                { question: "What is the resource after The End?", answer: "the new beginning", reward: 15000 },
+                { question: "What is the resource after The New Beginning?", answer: "the architect's will", reward: 20000 },
+                { question: "What comes after The Architect's Will?", answer: "the omniverse", reward: 50000 },
+                { question: "What comes after The Omniverse?", answer: "the boundless void", reward: 100000 },
+                { question: "What comes after The Boundless Void?", answer: "cosmic fabric", reward: 150000 },
+                { question: "What is the second to last resource in Stage 3?", answer: "eternal echo", reward: 200000 },
+                { question: "What is the final resource in Stage 3?", answer: "zenith of creation", reward: 250000 },
+                { question: "What comes after Zenith of Creation?", answer: "universal singularity", reward: 300000 },
+                { question: "What is the resource after Universal Singularity?", answer: "existential fabric", reward: 350000 },
+                { question: "What is the resource after Temporal Flux?", answer: "multidimensional harmony", reward: 400000 },
+                { question: "What is the ultimate resource of all?", answer: "divine spark", reward: 500000 }
+            ];
 
-        let currentQuestion = null;
-        let answeredQuestions = []; // To keep track of questions already asked in current session
-        const QUIZ_COOLDOWN_MS = 5000; // 5 seconds cooldown before next question
-        let quizCooldownTimer = 0;
+            let currentQuestion = null;
+            let answeredQuestions = [];
+            const QUIZ_COOLDOWN_MS = 5000;
+            let quizCooldownTimer = 0;
 
-        /**
-         * Loads a new random question into the quiz section.
-         */
-        function loadNewQuestion() {
-            if (quizQuestions.length === 0) {
-                quizQuestionParagraph.textContent = "No more questions available!";
+            function loadNewQuestion() {
+                if (quizQuestions.length === 0) {
+                    quizQuestionParagraph.textContent = "No more questions available!";
+                    quizAnswerInput.disabled = true;
+                    submitQuizAnswerButton.disabled = true;
+                    return;
+                }
+
+                if (answeredQuestions.length === quizQuestions.length) {
+                    answeredQuestions = [];
+                }
+
+                let randomIndex;
+                do {
+                    randomIndex = Math.floor(Math.random() * quizQuestions.length);
+                } while (answeredQuestions.includes(randomIndex));
+
+                answeredQuestions.push(randomIndex);
+                currentQuestion = quizQuestions[randomIndex];
+
+                quizQuestionParagraph.textContent = currentQuestion.question;
+                quizAnswerInput.value = '';
+                quizFeedbackParagraph.textContent = '';
+                quizAnswerInput.disabled = false;
+                submitQuizAnswerButton.disabled = false;
+            }
+
+            function checkAnswer() {
+                if (!currentQuestion) return;
+
+                const userAnswer = quizAnswerInput.value.trim().toLowerCase();
+                const correctAnswer = String(currentQuestion.answer).toLowerCase();
+
+                if (userAnswer === correctAnswer) {
+                    resources.wood.count += currentQuestion.reward;
+                    quizFeedbackParagraph.textContent = `Correct! Bạn đã nhận được ${currentQuestion.reward} Gỗ.`;
+                    quizFeedbackParagraph.style.color = 'green';
+                    updateDisplay();
+                } else {
+                    quizFeedbackParagraph.textContent = `Không đúng. Đáp án là "${currentQuestion.answer}".`;
+                    quizFeedbackParagraph.style.color = 'red';
+                }
+
                 quizAnswerInput.disabled = true;
                 submitQuizAnswerButton.disabled = true;
-                return;
+
+                quizCooldownTimer = Date.now();
+                setTimeout(() => {
+                    loadNewQuestion();
+                }, QUIZ_COOLDOWN_MS);
             }
 
-            // Ensure we don't repeat questions until all have been asked
-            if (answeredQuestions.length === quizQuestions.length) {
-                answeredQuestions = []; // Reset if all questions have been asked
+            async function generateLore(resourceName, loreDisplayElement) {
+                loreDisplayElement.textContent = 'Đang tạo lore...';
+                loreDisplayElement.style.color = '#555';
+
+                try {
+                    const prompt = `Viết một đoạn văn ngắn, giàu trí tưởng tượng (khoảng 30-50 từ) về tài nguyên "${resourceName}" trong một trò chơi incremental. Tập trung vào ý nghĩa, cách nó được sử dụng, hoặc cảm giác khi thu thập nó trong bối cảnh trò chơi phiêu lưu khoa học viễn tưởng.`;
+
+                    let chatHistory = [];
+                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+
+                    const payload = { contents: chatHistory };
+                    const apiKey = "";
+
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        loreDisplayElement.textContent = text;
+                        loreDisplayElement.style.color = '#388e3c';
+                    } else {
+                        loreDisplayElement.textContent = 'Không thể tạo lore. Cấu trúc phản hồi không mong muốn.';
+                        loreDisplayElement.style.color = 'orange';
+                    }
+                } catch (error) {
+                    console.error("Lỗi khi gọi Gemini API:", error);
+                    loreDisplayElement.textContent = 'Lỗi khi tạo lore. Vui lòng thử lại. (Kiểm tra console để biết chi tiết)';
+                    loreDisplayElement.style.color = 'red';
+                }
             }
 
-            let randomIndex;
-            do {
-                randomIndex = Math.floor(Math.random() * quizQuestions.length);
-            } while (answeredQuestions.includes(randomIndex));
+            function formatTime(ms) {
+                let seconds = Math.floor(ms / 1000);
+                let minutes = Math.floor(seconds / 60);
+                let hours = Math.floor(minutes / 60);
 
-            answeredQuestions.push(randomIndex);
-            currentQuestion = quizQuestions[randomIndex];
+                seconds = seconds % 60;
+                minutes = minutes % 60;
 
-            quizQuestionParagraph.textContent = currentQuestion.question;
-            quizAnswerInput.value = ''; // Clear previous answer
-            quizFeedbackParagraph.textContent = ''; // Clear feedback
-            quizAnswerInput.disabled = false;
-            submitQuizAnswerButton.disabled = false;
-        }
+                const pad = (num) => num < 10 ? '0' + num : num;
 
-        /**
-         * Checks the user's answer for the current quiz question.
-         */
-        function checkAnswer() {
-            if (!currentQuestion) return;
+                return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+            }
 
-            const userAnswer = quizAnswerInput.value.trim().toLowerCase();
-            const correctAnswer = String(currentQuestion.answer).toLowerCase(); // Ensure answer is string and lowercase
+            function updateTimePlayed() {
+                resources.timePlayed.second += 1;
+                if (resources.timePlayed.second === 60) {
+                    resources.timePlayed.second = 0;
+                    resources.timePlayed.minute += 1;
+                }
+                if (resources.timePlayed.minute === 60) {
+                    resources.timePlayed.minute = 0;
+                    resources.timePlayed.hour += 1;
+                }
+                timePlayedSpan.textContent = resources.timePlayed.hour.toString().padStart(2, '0') + ":" + resources.timePlayed.minute.toString().padStart(2, '0') + ":" + resources.timePlayed.second.toString().padStart(2, '0');
+            }
 
-            if (userAnswer === correctAnswer) {
-                resources.wood.count += currentQuestion.reward;
-                quizFeedbackParagraph.textContent = `Correct! Bạn đã nhận được ${currentQuestion.reward} Gỗ.`;
-                quizFeedbackParagraph.style.color = 'green';
+            function notify(type, message) {
+                (() => {
+                    let n = document.createElement("div");
+                    let id = Math.random().toString(36).substr(2, 10);
+                    n.setAttribute("id", id);
+                    n.classList.add("notification", type);
+                    n.classList.add("fade_out");
+                    n.innerText = message;
+                    document.getElementById("notification-area").appendChild(n);
+                    setTimeout(() => {
+                        var notifications = document.getElementById("notification-area").getElementsByClassName("notification");
+                        for (let i = 0; i < notifications.length; i++) {
+                            if (notifications[i].getAttribute("id") === id) {
+                                notifications[i].remove();
+                                break;
+                            }
+                        }
+                    }, 5000);
+                })();
+            }
+
+            function notifySuccess() {
+                notify("success", "The game has been saved.");
+            }
+
+            function autoSave() {
+                saveGame(1);
+                notifySuccess();
+            }
+
+            function gameLoop() {
+                resources.wood.count += resources.wood.perSecond / 10;
+                resources.stone.count += resources.stone.perSecond / 10;
+                resources.iron.count += resources.iron.perSecond / 10;
+                resources.alloy.count += resources.alloy.perSecond / 10;
+                resources.circuitry.count += resources.circuitry.perSecond / 10;
+                resources.aiCore.count += resources.aiCore.perSecond / 10;
+                resources.consciousness.count += resources.consciousness.perSecond / 10;
+                resources.realityShard.count += resources.realityShard.perSecond / 10;
+                resources.paradox.count += resources.paradox.perSecond / 10;
+                resources.singularity.count += resources.singularity.perSecond / 10;
+                resources.multiverse.count += resources.multiverse.perSecond / 10;
+                resources.omniscience.count += resources.omniscience.perSecond / 10;
+                resources.genesis.count += resources.genesis.perSecond / 10;
+                resources.void.count += resources.void.perSecond / 10;
+                resources.theAll.count += resources.theAll.perSecond / 10;
+                resources.transcendence.count += resources.transcendence.perSecond / 10;
+                resources.theAbsolute.count += resources.theAbsolute.perSecond / 10;
+                resources.theEnd.count += resources.theEnd.perSecond / 10;
+                resources.theNewBeginning.count += resources.theNewBeginning.perSecond / 10;
+                resources.theArchitectsWill.count += resources.theArchitectsWill.perSecond / 10;
+                resources.theOmniverse.count += resources.theOmniverse.perSecond / 10;
+                resources.theBoundlessVoid.count += resources.theBoundlessVoid.perSecond / 10;
+                resources.cosmicFabric.count += resources.cosmicFabric.perSecond / 10;
+                resources.infiniteNexus.count += resources.infiniteNexus.perSecond / 10;
+                resources.eternalEcho.count += resources.eternalEcho.perSecond / 10;
+                resources.zenithOfCreation.count += resources.zenithOfCreation.perSecond / 10;
+                resources.universalSingularity.count += resources.universalSingularity.perSecond / 10;
+                resources.existentialFabric.count += resources.existentialFabric.perSecond / 10;
+                resources.temporalFlux.count += resources.temporalFlux.perSecond / 10;
+                resources.multidimensionalHarmony.count += resources.multidimensionalHarmony.perSecond / 10;
+                resources.cosmicAwakening.count += resources.cosmicAwakening.perSecond / 10;
+                resources.divineSpark.count += resources.divineSpark.perSecond / 10;
+
                 updateDisplay();
-            } else {
-                quizFeedbackParagraph.textContent = `Không đúng. Đáp án là "${currentQuestion.answer}".`;
-                quizFeedbackParagraph.style.color = 'red';
             }
 
-            quizAnswerInput.disabled = true;
-            submitQuizAnswerButton.disabled = true;
+            // Public interface for the game
+            return {
+                init: () => {
+                    // Event Listeners
+                    addWoodButton.addEventListener('click', addWood);
+                    upgradeChopPowerButton.addEventListener('click', upgradeChopPower);
+                    buyWoodPerSecondButton.addEventListener('click', buyWoodPerSecondAutomation);
 
-            // Load a new question after a cooldown
-            quizCooldownTimer = Date.now();
-            setTimeout(() => {
-                loadNewQuestion();
-            }, QUIZ_COOLDOWN_MS);
-        }
+                    buyStoneButton.addEventListener('click', () => buyResource('stone', 'wood'));
+                    buyIronButton.addEventListener('click', () => buyResource('iron', 'stone'));
+                    buyAlloyButton.addEventListener('click', () => buyResource('alloy', 'iron'));
+                    buyCircuitryButton.addEventListener('click', () => buyResource('circuitry', 'alloy'));
+                    buyAICoreButton.addEventListener('click', () => buyResource('aiCore', 'circuitry'));
+                    buyConsciousnessButton.addEventListener('click', () => buyResource('consciousness', 'aiCore'));
+                    buyRealityShardButton.addEventListener('click', () => buyResource('realityShard', 'consciousness'));
+                    buyParadoxButton.addEventListener('click', () => buyResource('paradox', 'realityShard'));
+                    buySingularityButton.addEventListener('click', () => buyResource('singularity', 'paradox'));
+                    buyMultiverseButton.addEventListener('click', () => buyResource('multiverse', 'singularity'));
+                    buyOmniscienceButton.addEventListener('click', () => buyResource('omniscience', 'multiverse'));
+                    buyGenesisButton.addEventListener('click', () => buyResource('genesis', 'omniscience'));
+                    buyVoidButton.addEventListener('click', () => buyResource('void', 'genesis'));
+                    buyTheAllButton.addEventListener('click', () => buyResource('theAll', 'void'));
+                    buyTranscendenceButton.addEventListener('click', () => buyResource('transcendence', 'theAll'));
+                    buyTheAbsoluteButton.addEventListener('click', () => buyResource('theAbsolute', 'transcendence'));
+                    buyTheEndButton.addEventListener('click', () => buyResource('theEnd', 'theAbsolute'));
+                    buyTheNewBeginningButton.addEventListener('click', () => buyResource('theNewBeginning', 'theEnd'));
+                    buyTheArchitectsWillButton.addEventListener('click', () => buyResource('theArchitectsWill', 'theNewBeginning'));
+                    buyTheOmniverseButton.addEventListener('click', () => buyResource('theOmniverse', 'theArchitectsWill'));
+                    buyTheBoundlessVoidButton.addEventListener('click', () => buyResource('theBoundlessVoid', 'theOmniverse'));
+                    buyCosmicFabricButton.addEventListener('click', () => buyResource('cosmicFabric', 'theBoundlessVoid'));
+                    buyInfiniteNexusButton.addEventListener('click', () => buyResource('infiniteNexus', 'cosmicFabric'));
+                    buyEternalEchoButton.addEventListener('click', () => buyResource('eternalEcho', 'infiniteNexus'));
+                    buyZenithOfCreationButton.addEventListener('click', () => buyResource('zenithOfCreation', 'eternalEcho'));
+                    buyUniversalSingularityButton.addEventListener('click', () => buyResource('universalSingularity', 'zenithOfCreation'));
+                    buyExistentialFabricButton.addEventListener('click', () => buyResource('existentialFabric', 'universalSingularity'));
+                    buyTemporalFluxButton.addEventListener('click', () => buyResource('temporalFlux', 'existentialFabric'));
+                    buyMultidimensionalHarmonyButton.addEventListener('click', () => buyResource('multidimensionalHarmony', 'temporalFlux'));
+                    buyCosmicAwakeningButton.addEventListener('click', () => buyResource('cosmicAwakening', 'multidimensionalHarmony'));
+                    buyDivineSparkButton.addEventListener('click', () => buyResource('divineSpark', 'cosmicAwakening'));
 
-        // Event listener for quiz submit button and Enter key
-        submitQuizAnswerButton.addEventListener('click', checkAnswer);
-        quizAnswerInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                checkAnswer();
-            }
-        });
+                    saveGameBtn.addEventListener('click', () => saveGame(0));
+                    loadGameBtn.addEventListener('click', loadGame);
+                    closeCriticalFeedbackButton.addEventListener('click', dismissCriticalFeedback);
+                    document.addEventListener('keydown', handleCheatCode);
 
-        // --- Gemini API Lore Generation ---
-        /**
-         * Generates lore for a given resource using the Gemini API.
-         * @param {string} resourceName - The name of the resource to generate lore for.
-         * @param {HTMLElement} loreDisplayElement - The DOM element to display the lore.
-         */
-        async function generateLore(resourceName, loreDisplayElement) {
-            loreDisplayElement.textContent = 'Đang tạo lore...'; // Loading message
-            loreDisplayElement.style.color = '#555';
+                    submitQuizAnswerButton.addEventListener('click', checkAnswer);
+                    quizAnswerInput.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter') {
+                            checkAnswer();
+                        }
+                    });
 
-            try {
-                const prompt = `Viết một đoạn văn ngắn, giàu trí tưởng tượng (khoảng 30-50 từ) về tài nguyên "${resourceName}" trong một trò chơi incremental. Tập trung vào ý nghĩa, cách nó được sử dụng, hoặc cảm giác khi thu thập nó trong bối cảnh trò chơi phiêu lưu khoa học viễn tưởng.`;
+                    const isGitHubPages = window.location.hostname.includes('github.io') || window.location.hostname.includes('github.com');
+                    if (isGitHubPages) {
+                        loreButtons.forEach(button => {
+                            button.style.display = 'none';
+                            const loreDisplayElement = loreDisplays[button.dataset.resource];
+                            if (loreDisplayElement) {
+                                loreDisplayElement.style.display = 'none';
+                            }
+                        });
+                    } else {
+                        loreButtons.forEach(button => {
+                            button.addEventListener('click', () => {
+                                const resourceName = button.dataset.resource;
+                                const loreDisplayElement = loreDisplays[resourceName];
+                                generateLore(resourceName, loreDisplayElement);
+                            });
+                        });
+                    }
 
-                let chatHistory = [];
-                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                    // Start game loops
+                    setInterval(gameLoop, 100);
+                    setInterval(updateTimePlayed, 1000);
+                    setInterval(autoSave, 30000);
 
-                const payload = { contents: chatHistory };
-                const apiKey = ""; // Canvas will automatically provide the API key at runtime
+                    // Initial setup
+                    updateDisplay();
+                    loadGame();
+                    loadNewQuestion();
+                },
+                // Expose specific functions if needed for external interaction, e.g., for testing
+                getWoodCount: () => resources.wood.count,
+                addWoodExternal: (amount) => { resources.wood.count += amount; updateDisplay(); }
+            };
+        })();
 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
-                }
-
-                const result = await response.json();
-
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    loreDisplayElement.textContent = text;
-                    loreDisplayElement.style.color = '#388e3c'; // Reset to green on success
-                } else {
-                    loreDisplayElement.textContent = 'Không thể tạo lore. Cấu trúc phản hồi không mong muốn.';
-                    loreDisplayElement.style.color = 'orange'; // Indicate warning
-                }
-            } catch (error) {
-                console.error("Lỗi khi gọi Gemini API:", error);
-                loreDisplayElement.textContent = 'Lỗi khi tạo lore. Vui lòng thử lại. (Kiểm tra console để biết chi tiết)';
-                loreDisplayElement.style.color = 'red';
-            }
-        }
-
-
-        // --- Event Listeners (Existing) ---
-        addWoodButton.addEventListener('click', addWood);
-        upgradeChopPowerButton.addEventListener('click', upgradeChopPower);
-        buyWoodPerSecondButton.addEventListener('click', buyWoodPerSecondAutomation);
-
-        // Event listeners for resource conversions
-        buyStoneButton.addEventListener('click', () => buyResource('stone', 'wood'));
-        buyIronButton.addEventListener('click', () => buyResource('iron', 'stone'));
-        buyAlloyButton.addEventListener('click', () => buyResource('alloy', 'iron'));
-        buyCircuitryButton.addEventListener('click', () => buyResource('circuitry', 'alloy'));
-        buyAICoreButton.addEventListener('click', () => buyResource('aiCore', 'circuitry'));
-        buyConsciousnessButton.addEventListener('click', () => buyResource('consciousness', 'aiCore'));
-        buyRealityShardButton.addEventListener('click', () => buyResource('realityShard', 'consciousness'));
-        buyParadoxButton.addEventListener('click', () => buyResource('paradox', 'realityShard'));
-        buySingularityButton.addEventListener('click', () => buyResource('singularity', 'paradox'));
-        buyMultiverseButton.addEventListener('click', () => buyResource('multiverse', 'singularity'));
-        buyOmniscienceButton.addEventListener('click', () => buyResource('omniscience', 'multiverse'));
-        buyGenesisButton.addEventListener('click', () => buyResource('genesis', 'omniscience'));
-        buyVoidButton.addEventListener('click', () => buyResource('void', 'genesis'));
-        buyTheAllButton.addEventListener('click', () => buyResource('theAll', 'void'));
-        buyTranscendenceButton.addEventListener('click', () => buyResource('transcendence', 'theAll'));
-        buyTheAbsoluteButton.addEventListener('click', () => buyResource('theAbsolute', 'transcendence'));
-        buyTheEndButton.addEventListener('click', () => buyResource('theEnd', 'theAbsolute'));
-        buyTheNewBeginningButton.addEventListener('click', () => buyResource('theNewBeginning', 'theEnd'));
-        buyTheArchitectsWillButton.addEventListener('click', () => buyResource('theArchitectsWill', 'theNewBeginning'));
-        buyTheOmniverseButton.addEventListener('click', () => buyResource('theOmniverse', 'theArchitectsWill'));
-        // --- NEW RESOURCE EVENT LISTENERS (STAGE 3) ---
-        buyTheBoundlessVoidButton.addEventListener('click', () => buyResource('theBoundlessVoid', 'theOmniverse'));
-        buyCosmicFabricButton.addEventListener('click', () => buyResource('cosmicFabric', 'theBoundlessVoid'));
-        buyInfiniteNexusButton.addEventListener('click', () => buyResource('infiniteNexus', 'cosmicFabric'));
-        buyEternalEchoButton.addEventListener('click', () => buyResource('eternalEcho', 'infiniteNexus'));
-        buyZenithOfCreationButton.addEventListener('click', () => buyResource('zenithOfCreation', 'eternalEcho'));
-        // --- EVEN MORE NEW RESOURCE EVENT LISTENERS (STAGE 4) ---
-        buyUniversalSingularityButton.addEventListener('click', () => buyResource('universalSingularity', 'zenithOfCreation'));
-        buyExistentialFabricButton.addEventListener('click', () => buyResource('existentialFabric', 'universalSingularity'));
-        buyTemporalFluxButton.addEventListener('click', () => buyResource('temporalFlux', 'existentialFabric'));
-        buyMultidimensionalHarmonyButton.addEventListener('click', () => buyResource('multidimensionalHarmony', 'temporalFlux'));
-        buyCosmicAwakeningButton.addEventListener('click', () => buyResource('cosmicAwakening', 'multidimensionalHarmony'));
-        buyDivineSparkButton.addEventListener('click', () => buyResource('divineSpark', 'cosmicAwakening'));
-
-
-        // Event listeners for save/load buttons
-        saveGameBtn.addEventListener('click', () => saveGame(0)); // Pass 0 to show alert
-        loadGameBtn.addEventListener('click', loadGame);
-
-        // Event listener for the critical feedback close button
-        closeCriticalFeedbackButton.addEventListener('click', dismissCriticalFeedback);
-
-        // Conditional display for Lore buttons
-        const isGitHubPages = window.location.hostname.includes('github.io') || window.location.hostname.includes('github.com');
-        if (isGitHubPages) {
-            loreButtons.forEach(button => {
-                button.style.display = 'none'; // Hide the lore buttons
-                const loreDisplayElement = loreDisplays[button.dataset.resource];
-                if (loreDisplayElement) {
-                    loreDisplayElement.style.display = 'none'; // Hide the lore display area too
-                }
-            });
-        } else {
-            // Only add event listeners if not on GitHub Pages (i.e., when buttons are visible)
-            loreButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const resourceName = button.dataset.resource;
-                    const loreDisplayElement = loreDisplays[resourceName];
-                    generateLore(resourceName, loreDisplayElement);
-                });
-            });
-        }
-
-
-        // --- Game Loop ---
-        /**
-         * Formats milliseconds into HH:MM:SS string.
-         * @param {number} ms - Milliseconds to format.
-         * @returns {string} Formatted time string.
-         */
-        function formatTime(ms) {
-            let seconds = Math.floor(ms / 1000);
-            let minutes = Math.floor(seconds / 60);
-            let hours = Math.floor(minutes / 60);
-
-            seconds = seconds % 60;
-            minutes = minutes % 60;
-
-            const pad = (num) => num < 10 ? '0' + num : num;
-
-            return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-        }
-        function updateTimePlayed() {
-
-
-       resources.timePlayed.second += 1;
-       if(  resources.timePlayed.second == 60)
-{
-    resources.timePlayed.second = 0;
-     resources.timePlayed.minute += 1;
-}
-      if(  resources.timePlayed.minute == 60)
-{
-    resources.timePlayed.minute = 0;
-     resources.timePlayed.hour += 1;
-}
-       timePlayedSpan.textContent =    resources.timePlayed.hour.toString().padStart(2, '0') + ":" + resources.timePlayed.minute.toString().padStart(2, '0') + ":" +      resources.timePlayed.second.toString().padStart(2, '0');
-
-}
-
-function notify(type,message){
-  (()=>{
-    let n = document.createElement("div");
-    let id = Math.random().toString(36).substr(2,10);
-    n.setAttribute("id",id);
-    n.classList.add("notification",type);
-    n.classList.add("fade_out")
-    n.innerText = message;
-    document.getElementById("notification-area").appendChild(n);
-    setTimeout(()=>{
-      var notifications = document.getElementById("notification-area").getElementsByClassName("notification");
-      for(let i=0;i<notifications.length;i++){
-        if(notifications[i].getAttribute("id") == id){
-          notifications[i].remove();
-          break;
-        }
-      }
-    },5000);
-  })();
-}
-
-
-function notifySuccess(){
-  notify("success","The game has been saved.");
-}
-
-
-function autoSave(){
-saveGame(1); // Pass 1 to suppress the alert during autosave
-notifySuccess();
-}
-        /**
-         * The main game loop that updates resources based on their per-second production.
-         * Runs every 100 milliseconds.
-         */
-        function gameLoop() {
-            // Update all resources based on their perSecond rates
-            // Divide by 10 because the loop runs 10 times per second (1000ms / 100ms = 10)
-            resources.wood.count += resources.wood.perSecond / 10;
-            resources.stone.count += resources.stone.perSecond / 10;
-            resources.iron.count += resources.iron.perSecond / 10;
-            resources.alloy.count += resources.alloy.perSecond / 10;
-            resources.circuitry.count += resources.circuitry.perSecond / 10;
-            resources.aiCore.count += resources.aiCore.perSecond / 10;
-            resources.consciousness.count += resources.consciousness.perSecond / 10;
-            resources.realityShard.count += resources.realityShard.perSecond / 10;
-            resources.paradox.count += resources.paradox.perSecond / 10;
-            resources.singularity.count += resources.singularity.perSecond / 10;
-            resources.multiverse.count += resources.multiverse.perSecond / 10;
-            resources.omniscience.count += resources.omniscience.perSecond / 10;
-            resources.genesis.count += resources.genesis.perSecond / 10;
-            resources.void.count += resources.void.perSecond / 10;
-            resources.theAll.count += resources.theAll.perSecond / 10;
-            resources.transcendence.count += resources.transcendence.perSecond / 10;
-            resources.theAbsolute.count += resources.theAbsolute.perSecond / 10;
-            resources.theEnd.count += resources.theEnd.perSecond / 10;
-            resources.theNewBeginning.count += resources.theNewBeginning.perSecond / 10;
-            resources.theArchitectsWill.count += resources.theArchitectsWill.perSecond / 10;
-            resources.theOmniverse.count += resources.theOmniverse.perSecond / 10;
-            // --- NEW RESOURCE UPDATES (STAGE 3) ---
-            resources.theBoundlessVoid.count += resources.theBoundlessVoid.perSecond / 10;
-            resources.cosmicFabric.count += resources.cosmicFabric.perSecond / 10;
-            resources.infiniteNexus.count += resources.infiniteNexus.perSecond / 10;
-            resources.eternalEcho.count += resources.eternalEcho.perSecond / 10;
-            resources.zenithOfCreation.count += resources.zenithOfCreation.perSecond / 10;
-            // --- EVEN MORE NEW RESOURCE UPDATES (STAGE 4) ---
-            resources.universalSingularity.count += resources.universalSingularity.perSecond / 10;
-            resources.existentialFabric.count += resources.existentialFabric.perSecond / 10;
-            resources.temporalFlux.count += resources.temporalFlux.perSecond / 10;
-            resources.multidimensionalHarmony.count += resources.multidimensionalHarmony.perSecond / 10;
-            resources.cosmicAwakening.count += resources.cosmicAwakening.perSecond / 10;
-            resources.divineSpark.count += resources.divineSpark.perSecond / 10;
-
-            updateDisplay(); // Update the UI after resources are calculated
-        }
-
-        // Start the game loop
-        setInterval(gameLoop, 100);
-        setInterval(updateTimePlayed, 1000); // Update timePlayed every second
-        setInterval(autoSave, 30000); // Auto-save every 30 seconds
-
-        // Initial display update and load game when the page loads
-        updateDisplay();
-        loadGame(); // Attempt to load game progress on startup
-        loadNewQuestion(); // Load the first quiz question
+        // Initialize the game
+        game.init();
     </script>
 </body>
 </html>
