@@ -56,7 +56,9 @@ let workers = {
     idleResearchers: 0,
     assignedResearchers: 0,
     soldiers: [], // Thay đổi từ số lượng thành mảng các đối tượng binh sĩ
-    idleSoldiers: 0 // Số lính rảnh rỗi (tính từ mảng soldiers)
+    idleSoldiers: 0, // Số lính rảnh rỗi (tính từ mảng soldiers)
+soldierTrainingRemainingTime: 0, // Thời gian còn lại để huấn luyện binh sĩ hiện tại
+    isTrainingSoldier: false
 };
 
 let buildings = {
@@ -87,6 +89,13 @@ let buildings = {
             wood: 150,
             stone: 100
         }
+    },
+   // THÊM NHÀ LÍNH (BARRACK) VÀO ĐÂY
+    barrack: {
+        level: 0, // Bắt đầu ở cấp 0 (chưa xây)
+        buildCost: { wood: 300, stone: 200, gold: 100 }, // Chi phí để xây cấp 1
+        upgradeCost: { wood: 300, stone: 200, gold: 100 }, // Chi phí cơ bản để nâng cấp
+        trainingTimeReductionPerLevel: 0.05 // Giảm 5% thời gian huấn luyện mỗi cấp
     }
 };
 
@@ -225,7 +234,10 @@ function updateUI() {
         document.getElementById('library-cost-wood').textContent = buildings.library.upgradeCost.wood;
         document.getElementById('library-cost-stone').textContent = buildings.library.upgradeCost.stone;
     }
-
+//cập nhật thông tin nhà lính
+if( buildings.barrack.level >0){
+document.getElementById('btnUpgradeBarrack').textContent = "Nâng cấp";
+}
 
    // NEW: Kỳ Quan
     document.getElementById('wonder-segments').textContent = wonder.segments;
@@ -258,6 +270,14 @@ function updateUI() {
     document.getElementById('warehouse-level').textContent = buildings.warehouse.level;
     document.getElementById('warehouse-upgrade-cost-wood').textContent = buildings.warehouse.upgradeCost.wood;
     document.getElementById('warehouse-upgrade-cost-stone').textContent = buildings.warehouse.upgradeCost.stone;
+
+
+    // Cập nhật thông tin Nhà lính
+    document.getElementById('barrack-level').textContent = buildings.barrack.level;
+    document.getElementById('barrack-upgrade-cost-wood').textContent = buildings.barrack.upgradeCost.wood;
+    document.getElementById('barrack-upgrade-cost-stone').textContent = buildings.barrack.upgradeCost.stone;
+    document.getElementById('barrack-upgrade-cost-gold').textContent = buildings.barrack.upgradeCost.gold;
+
 
 
     // Cập nhật huấn luyện nhà nghiên cứu
@@ -658,18 +678,13 @@ function resetGame() {
             },
             baseCapacity: 500
         },
-        barracks: {
-            level: 0,
-            maxSoldiers: 0,
-            buildCost: {
-                wood: 200,
-                stone: 150
-            },
-            upgradeCost: {
-                wood: 100,
-                stone: 80
-            }
-        }
+           // THÊM NHÀ LÍNH (BARRACK) VÀO ĐÂY
+    barrack: {
+        level: 0, // Bắt đầu ở cấp 0 (chưa xây)
+        buildCost: { wood: 300, stone: 200, gold: 100 }, // Chi phí để xây cấp 1
+        upgradeCost: { wood: 300, stone: 200, gold: 100 }, // Chi phí cơ bản để nâng cấp
+        trainingTimeReductionPerLevel: 0.05 // Giảm 5% thời gian huấn luyện mỗi cấp
+    }
     };
 
     training = {
@@ -849,7 +864,8 @@ function upgradeBuilding(buildingName) {
             if (resources.stone < costStone) message += `Thiếu Đá: ${costStone - resources.stone}\n`;
             alert(message);
         }
-    } else if (buildingName === 'library') {
+    } 
+        else if (buildingName === 'library') {
         if (buildings.library.level === 0) {
             alert('Cần xây dựng Thư viện trước khi nâng cấp!');
             return;
@@ -874,7 +890,40 @@ function upgradeBuilding(buildingName) {
             if (resources.stone < costStone) message += `Thiếu Đá: ${costStone - resources.stone}\n`;
             alert(message);
         }
-    } else if (buildingName === 'warehouse') {
+    } 
+             else if (buildingName === 'barrack') {
+       // if (buildings.barrack.level === 0) {
+         //   alert('Cần xây dựng Nhà lính trước khi nâng cấp!');
+          //  return;
+        //}
+        const costWood = buildings.barrack.upgradeCost.wood;
+        const costStone = buildings.barrack.upgradeCost.stone;
+        const costGold = buildings.barrack.upgradeCost.gold;
+
+        if (resources.wood >= costWood && resources.stone >= costStone && resources.gold >= costGold) {
+            resources.wood -= costWood;
+            resources.stone -= costStone;
+            resources.gold -= costGold;
+            buildings.barrack.level++;
+            training.soldier.duration = 300 * (1 - (buildings.barrack.level * 0.05));
+            document.getElementById("train-soldier-btn").textContent = "Huấn luyện (" + training.soldier.duration.toString() + "s)";
+            
+            buildings.barrack.upgradeCost.wood = Math.floor(buildings.barrack.upgradeCost.wood * 1.8);
+            buildings.barrack.upgradeCost.stone = Math.floor(buildings.barrack.upgradeCost.stone * 1.8);
+            buildings.barrack.upgradeCost.gold = Math.floor(buildings.barrack.upgradeCost.gold * 1.8);
+
+            alert(`Nâng cấp Nhà lính lên cấp ${buildings.barrack.level} thành công!`);
+            updateUI();
+        } else {
+            let message = 'Không đủ tài nguyên để nâng cấp Nhà lính!\n';
+            if (resources.wood < costWood) message += `Thiếu Gỗ: ${costWood - resources.wood}\n`;
+            if (resources.stone < costStone) message += `Thiếu Đá: ${costStone - resources.stone}\n`;
+            if( resources.gold <costGold) message += `Thiếu Vàng: ${costGold- resources.gold}\n`;
+            alert(message);
+        }
+    } 
+
+else if (buildingName === 'warehouse') {
         const costWood = buildings.warehouse.upgradeCost.wood;
         const costStone = buildings.warehouse.upgradeCost.stone;
 
