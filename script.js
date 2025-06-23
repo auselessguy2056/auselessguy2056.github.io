@@ -238,6 +238,9 @@ function updateUI() {
 if( buildings.barrack.level >0){
 document.getElementById('btnUpgradeBarrack').textContent = "Nâng cấp";
 }
+// cập nhật thời gian huấn luyện
+   document.getElementById("train-soldier-btn").textContent = "Huấn luyện (" + training.soldier.duration.toString() + "s)";
+         
 
    // NEW: Kỳ Quan
     document.getElementById('wonder-segments').textContent = wonder.segments;
