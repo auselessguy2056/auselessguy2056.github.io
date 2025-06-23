@@ -1897,7 +1897,7 @@ function startGameLoop() {
         advanceTrainingSoldier();
         advanceCraftingArmor();
         advanceExploration();
-        autoSaveGame();
+        //autoSaveGame();
     }, 1000);
 }
 
@@ -2048,6 +2048,7 @@ window.onload = () => {
     autoLoadGame();
     startGameLoop();
     showMainTab('world-tab');
+    setInterval(autoSaveGame,5000);
 
     // Logic để ẩn phần hack nếu URL chứa '.github.io'
     const developerHackSection = document.getElementById('developer-hack-section');
