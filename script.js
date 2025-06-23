@@ -96,7 +96,14 @@ let buildings = {
         buildCost: { wood: 300, stone: 200, gold: 100 }, // Chi phí để xây cấp 1
         upgradeCost: { wood: 300, stone: 200, gold: 100 }, // Chi phí cơ bản để nâng cấp
         trainingTimeReductionPerLevel: 0.05 // Giảm 5% thời gian huấn luyện mỗi cấp
-    }
+    },
+    cargoship: {
+        
+        level: 0, // Bắt đầu ở cấp 0 (chưa xây)
+        buildCost: { wood: 14500, stone: 14500, gold: 14500, iron: 14500 }, // Chi phí để xây cấp 1
+        upgradeCost: { wood: 14500, stone: 14500, gold: 14500, iron: 14500 }, // Chi phí cơ bản để nâng cấp
+        capacityPerLevel: 5000 
+               }
 };
 
 let training = {
@@ -240,7 +247,21 @@ document.getElementById('btnUpgradeBarrack').textContent = "Nâng cấp";
 }
 // cập nhật thời gian huấn luyện
    document.getElementById("train-soldier-btn").textContent = "Huấn luyện (" + training.soldier.duration.toString() + "s)";
-         
+// cập nhật thông tin tàu chở hàng
+document.getElementById("cargo-ship-level").textContent = buildings.cargoship.level;
+if(buildings.cargoship.level >0){
+document.getElementById("btnUpgradeCargoShip").textContent = "Nâng cấp";
+         }
+if(buildings.warehouse.level < 15)
+{
+  document.getElementById("cargo-ship-block").style.display = "none";
+}
+else
+{
+     document.getElementById("cargo-ship-block").style.display = "block";
+}
+
+
 
    // NEW: Kỳ Quan
     document.getElementById('wonder-segments').textContent = wonder.segments;
@@ -687,7 +708,15 @@ function resetGame() {
         buildCost: { wood: 300, stone: 200, gold: 100 }, // Chi phí để xây cấp 1
         upgradeCost: { wood: 300, stone: 200, gold: 100 }, // Chi phí cơ bản để nâng cấp
         trainingTimeReductionPerLevel: 0.05 // Giảm 5% thời gian huấn luyện mỗi cấp
-    }
+    },
+    cargoship: {
+        
+        level: 0, // Bắt đầu ở cấp 0 (chưa xây)
+        buildCost: { wood: 14500, stone: 14500, gold: 14500, iron: 14500 }, // Chi phí để xây cấp 1
+        upgradeCost: { wood: 14500, stone: 14500, gold: 14500, iron: 14500 }, // Chi phí cơ bản để nâng cấp
+        capacityPerLevel: 5000 
+               }
+
     };
 
     training = {
@@ -894,6 +923,7 @@ function upgradeBuilding(buildingName) {
             alert(message);
         }
     } 
+
              else if (buildingName === 'barrack') {
        // if (buildings.barrack.level === 0) {
          //   alert('Cần xây dựng Nhà lính trước khi nâng cấp!');
@@ -950,6 +980,41 @@ else if (buildingName === 'warehouse') {
             let message = 'Không đủ tài nguyên để nâng cấp Nhà Kho!\n';
             if (resources.wood < costWood) message += `Thiếu Gỗ: ${costWood - resources.wood}\n`;
             if (resources.stone < costStone) message += `Thiếu Đá: ${costStone - resources.stone}\n`;
+            alert(message);
+        }
+    }
+else if (buildingName === 'cargoship') {
+        const costWood = buildings.cargoship.upgradeCost.wood;
+        const costStone = buildings.cargoship.upgradeCost.stone;
+ const costIron = buildings.cargoship.upgradeCost.iron;
+        const costGold = buildings.cargoship.upgradeCost.gold;
+
+        if (resources.wood >= costWood && resources.stone >= costStone && resources.iron >= costIron && resources.gold >= costGold) {
+            resources.wood -= costWood;
+            resources.stone -= costStone;
+
+            resources.iron -= costIron;
+            resources.gold -= costGold;
+
+
+            buildings.cargoship.level++;
+            
+            resources.woodCapacity += buildings.cargoship.capacityPerLevel;
+            resources.grainCapacity += buildings.cargoship.capacityPerLevel;
+            resources.goldCapacity += buildings.cargoship.capacityPerLevel;
+            resources.stoneCapacity += buildings.cargoship.capacityPerLevel;
+            resources.ironCapacity += buildings.cargoship.capacityPerLevel;
+
+          
+
+            alert(`Nâng cấp Tàu Chở Hàng lên cấp ${buildings.cargoship.level} thành công!`);
+            updateUI();
+        } else {
+            let message = 'Không đủ tài nguyên để nâng cấp Tàu Chở Hàng!\n';
+            if (resources.wood < costWood) message += `Thiếu Gỗ: ${costWood - resources.wood}\n`;
+            if (resources.stone < costStone) message += `Thiếu Đá: ${costStone - resources.stone}\n`;
+                   if (resources.iron < costIron) message += `Thiếu Sắt: ${costIron - resources.iron}\n`;
+            if (resources.gold < costGold) message += `Thiếu Vàng: ${costGold - resources.gold}\n`;
             alert(message);
         }
     }
