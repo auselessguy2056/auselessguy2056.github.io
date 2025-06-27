@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -237,7 +238,14 @@
         <h2>Game Stats</h2>
         <p>Time Played: <span id="timePlayed">00:00:00</span></p>
         <button id="saveGameBtn">Save Game</button>
-        <button id="loadGameBtn">Load Game</button>
+        <button id="loadGameBtn">Load Game</button>        
+         <script>
+ 
+
+</script>
+<button id="saveFile" onclick ="">Save as a File</button>
+        <button id="loadFile">Load code</button>
+        <textarea id="load-game-data" rows="5" cols="50" placeholder="Dán dữ liệu game vào đây"></textarea>
     </div>
 
     <hr>
@@ -644,9 +652,23 @@
         <h2>Divine Spark</h2>
         <p>Current Divine Spark: <span id="divineSparkCount">0</span></p>
         <p>Divine Spark per second: <span id="divineSparkPerSecond">0</span></p>
-        <button id="buyDivineSpark">Convert <span id="divineSparkCost">1000000</span> Cosmic Awakening to 1 Divine Spark</button>
+        <button id="buyDivineSpark">Convert <span id="divineSparkCost">1e6</span> Cosmic Awakening to 1 Divine Spark</button>
         <button class="generate-lore-btn" data-resource="Divine Spark">Tạo Lore ✨</button>
         <div id="divineSparkLore" class="lore-display"></div>
+    </div>
+  <!-- Stage 5 Section -->
+    <div class="resource-section" style="background-color: #CBC3E3; border-color: #dc3545;">
+        <h2>Stage 5: World Collapse</h2>
+        <p>The fall of a complex human society</p>
+    </div>
+
+ <div class="resource-section" style="background-color: #CBC3E3; border-color: #dc3545;">
+        <h2>Secondary Tachyon Flux Regulator</h2>
+        <p>Current Secondary Tachyon Flux Regulator: <span id="secondaryTachyonFluxRegulatorCountSpan">0</span></p>
+        <p>Secondary Tachyon Flux Regulator per second: <span id="secondaryTachyonFluxRegulatorPerSecondSpan">0</span></p>
+        <button id="buySecondaryTachyonFluxRegulatorButton">Convert <span id="secondaryTachyonFluxRegulatorCost">1e7</span> Divine Spark to 1 Secondary Tachyon Flux Regulator</button>
+        <button class="generate-lore-btn" data-resource="Secondary Tachyon Flux Regulator">Tạo Lore ✨</button>
+        <div id="secondaryTachyonFluxRegulatorLore" class="lore-display"></div>
     </div>
 
     <footer>
@@ -892,6 +914,13 @@
                     conversionCost: 1000000,
                     produces: 'divineSpark',
                     perUnitProduction: 1
+                },
+   		secondaryTachyonFluxRegulator: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 10000000,
+                    produces: 'secondaryTachyonFluxRegulator',
+                    perUnitProduction: 1
                 }
             };
 
@@ -1095,7 +1124,8 @@
                 "Temporal Flux": document.getElementById('temporalFluxLore'),
                 "Multidimensional Harmony": document.getElementById('multidimensionalHarmonyLore'),
                 "Cosmic Awakening": document.getElementById('cosmicAwakeningLore'),
-                "Divine Spark": document.getElementById('divineSparkLore')
+                "Divine Spark": document.getElementById('divineSparkLore'),
+                "Secondary Tachyon Flux Regulator": document.getElementById('secondaryTachyonFluxRegulatorLore')
             };
 
             // --- Game Logic Functions ---
@@ -1248,8 +1278,14 @@
 
                 divineSparkCountSpan.textContent = resources.divineSpark.count.toFixed(0);
                 divineSparkPerSecondSpan.textContent = resources.divineSpark.perSecond.toFixed(1);
-                divineSparkCost.textContent = resources.divineSpark.conversionCost;
+           //     divineSparkCost.textContent = resources.divineSpark.conversionCost;
                 buyDivineSparkButton.disabled = resources.cosmicAwakening.count < resources.divineSpark.conversionCost;
+
+ 		secondaryTachyonFluxRegulatorCountSpan.textContent = resources.secondaryTachyonFluxRegulator.count.toFixed(0);
+                secondaryTachyonFluxRegulatorPerSecondSpan.textContent = resources.secondaryTachyonFluxRegulator.perSecond.toFixed(1);
+                //secondaryTachyonFluxRegulatorCost.textContent = resources.secondaryTachyonFluxRegulator.conversionCost;
+                buySecondaryTachyonFluxRegulatorButton.disabled = resources.divineSpark.count < resources.secondaryTachyonFluxRegulator.conversionCost;
+
             }
 
             function addWood() {
@@ -1327,7 +1363,6 @@
                     alert('Không thể lưu game. Vui lòng kiểm tra dung lượng lưu trữ của trình duyệt.');
                 }
             }
-
             function loadGame() {
                 try {
                     const savedData = localStorage.getItem('incrementalGameSave');
@@ -1355,6 +1390,60 @@
                     alert('Không thể tải game. Dữ liệu lưu có thể bị hỏng.');
                 }
             }
+          
+
+function saveAsFile(gamedata, filename){
+       const gameState = {
+        resources: resources
+                         
+    };
+    const jsonString = JSON.stringify(gameState);
+
+    const encodedData = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g,
+        function toSolidBytes(match, p1) {
+            return String.fromCharCode('0x' + p1);
+        }));
+    document.getElementById('load-game-data').value = encodedData;
+
+       const password = JSON.stringify(encodedData).replace(/\"/g, "") ;
+       const blob = new Blob([password], { type: 'text/plain' });
+       const url = URL.createObjectURL(blob);
+       const link = document.createElement('a');
+       link.href = url;
+       link.download = filename;
+       document.body.appendChild(link);
+       link.click();
+       document.body.removeChild(link);
+       URL.revokeObjectURL(url);
+
+}
+
+
+
+
+function loadAsFile() {
+    const encodedData = document.getElementById('load-game-data').value;
+    if (!encodedData) {
+        alert('Vui lòng dán dữ liệu game vào ô để tải!');
+        return;
+    }
+    try {
+        const jsonString = decodeURIComponent(atob(encodedData).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        const loadedState = JSON.parse(jsonString);
+
+        resources = loadedState.resources;
+   updateDisplay();
+                        alert('Tiến độ trò chơi đã được tải!');
+
+        }
+catch (e) {
+                    console.error("Lỗi khi tải game:", e);
+                    alert('Không thể tải game. Dữ liệu lưu có thể bị hỏng.');
+}
+}
+
 
             let cheatCodeSequence = [];
             const cheatCode = "add10kwood";
@@ -1588,7 +1677,7 @@
                 resources.multidimensionalHarmony.count += resources.multidimensionalHarmony.perSecond / 10;
                 resources.cosmicAwakening.count += resources.cosmicAwakening.perSecond / 10;
                 resources.divineSpark.count += resources.divineSpark.perSecond / 10;
-
+      resources.secondaryTachyonFluxRegulator.count += resources.secondaryTachyonFluxRegulator.perSecond / 10;
                 updateDisplay();
             }
 
@@ -1596,6 +1685,11 @@
             return {
                 init: () => {
                     // Event Listeners
+                    saveFile.addEventListener('click', function() {
+  saveAsFile(document.getElementById('load-game-data').value, 'Ultimate Incremental Resource Game'); 
+}); 
+
+                    loadFile.addEventListener('click', loadAsFile);
                     addWoodButton.addEventListener('click', addWood);
                     upgradeChopPowerButton.addEventListener('click', upgradeChopPower);
                     buyWoodPerSecondButton.addEventListener('click', buyWoodPerSecondAutomation);
@@ -1631,6 +1725,8 @@
                     buyMultidimensionalHarmonyButton.addEventListener('click', () => buyResource('multidimensionalHarmony', 'temporalFlux'));
                     buyCosmicAwakeningButton.addEventListener('click', () => buyResource('cosmicAwakening', 'multidimensionalHarmony'));
                     buyDivineSparkButton.addEventListener('click', () => buyResource('divineSpark', 'cosmicAwakening'));
+                      buySecondaryTachyonFluxRegulatorButton.addEventListener('click', () => buyResource('secondaryTachyonFluxRegulator', 'divineSpark'));
+
 
                     saveGameBtn.addEventListener('click', () => saveGame(0));
                     loadGameBtn.addEventListener('click', loadGame);
