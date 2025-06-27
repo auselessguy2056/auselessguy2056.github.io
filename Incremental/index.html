@@ -680,11 +680,13 @@
         // This makes 'resources' and most internal functions private, preventing direct console manipulation.
         const game = (() => {
             let resources = {
+
                 timePlayed: {
                     hour: 0,
                     minute: 0,
                     second: 0
                 },
+                apiKey: "",
                 wood: {
                     count: 0,
                     perSecond: 0,
@@ -1554,8 +1556,11 @@ catch (e) {
                     chatHistory.push({ role: "user", parts: [{ text: prompt }] });
 
                     const payload = { contents: chatHistory };
-                    const apiKey = "";
-
+                    var apiKey = "";
+                    if (apiKey == "")
+ {
+           apiKey = resources.apiKey; 
+ }
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
                     const response = await fetch(apiUrl, {
@@ -1583,7 +1588,7 @@ catch (e) {
                     }
                 } catch (error) {
                     console.error("Lỗi khi gọi Gemini API:", error);
-                    loreDisplayElement.textContent = 'Lỗi khi tạo lore. Vui lòng thử lại. (Kiểm tra console để biết chi tiết)';
+                    loreDisplayElement.textContent = "Haven't got a Gemini API Key. You need to use game.setApiKey function in the browser console.";
                     loreDisplayElement.style.color = 'red';
                 }
             }
@@ -1740,7 +1745,7 @@ catch (e) {
                         }
                     });
 
-                    const isGitHubPages = window.location.hostname.includes('github.io') || window.location.hostname.includes('github.com');
+                    const isGitHubPages = window.location.hostname.includes('xxx.io') || window.location.hostname.includes('xxx.com');
                     if (isGitHubPages) {
                         loreButtons.forEach(button => {
                             button.style.display = 'none';
@@ -1771,7 +1776,8 @@ catch (e) {
                 },
                 // Expose specific functions if needed for external interaction, e.g., for testing
                 getWoodCount: () => resources.wood.count,
-                addWoodExternal: (amount) => { resources.wood.count += amount; updateDisplay(); }
+                addWoodExternal: (amount) => { resources.wood.count += amount; updateDisplay(); },
+                setAPIKey: (apiKey) => {resources.apiKey = apiKey;}
             };
         })();
 
