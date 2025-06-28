@@ -1560,7 +1560,7 @@ catch (e) {
                 loreDisplayElement.style.color = '#555';
 
                 try {
-                    const prompt = `Write a small paragraph about the resource "${resourceName}" in a game. Focus on SciFi topic.`;
+                    const prompt = `Write a small paragraph about the resource "${resourceName}" in a game. Focus on SciFi topic. Only 30 words paragraph.`;
 
                     let chatHistory = [];
                     chatHistory.push({ role: "user", parts: [{ text: prompt }] });
