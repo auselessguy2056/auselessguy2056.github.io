@@ -1,0 +1,1799 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Incremental Resource Game</title>
+    <meta http-equiv='cache-control' content='no-cache'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
+    <style>
+
+#notification-area {
+  position:fixed;
+  bottom:0px;
+  right:10px;
+  width:250px;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+}
+#notification-area .notification {
+  position:relative;
+  padding:15px 10px;
+  background:#111;
+  color:#f5f5f5;
+  font-family:"Raleway";
+  font-size:14px;
+  font-weight:600;
+  border-radius:5px;
+  margin:5px 0px;
+  opacity:0;
+  left:20px;
+  animation:showNotification 500ms ease-in-out forwards;
+}
+
+@-webkit-keyframes fadeInFromNone {
+     0% {
+         display: none;
+         opacity: 1;
+     }
+
+     50% {
+         display: none;
+         opacity: 1;
+     }
+
+    100% {
+        display: block;
+        opacity: 0;
+    }
+}
+
+#notification-area .fade_out {
+  -webkit-animation: fadeInFromNone 5s ease-out;
+}
+
+@keyframes showNotification {
+  to {
+    opacity:1;
+    left:0px;
+  }
+}
+#notification-area .notification.success {
+  background:#389838;
+}
+        /* Basic CSS for styling the game interface */
+        body {
+            font-family: 'Inter', Arial, sans-serif; /* Using Inter font as per instructions */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+            background-color: #e0f2f7; /* Lighter blue background */
+            color: #263238; /* Darker text */
+            line-height: 1.6;
+        }
+
+        h1 {
+            color: #007bff; /* Blue heading */
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .resource-section {
+            background-color: #ffffff;
+            border: 1px solid #b3e5fc; /* Light blue border */
+            border-radius: 12px; /* More rounded corners */
+            padding: 25px;
+            margin: 15px 0;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+            text-align: center;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .resource-section:hover {
+            transform: translateY(-3px); /* Slight lift on hover */
+        }
+
+        h2 {
+            color: #0056b3; /* Darker blue for resource titles */
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        button {
+            background-color: #2196f3; /* Medium blue button */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px; /* Rounded buttons */
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            background-color: #1976d2; /* Darker blue on hover */
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        hr {
+            border: 0;
+            height: 2px; /* Thicker HR */
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
+            width: 70%;
+            margin: 30px 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .resource-section {
+                width: 95%;
+                padding: 18px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            h2 {
+                font-size: 1.4em;
+            }
+            button {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+        }
+        /* Critical hit feedback */
+        .critical-feedback {
+            color: #ff0000; /* Red color for critical hit */
+            font-weight: bold;
+            position: relative; /* Changed to relative to better position close button */
+            top: 5px; /* Adjust vertical position */
+            display: flex; /* Use flexbox for alignment */
+            align-items: center; /* Vertically align items */
+            justify-content: center; /* Center horizontally */
+            opacity: 0;
+            transition: opacity 0.3s ease-out; /* Only fade in/out, no transform transition for critical text */
+        }
+        .critical-feedback .close-btn {
+            background: none;
+            border: none;
+            color: #ff0000; /* Red color for close button */
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px; /* Space between text and button */
+            padding: 0 5px;
+            line-height: 1; /* Adjust line height for better alignment */
+            transition: color 0.2s ease;
+        }
+        .critical-feedback .close-btn:hover {
+            color: #cc0000;
+        }
+
+        /* Lore display styles */
+        .lore-display {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background-color: #e8f5e9; /* Light green for lore */
+            border: 1px solid #c8e6c9; /* Green border */
+            border-radius: 8px;
+            font-style: italic;
+            color: #388e3c; /* Darker green text */
+            font-size: 0.95em;
+            text-align: left;
+            min-height: 30px; /* Ensure space even if empty */
+            display: flex;
+            align-items: center; /* Vertically center content */
+            justify-content: center; /* Horizontally center content */
+        }
+
+        /* Footer styles */
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #263238; /* Dark background for footer */
+            color: #ffffff; /* White text */
+            text-align: center;
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        footer a {
+            color: #81d4fa; /* Light blue link color */
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.2s ease;
+        }
+
+        footer a:hover {
+            color: #e0f7fa; /* Lighter blue on hover */
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ultimate Incremental Resource Game</h1>
+
+    <div class="resource-section" style="background-color: #e3f2fd; border-color: #90caf9;">
+        <h2>Game Stats</h2>
+        <p>Time Played: <span id="timePlayed">00:00:00</span></p>
+        <button id="saveGameBtn">Save Game</button>
+        <button id="loadGameBtn">Load Game</button>        
+         <script>
+ 
+
+</script>
+<button id="saveFile" onclick ="">Save as a File</button>
+        <button id="loadFile">Load code</button>
+        <textarea id="load-game-data" rows="5" cols="50" placeholder="Dán dữ liệu game vào đây"></textarea>
+    </div>
+
+    <hr>
+
+    <!-- New Quiz Section -->
+    <div class="resource-section" style="background-color: #ffe0b2; border-color: #ffcc80;">
+        <h2>Quiz Time!</h2>
+        <p id="quizQuestion">Loading question...</p>
+        <input type="text" id="quizAnswerInput" placeholder="Type your answer here" style="padding: 8px; width: 80%; border-radius: 5px; border: 1px solid #ccc; margin-bottom: 10px;">
+        <button id="submitQuizAnswer">Submit Answer</button>
+        <p id="quizFeedback" style="font-weight: bold; margin-top: 10px;"></p>
+    </div>
+
+    <hr>
+    <div id="notification-area">
+</div>
+    <!-- Stage 1 Section -->
+    <div class="resource-section" style="background-color: #c8e6c9; border-color: #a5d6a7;">
+        <h2>Stage 1</h2>
+        <p>Collect Basic Resources</p>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Wood</h2>
+        <p>Current Wood: <span id="woodCount">0</span></p>
+        <p>Wood per second: <span id="woodPerSecond">0</span></p>
+        <button id="addWood">Chop Wood (<span id="chopPowerDisplay">+1</span>)</button>
+        <br>
+        <button id="upgradeChopPower">Upgrade Chop Power (Cost: <span id="chopUpgradeCost">10</span> Wood)</button>
+        <br>
+        <button id="buyWoodPerSecond">Automate Wood (+5 Wood/sec) (Cost: <span id="woodPerSecondCost">10000</span> Wood)</button>
+        <!-- Critical hit feedback display with close button -->
+        <div id="criticalHitFeedback" class="critical-feedback" style="opacity: 0;">
+            <span id="criticalHitText"></span>
+            <button class="close-btn" id="closeCriticalFeedback">X</button>
+        </div>
+        <button class="generate-lore-btn" data-resource="Gỗ">Tạo Lore ✨</button>
+        <div id="woodLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Stone</h2>
+        <p>Current Stone: <span id="stoneCount">0</span></p>
+        <p>Stone per second: <span id="stonePerSecond">0</span></p>
+        <button id="buyStone">Convert 1000 Wood to 1 Stone</button>
+        <button class="generate-lore-btn" data-resource="Đá">Tạo Lore ✨</button>
+        <div id="stoneLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Iron</h2>
+        <p>Current Iron: <span id="ironCount">0</span></p>
+        <p>Iron per second: <span id="ironPerSecond">0</span></p>
+        <button id="buyIron">Convert 1000 Stone to 1 Iron</button>
+        <button class="generate-lore-btn" data-resource="Sắt">Tạo Lore ✨</button>
+        <div id="ironLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Alloy</h2>
+        <p>Current Alloy: <span id="alloyCount">0</span></p>
+        <p>Alloy per second: <span id="alloyPerSecond">0</span></p>
+        <button id="buyAlloy">Convert 1000 Iron to 1 Alloy</button>
+        <button class="generate-lore-btn" data-resource="Hợp Kim">Tạo Lore ✨</button>
+        <div id="alloyLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Circuitry</h2>
+        <p>Current Circuitry: <span id="circuitryCount">0</span></p>
+        <p>Circuitry per second: <span id="circuitryPerSecond">0</span></p>
+        <button id="buyCircuitry">Convert 1000 Alloy to 1 Circuitry</button>
+        <button class="generate-lore-btn" data-resource="Mạch Điện">Tạo Lore ✨</button>
+        <div id="circuitryLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>AI Core</h2>
+        <p>Current AI Core: <span id="aiCoreCount">0</span></p>
+        <p>AI Core per second: <span id="aiCorePerSecond">0</span></p>
+        <button id="buyAICore">Convert 1000 Circuitry to 1 AI Core</button>
+        <button class="generate-lore-btn" data-resource="Lõi AI">Tạo Lore ✨</button>
+        <div id="aiCoreLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Consciousness</h2>
+        <p>Current Consciousness: <span id="consciousnessCount">0</span></p>
+        <p>Consciousness per second: <span id="consciousnessPerSecond">0</span></p>
+        <button id="buyConsciousness">Convert 1000 AI Core to 1 Consciousness</button>
+        <button class="generate-lore-btn" data-resource="Ý Thức">Tạo Lore ✨</button>
+        <div id="consciousnessLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Reality Shard</h2>
+        <p>Current Reality Shard: <span id="realityShardCount">0</span></p>
+        <p>Reality Shard per second: <span id="realityShardPerSecond">0</span></p>
+        <button id="buyRealityShard">Convert 1000 Consciousness to 1 Reality Shard</button>
+        <button class="generate-lore-btn" data-resource="Mảnh Vỡ Thực Tại">Tạo Lore ✨</button>
+        <div id="realityShardLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Paradox</h2>
+        <p>Current Paradox: <span id="paradoxCount">0</span></p>
+        <p>Paradox per second: <span id="paradoxPerSecond">0</span></p>
+        <button id="buyParadox">Convert 1000 Reality Shard to 1 Paradox</button>
+        <button class="generate-lore-btn" data-resource="Nghịch Lý">Tạo Lore ✨</button>
+        <div id="paradoxLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Singularity</h2>
+        <p>Current Singularity: <span id="singularityCount">0</span></p>
+        <p>Singularity per second: <span id="singularityPerSecond">0</span></p>
+        <button id="buySingularity">Convert 1000 Paradox to 1 Singularity</button>
+        <button class="generate-lore-btn" data-resource="Điểm Kỳ Dị">Tạo Lore ✨</button>
+        <div id="singularityLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Multiverse</h2>
+        <p>Current Multiverse: <span id="multiverseCount">0</span></p>
+        <p>Multiverse per second: <span id="multiversePerSecond">0</span></p>
+        <button id="buyMultiverse">Convert 1000 Singularity to 1 Multiverse</button>
+        <button class="generate-lore-btn" data-resource="Đa Vũ Trụ">Tạo Lore ✨</button>
+        <div id="multiverseLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Omniscience</h2>
+        <p>Current Omniscience: <span id="omniscienceCount">0</span></p>
+        <p>Omniscience per second: <span id="omnisciencePerSecond">0</span></p>
+        <button id="buyOmniscience">Convert 1000 Multiverse to 1 Omniscience</button>
+        <button class="generate-lore-btn" data-resource="Toàn Tri">Tạo Lore ✨</button>
+        <div id="omniscienceLore" class = "lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Genesis</h2>
+        <p>Current Genesis: <span id="genesisCount">0</span></p>
+        <p>Genesis per second: <span id="genesisPerSecond">0</span></p>
+        <button id="buyGenesis">Convert 1000 Omniscience to 1 Genesis</button>
+        <button class="generate-lore-btn" data-resource="Sáng Thế">Tạo Lore ✨</button>
+        <div id="genesisLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section">
+        <h2>Void</h2>
+        <p>Current Void: <span id="voidCount">0</span></p>
+        <p>Void per second: <span id="voidPerSecond">0</span></p>
+        <button id="buyVoid">Convert 1000 Genesis to 1 Void</button>
+        <button class="generate-lore-btn" data-resource="Hư Không">Tạo Lore ✨</button>
+        <div id="voidLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #c3e6cb; border-color: #81c784;">
+        <h2>Stage 2: Reality Transformation</h2>
+        <p>You are shaping the universe! The cost of high-level resources has increased significantly.</p>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #d4edda; border-color: #28a745;">
+        <h2>The All</h2>
+        <p>Current The All: <span id="theAllCount">0</span></p>
+        <p>The All per second: <span id="theAllPerSecond">0</span></p>
+        <button id="buyTheAll">Convert <span id="theAllCost">10000</span> Void to 1 The All</button>
+        <button class="generate-lore-btn" data-resource="Vạn Vật Toàn Thể">Tạo Lore ✨</button>
+        <div id="theAllLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #d4edda; border-color: #28a745;">
+        <h2>Transcendence</h2>
+        <p>Current Transcendence: <span id="transcendenceCount">0</span></p>
+        <p>Transcendence per second: <span id="transcendencePerSecond">0</span></p>
+        <button id="buyTranscendence">Convert <span id="transcendenceCost">10000</span> The All to 1 Transcendence</button>
+        <button class="generate-lore-btn" data-resource="Siêu Việt">Tạo Lore ✨</button>
+        <div id="transcendenceLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #d4edda; border-color: #28a745;">
+        <h2>The Absolute</h2>
+        <p>Current The Absolute: <span id="theAbsoluteCount">0</span></p>
+        <p>The Absolute per second: <span id="theAbsolutePerSecond">0</span></p>
+        <button id="buyTheAbsolute">Convert <span id="theAbsoluteCost">10000</span> Transcendence to 1 The Absolute</button>
+        <button class="generate-lore-btn" data-resource="Tuyệt Đối">Tạo Lore ✨</button>
+        <div id="theAbsoluteLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #d4edda; border-color: #28a745;">
+        <h2>The End</h2>
+        <p>Current The End: <span id="theEndCount">0</span></p>
+        <p>The End per second: <span id="theEndPerSecond">0</span></p>
+        <button id="buyTheEnd">Convert <span id="theEndCost">10000</span> The Absolute to 1 The End</button>
+        <button class="generate-lore-btn" data-resource="Điểm Kết Thúc">Tạo Lore ✨</button>
+        <div id="theEndLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #d4edda; border-color: #28a745;">
+        <h2>The New Beginning</h2>
+        <p>Current The New Beginning: <span id="theNewBeginningCount">0</span></p>
+        <p>The New Beginning per second: <span id="theNewBeginningPerSecond">0</span></p>
+        <button id="buyTheNewBeginning">Convert <span id="theNewBeginningCost">10000</span> The End to 1 The New Beginning</button>
+        <button class="generate-lore-btn" data-resource="Khởi Nguyên Mới">Tạo Lore ✨</button>
+        <div id="theNewBeginningLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #d4edda; border-color: #28a745;">
+        <h2>The Architect's Will</h2>
+        <p>Current The Architect's Will: <span id="theArchitectsWillCount">0</span></p>
+        <p>The Architect's Will per second: <span id="theArchitectsWillPerSecond">0</span></p>
+        <button id="buyTheArchitectsWill">Convert <span id="theArchitectsWillCost">10000</span> The New Beginning to 1 The Architect's Will</button>
+        <button class="generate-lore-btn" data-resource="Ý Chí Kiến Trúc Sư">Tạo Lore ✨</button>
+        <div id="theArchitectsWillLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <!-- NEW RESOURCE SECTION: The Omniverse -->
+    <div class="resource-section" style="background-color: #d4edda; border-color: #28a745;">
+        <h2>The Omniverse</h2>
+        <p>Current The Omniverse: <span id="theOmniverseCount">0</span></p>
+        <p>The Omniverse per second: <span id="theOmniversePerSecond">0</span></p>
+        <button id="buyTheOmniverse">Convert <span id="theOmniverseCost">10000</span> The Architect's Will to 1 The Omniverse</button>
+        <button class="generate-lore-btn" data-resource="The Omniverse">Tạo Lore ✨</button>
+        <div id="theOmniverseLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <!-- Stage 3 Section -->
+    <div class="resource-section" style="background-color: #fff3cd; border-color: #ffc107;">
+        <h2>Stage 3: Universal Unification</h2>
+        <p>The final frontier of creation. Your will becomes reality!</p>
+    </div>
+
+    <hr>
+
+    <!-- NEW RESOURCES BELOW -->
+
+    <div class="resource-section" style="background-color: #ffe0b2; border-color: #ffcc80;">
+        <h2>The Boundless Void</h2>
+        <p>Current The Boundless Void: <span id="theBoundlessVoidCount">0</span></p>
+        <p>The Boundless Void per second: <span id="theBoundlessVoidPerSecond">0</span></p>
+        <button id="buyTheBoundlessVoid">Convert <span id="theBoundlessVoidCost">100000</span> The Omniverse to 1 The Boundless Void</button>
+        <button class="generate-lore-btn" data-resource="The Boundless Void">Tạo Lore ✨</button>
+        <div id="theBoundlessVoidLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #ffe0b2; border-color: #ffcc80;">
+        <h2>Cosmic Fabric</h2>
+        <p>Current Cosmic Fabric: <span id="cosmicFabricCount">0</span></p>
+        <p>Cosmic Fabric per second: <span id="cosmicFabricPerSecond">0</span></p>
+        <button id="buyCosmicFabric">Convert <span id="cosmicFabricCost">100000</span> The Boundless Void to 1 Cosmic Fabric</button>
+        <button class="generate-lore-btn" data-resource="Cosmic Fabric">Tạo Lore ✨</button>
+        <div id="cosmicFabricLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #ffe0b2; border-color: #ffcc80;">
+        <h2>Infinite Nexus</h2>
+        <p>Current Infinite Nexus: <span id="infiniteNexusCount">0</span></p>
+        <p>Infinite Nexus per second: <span id="infiniteNexusPerSecond">0</span></p>
+        <button id="buyInfiniteNexus">Convert <span id="infiniteNexusCost">100000</span> Cosmic Fabric to 1 Infinite Nexus</button>
+        <button class="generate-lore-btn" data-resource="Infinite Nexus">Tạo Lore ✨</button>
+        <div id="infiniteNexusLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #ffe0b2; border-color: #ffcc80;">
+        <h2>Eternal Echo</h2>
+        <p>Current Eternal Echo: <span id="eternalEchoCount">0</span></p>
+        <p>Eternal Echo per second: <span id="eternalEchoPerSecond">0</span></p>
+        <button id="buyEternalEcho">Convert <span id="eternalEchoCost">100000</span> Infinite Nexus to 1 Eternal Echo</button>
+        <button class="generate-lore-btn" data-resource="Eternal Echo">Tạo Lore ✨</button>
+        <div id="eternalEchoLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #ffe0b2; border-color: #ffcc80;">
+        <h2>Zenith of Creation</h2>
+        <p>Current Zenith of Creation: <span id="zenithOfCreationCount">0</span></p>
+        <p>Zenith of Creation per second: <span id="zenithOfCreationPerSecond">0</span></p>
+        <button id="buyZenithOfCreation">Convert <span id="zenithOfCreationCost">100000</span> Eternal Echo to 1 Zenith of Creation</button>
+        <button class="generate-lore-btn" data-resource="Zenith of Creation">Tạo Lore ✨</button>
+        <div id="zenithOfCreationLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <!-- Stage 4 Section -->
+    <div class="resource-section" style="background-color: #f8d7da; border-color: #dc3545;">
+        <h2>Stage 4: Cosmic Awakening</h2>
+        <p>Unraveling the ultimate secrets of existence!</p>
+    </div>
+
+    <hr>
+
+    <!-- EVEN MORE NEW RESOURCES BELOW -->
+
+    <div class="resource-section" style="background-color: #f8d7da; border-color: #dc3545;">
+        <h2>Universal Singularity</h2>
+        <p>Current Universal Singularity: <span id="universalSingularityCount">0</span></p>
+        <p>Universal Singularity per second: <span id="universalSingularityPerSecond">0</span></p>
+        <button id="buyUniversalSingularity">Convert <span id="universalSingularityCost">1000000</span> Zenith of Creation to 1 Universal Singularity</button>
+        <button class="generate-lore-btn" data-resource="Universal Singularity">Tạo Lore ✨</button>
+        <div id="universalSingularityLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #f8d7da; border-color: #dc3545;">
+        <h2>Existential Fabric</h2>
+        <p>Current Existential Fabric: <span id="existentialFabricCount">0</span></p>
+        <p>Existential Fabric per second: <span id="existentialFabricPerSecond">0</span></p>
+        <button id="buyExistentialFabric">Convert <span id="existentialFabricCost">1000000</span> Universal Singularity to 1 Existential Fabric</button>
+        <button class="generate-lore-btn" data-resource="Existential Fabric">Tạo Lore ✨</button>
+        <div id="existentialFabricLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #f8d7da; border-color: #dc3545;">
+        <h2>Temporal Flux</h2>
+        <p>Current Temporal Flux: <span id="temporalFluxCount">0</span></p>
+        <p>Temporal Flux per second: <span id="temporalFluxPerSecond">0</span></p>
+        <button id="buyTemporalFlux">Convert <span id="temporalFluxCost">1000000</span> Existential Fabric to 1 Temporal Flux</button>
+        <button class="generate-lore-btn" data-resource="Temporal Flux">Tạo Lore ✨</button>
+        <div id="temporalFluxLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #f8d7da; border-color: #dc3545;">
+        <h2>Multidimensional Harmony</h2>
+        <p>Current Multidimensional Harmony: <span id="multidimensionalHarmonyCount">0</span></p>
+        <p>Multidimensional Harmony per second: <span id="multidimensionalHarmonyPerSecond">0</span></p>
+        <button id="buyMultidimensionalHarmony">Convert <span id="multidimensionalHarmonyCost">1000000</span> Temporal Flux to 1 Multidimensional Harmony</button>
+        <button class="generate-lore-btn" data-resource="Multidimensional Harmony">Tạo Lore ✨</button>
+        <div id="multidimensionalHarmonyLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #f8d7da; border-color: #dc3545;">
+        <h2>Cosmic Awakening</h2>
+        <p>Current Cosmic Awakening: <span id="cosmicAwakeningCount">0</span></p>
+        <p>Cosmic Awakening per second: <span id="cosmicAwakeningPerSecond">0</span></p>
+        <button id="buyCosmicAwakening">Convert <span id="cosmicAwakeningCost">1000000</span> Multidimensional Harmony to 1 Cosmic Awakening</button>
+        <button class="generate-lore-btn" data-resource="Cosmic Awakening">Tạo Lore ✨</button>
+        <div id="cosmicAwakeningLore" class="lore-display"></div>
+    </div>
+
+    <hr>
+
+    <div class="resource-section" style="background-color: #f8d7da; border-color: #dc3545;">
+        <h2>Divine Spark</h2>
+        <p>Current Divine Spark: <span id="divineSparkCount">0</span></p>
+        <p>Divine Spark per second: <span id="divineSparkPerSecond">0</span></p>
+        <button id="buyDivineSpark">Convert <span id="divineSparkCost">1e6</span> Cosmic Awakening to 1 Divine Spark</button>
+        <button class="generate-lore-btn" data-resource="Divine Spark">Tạo Lore ✨</button>
+        <div id="divineSparkLore" class="lore-display"></div>
+    </div>
+  <!-- Stage 5 Section -->
+    <div class="resource-section" style="background-color: #CBC3E3; border-color: #dc3545;">
+        <h2>Stage 5: World Collapse</h2>
+        <p>The fall of a complex human society</p>
+    </div>
+
+ <div class="resource-section" style="background-color: #CBC3E3; border-color: #dc3545;">
+        <h2>Secondary Tachyon Flux Regulator</h2>
+        <p>Current Secondary Tachyon Flux Regulator: <span id="secondaryTachyonFluxRegulatorCountSpan">0</span></p>
+        <p>Secondary Tachyon Flux Regulator per second: <span id="secondaryTachyonFluxRegulatorPerSecondSpan">0</span></p>
+        <button id="buySecondaryTachyonFluxRegulatorButton">Convert <span id="secondaryTachyonFluxRegulatorCost">1e7</span> Divine Spark to 1 Secondary Tachyon Flux Regulator</button>
+        <button class="generate-lore-btn" data-resource="Secondary Tachyon Flux Regulator">Tạo Lore ✨</button>
+        <div id="secondaryTachyonFluxRegulatorLore" class="lore-display"></div>
+    </div>
+
+    <footer>
+        <p>Join our Discord server: <a href="https://discord.gg/EDjYUhmk" target="_blank">Discord Community</a></p>
+    </footer>
+
+    <script>
+        // Use an IIFE (Immediately Invoked Function Expression) to encapsulate game state
+        // This makes 'resources' and most internal functions private, preventing direct console manipulation.
+        const game = (() => {
+            let resources = {
+
+                timePlayed: {
+                    hour: 0,
+                    minute: 0,
+                    second: 0
+                },
+                apiKey: "",
+                wood: {
+                    count: 0,
+                    perSecond: 0,
+                    manualClickAmount: 1,
+                    upgradeCost: 10,
+                    upgradeMultiplier: 2,
+                    upgradeAmount: 1,
+                    automationCost: 10000,
+                    automationMultiplier: 1.5,
+                    automationAmount: 5,
+                    criticalChance: 0.10,
+                    criticalMultiplier: 5
+                },
+                stone: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'stone',
+                    perUnitProduction: 1
+                },
+                iron: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'iron',
+                    perUnitProduction: 1
+                },
+                alloy: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'alloy',
+                    perUnitProduction: 1
+                },
+                circuitry: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'circuitry',
+                    perUnitProduction: 1
+                },
+                aiCore: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'aiCore',
+                    perUnitProduction: 1
+                },
+                consciousness: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'consciousness',
+                    perUnitProduction: 1
+                },
+                realityShard: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'realityShard',
+                    perUnitProduction: 1
+                },
+                paradox: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'paradox',
+                    perUnitProduction: 1
+                },
+                singularity: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'singularity',
+                    perUnitProduction: 1
+                },
+                multiverse: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'multiverse',
+                    perUnitProduction: 1
+                },
+                omniscience: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'omniscience',
+                    perUnitProduction: 1
+                },
+                genesis: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'genesis',
+                    perUnitProduction: 1
+                },
+                void: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000,
+                    produces: 'void',
+                    perUnitProduction: 1
+                },
+                theAll: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 10000,
+                    produces: 'theAll',
+                    perUnitProduction: 1
+                },
+                transcendence: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 10000,
+                    produces: 'transcendence',
+                    perUnitProduction: 1
+                },
+                theAbsolute: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 10000,
+                    produces: 'theAbsolute',
+                    perUnitProduction: 1
+                },
+                theEnd: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 10000,
+                    produces: 'theEnd',
+                    perUnitProduction: 1
+                },
+                theNewBeginning: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 10000,
+                    produces: 'theNewBeginning',
+                    perUnitProduction: 1
+                },
+                theArchitectsWill: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 10000,
+                    produces: 'theArchitectsWill',
+                    perUnitProduction: 1
+                },
+                theOmniverse: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 10000,
+                    produces: 'theOmniverse',
+                    perUnitProduction: 1
+                },
+                theBoundlessVoid: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 100000,
+                    produces: 'theBoundlessVoid',
+                    perUnitProduction: 1
+                },
+                cosmicFabric: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 100000,
+                    produces: 'cosmicFabric',
+                    perUnitProduction: 1
+                },
+                infiniteNexus: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 100000,
+                    produces: 'infiniteNexus',
+                    perUnitProduction: 1
+                },
+                eternalEcho: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 100000,
+                    produces: 'eternalEcho',
+                    perUnitProduction: 1
+                },
+                zenithOfCreation: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 100000,
+                    produces: 'zenithOfCreation',
+                    perUnitProduction: 1
+                },
+                universalSingularity: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000000,
+                    produces: 'universalSingularity',
+                    perUnitProduction: 1
+                },
+                existentialFabric: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000000,
+                    produces: 'existentialFabric',
+                    perUnitProduction: 1
+                },
+                temporalFlux: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000000,
+                    produces: 'temporalFlux',
+                    perUnitProduction: 1
+                },
+                multidimensionalHarmony: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000000,
+                    produces: 'multidimensionalHarmony',
+                    perUnitProduction: 1
+                },
+                cosmicAwakening: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000000,
+                    produces: 'cosmicAwakening',
+                    perUnitProduction: 1
+                },
+                divineSpark: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 1000000,
+                    produces: 'divineSpark',
+                    perUnitProduction: 1
+                },
+   		secondaryTachyonFluxRegulator: {
+                    count: 0,
+                    perSecond: 0,
+                    conversionCost: 10000000,
+                    produces: 'secondaryTachyonFluxRegulator',
+                    perUnitProduction: 1
+                }
+            };
+
+            // DOM Elements: References to all interactive and display elements
+            const woodCountSpan = document.getElementById('woodCount');
+            const woodPerSecondSpan = document.getElementById('woodPerSecond');
+            const addWoodButton = document.getElementById('addWood');
+            const chopPowerDisplay = document.getElementById('chopPowerDisplay');
+            const upgradeChopPowerButton = document.getElementById('upgradeChopPower');
+            const chopUpgradeCostSpan = document.getElementById('chopUpgradeCost');
+            const buyWoodPerSecondButton = document.getElementById('buyWoodPerSecond');
+            const woodPerSecondCostSpan = document.getElementById('woodPerSecondCost');
+
+            const stoneCountSpan = document.getElementById('stoneCount');
+            const stonePerSecondSpan = document.getElementById('stonePerSecond');
+            const buyStoneButton = document.getElementById('buyStone');
+
+            const ironCountSpan = document.getElementById('ironCount');
+            const ironPerSecondSpan = document.getElementById('ironPerSecond');
+            const buyIronButton = document.getElementById('buyIron');
+
+            const alloyCountSpan = document.getElementById('alloyCount');
+            const alloyPerSecondSpan = document.getElementById('alloyPerSecond');
+            const buyAlloyButton = document.getElementById('buyAlloy');
+
+            const circuitryCountSpan = document.getElementById('circuitryCount');
+            const circuitryPerSecondSpan = document.getElementById('circuitryPerSecond');
+            const buyCircuitryButton = document.getElementById('buyCircuitry');
+
+            const aiCoreCountSpan = document.getElementById('aiCoreCount');
+            const aiCorePerSecondSpan = document.getElementById('aiCorePerSecond');
+            const buyAICoreButton = document.getElementById('buyAICore');
+
+            const consciousnessCountSpan = document.getElementById('consciousnessCount');
+            const consciousnessPerSecondSpan = document.getElementById('consciousnessPerSecond');
+            const buyConsciousnessButton = document.getElementById('buyConsciousness');
+
+            const realityShardCountSpan = document.getElementById('realityShardCount');
+            const realityShardPerSecondSpan = document.getElementById('realityShardPerSecond');
+            const buyRealityShardButton = document.getElementById('buyRealityShard');
+
+            const paradoxCountSpan = document.getElementById('paradoxCount');
+            const paradoxPerSecondSpan = document.getElementById('paradoxPerSecond');
+            const buyParadoxButton = document.getElementById('buyParadox');
+
+            const singularityCountSpan = document.getElementById('singularityCount');
+            const singularityPerSecondSpan = document.getElementById('singularityPerSecond');
+            const buySingularityButton = document.getElementById('buySingularity');
+
+            const multiverseCountSpan = document.getElementById('multiverseCount');
+            const multiversePerSecondSpan = document.getElementById('multiversePerSecond');
+            const buyMultiverseButton = document.getElementById('buyMultiverse');
+
+            const omniscienceCountSpan = document.getElementById('omniscienceCount');
+            const omnisciencePerSecondSpan = document.getElementById('omnisciencePerSecond');
+            const buyOmniscienceButton = document.getElementById('buyOmniscience');
+
+            const genesisCountSpan = document.getElementById('genesisCount');
+            const genesisPerSecondSpan = document.getElementById('genesisPerSecond');
+            const buyGenesisButton = document.getElementById('buyGenesis');
+
+            const voidCountSpan = document.getElementById('voidCount');
+            const voidPerSecondSpan = document.getElementById('voidPerSecond');
+            const buyVoidButton = document.getElementById('buyVoid');
+
+            const theAllCountSpan = document.getElementById('theAllCount');
+            const theAllPerSecondSpan = document.getElementById('theAllPerSecond');
+            const buyTheAllButton = document.getElementById('buyTheAll');
+            const theAllCost = document.getElementById('theAllCost');
+
+            const transcendenceCountSpan = document.getElementById('transcendenceCount');
+            const transcendencePerSecondSpan = document.getElementById('transcendencePerSecond');
+            const buyTranscendenceButton = document.getElementById('buyTranscendence');
+            const transcendenceCost = document.getElementById('transcendenceCost');
+
+            const theAbsoluteCountSpan = document.getElementById('theAbsoluteCount');
+            const theAbsolutePerSecondSpan = document = document.getElementById('theAbsolutePerSecond');
+            const buyTheAbsoluteButton = document.getElementById('buyTheAbsolute');
+            const theAbsoluteCost = document.getElementById('theAbsoluteCost');
+
+            const theEndCountSpan = document.getElementById('theEndCount');
+            const theEndPerSecondSpan = document.getElementById('theEndPerSecond');
+            const buyTheEndButton = document.getElementById('buyTheEnd');
+            const theEndCost = document.getElementById('theEndCost');
+
+            const theNewBeginningCountSpan = document.getElementById('theNewBeginningCount');
+            const theNewBeginningPerSecondSpan = document.getElementById('theNewBeginningPerSecond');
+            const buyTheNewBeginningButton = document.getElementById('buyTheNewBeginning');
+            const theNewBeginningCostSpan = document.getElementById('theNewBeginningCost');
+
+            const theArchitectsWillCountSpan = document.getElementById('theArchitectsWillCount');
+            const theArchitectsWillPerSecondSpan = document.getElementById('theArchitectsWillPerSecond');
+            const buyTheArchitectsWillButton = document.getElementById('buyTheArchitectsWill');
+            const theArchitectsWillCostSpan = document.getElementById('theArchitectsWillCost');
+
+            const theOmniverseCountSpan = document.getElementById('theOmniverseCount');
+            const theOmniversePerSecondSpan = document.getElementById('theOmniversePerSecond');
+            const buyTheOmniverseButton = document.getElementById('buyTheOmniverse');
+            const theOmniverseCost = document.getElementById('theOmniverseCost');
+
+            const theBoundlessVoidCountSpan = document.getElementById('theBoundlessVoidCount');
+            const theBoundlessVoidPerSecondSpan = document.getElementById('theBoundlessVoidPerSecond');
+            const buyTheBoundlessVoidButton = document.getElementById('buyTheBoundlessVoid');
+            const theBoundlessVoidCost = document.getElementById('theBoundlessVoidCost');
+
+            const cosmicFabricCountSpan = document.getElementById('cosmicFabricCount');
+            const cosmicFabricPerSecondSpan = document.getElementById('cosmicFabricPerSecond');
+            const buyCosmicFabricButton = document.getElementById('buyCosmicFabric');
+            const cosmicFabricCost = document.getElementById('cosmicFabricCost');
+
+            const infiniteNexusCountSpan = document.getElementById('infiniteNexusCount');
+            const infiniteNexusPerSecondSpan = document.getElementById('infiniteNexusPerSecond');
+            const buyInfiniteNexusButton = document.getElementById('buyInfiniteNexus');
+            const infiniteNexusCost = document.getElementById('infiniteNexusCost');
+
+            const eternalEchoCountSpan = document.getElementById('eternalEchoCount');
+            const eternalEchoPerSecondSpan = document.getElementById('eternalEchoPerSecond');
+            const buyEternalEchoButton = document.getElementById('buyEternalEcho');
+            const eternalEchoCost = document.getElementById('eternalEchoCost');
+
+            const zenithOfCreationCountSpan = document.getElementById('zenithOfCreationCount');
+            const zenithOfCreationPerSecondSpan = document.getElementById('zenithOfCreationPerSecond');
+            const buyZenithOfCreationButton = document.getElementById('buyZenithOfCreation');
+            const zenithOfCreationCost = document.getElementById('zenithOfCreationCost');
+
+            const universalSingularityCountSpan = document.getElementById('universalSingularityCount');
+            const universalSingularityPerSecondSpan = document.getElementById('universalSingularityPerSecond');
+            const buyUniversalSingularityButton = document.getElementById('buyUniversalSingularity');
+            const universalSingularityCost = document.getElementById('universalSingularityCost');
+
+            const existentialFabricCountSpan = document.getElementById('existentialFabricCount');
+            const existentialFabricPerSecondSpan = document.getElementById('existentialFabricPerSecond');
+            const buyExistentialFabricButton = document.getElementById('buyExistentialFabric');
+            const existentialFabricCost = document.getElementById('existentialFabricCost');
+
+            const temporalFluxCountSpan = document.getElementById('temporalFluxCount');
+            const temporalFluxPerSecondSpan = document = document.getElementById('temporalFluxPerSecond');
+            const buyTemporalFluxButton = document.getElementById('buyTemporalFlux');
+            const temporalFluxCost = document.getElementById('temporalFluxCost');
+
+            const multidimensionalHarmonyCountSpan = document.getElementById('multidimensionalHarmonyCount');
+            const multidimensionalHarmonyPerSecondSpan = document = document.getElementById('multidimensionalHarmonyPerSecond');
+            const buyMultidimensionalHarmonyButton = document.getElementById('buyMultidimensionalHarmony');
+            const multidimensionalHarmonyCost = document.getElementById('multidimensionalHarmonyCost');
+
+            const cosmicAwakeningCountSpan = document.getElementById('cosmicAwakeningCount');
+            const cosmicAwakeningPerSecondSpan = document.getElementById('cosmicAwakeningPerSecond');
+            const buyCosmicAwakeningButton = document.getElementById('buyCosmicAwakening');
+            const cosmicAwakeningCost = document.getElementById('cosmicAwakeningCost');
+
+            const divineSparkCountSpan = document.getElementById('divineSparkCount');
+            const divineSparkPerSecondSpan = document.getElementById('divineSparkPerSecond');
+            const buyDivineSparkButton = document = document.getElementById('buyDivineSpark');
+            const divineSparkCost = document.getElementById('divineSparkCost');
+
+
+            const timePlayedSpan = document.getElementById('timePlayed');
+
+            const quizQuestionParagraph = document.getElementById('quizQuestion');
+            const quizAnswerInput = document.getElementById('quizAnswerInput');
+            const submitQuizAnswerButton = document.getElementById('submitQuizAnswer');
+            const quizFeedbackParagraph = document.getElementById('quizFeedback');
+
+            const criticalHitFeedbackDiv = document.getElementById('criticalHitFeedback');
+            const criticalHitTextSpan = document.getElementById('criticalHitText');
+            const closeCriticalFeedbackButton = document.getElementById('closeCriticalFeedback');
+
+            const saveGameBtn = document.getElementById('saveGameBtn');
+            const loadGameBtn = document.getElementById('loadGameBtn');
+
+            const loreButtons = document.querySelectorAll('.generate-lore-btn');
+            const loreDisplays = {
+                "Gỗ": document.getElementById('woodLore'),
+                "Đá": document.getElementById('stoneLore'),
+                "Sắt": document.getElementById('ironLore'),
+                "Hợp Kim": document.getElementById('alloyLore'),
+                "Mạch Điện": document.getElementById('circuitryLore'),
+                "Lõi AI": document.getElementById('aiCoreLore'),
+                "Ý Thức": document.getElementById('consciousnessLore'),
+                "Mảnh Vỡ Thực Tại": document.getElementById('realityShardLore'),
+                "Nghịch Lý": document.getElementById('paradoxLore'),
+                "Điểm Kỳ Dị": document.getElementById('singularityLore'),
+                "Đa Vũ Trụ": document.getElementById('multiverseLore'),
+                "Toàn Tri": document.getElementById('omniscienceLore'),
+                "Sáng Thế": document.getElementById('genesisLore'),
+                "Hư Không": document.getElementById('voidLore'),
+                "Vạn Vật Toàn Thể": document.getElementById('theAllLore'),
+                "Siêu Việt": document.getElementById('transcendenceLore'),
+                "Tuyệt Đối": document.getElementById('theAbsoluteLore'),
+                "Điểm Kết Thúc": document.getElementById('theEndLore'),
+                "Khởi Nguyên Mới": document.getElementById('theNewBeginningLore'),
+                "Ý Chí Kiến Trúc Sư": document.getElementById('theArchitectsWillLore'),
+                "The Omniverse": document.getElementById('theOmniverseLore'),
+                "The Boundless Void": document.getElementById('theBoundlessVoidLore'),
+                "Cosmic Fabric": document.getElementById('cosmicFabricLore'),
+                "Infinite Nexus": document.getElementById('infiniteNexusLore'),
+                "Eternal Echo": document.getElementById('eternalEchoLore'),
+                "Zenith of Creation": document.getElementById('zenithOfCreationLore'),
+                "Universal Singularity": document.getElementById('universalSingularityLore'),
+                "Existential Fabric": document.getElementById('existentialFabricLore'),
+                "Temporal Flux": document.getElementById('temporalFluxLore'),
+                "Multidimensional Harmony": document.getElementById('multidimensionalHarmonyLore'),
+                "Cosmic Awakening": document.getElementById('cosmicAwakeningLore'),
+                "Divine Spark": document.getElementById('divineSparkLore'),
+                "Secondary Tachyon Flux Regulator": document.getElementById('secondaryTachyonFluxRegulatorLore')
+            };
+            
+            function textToSpeech(loreDisplayElement){
+                   let text = loreDisplayElement.textContent;
+                   let speech = new SpeechSynthesisUtterance();
+                   speech.text = text;
+                   speech.rate = 1;
+                   speech.volume = 1;
+                   speech.pitch = 1;
+                   window.speechSynthesis.speak(speech);
+
+}
+            // --- Game Logic Functions ---
+            function updateDisplay() {
+                // Update all resources based on their perSecond rates
+                woodCountSpan.textContent = resources.wood.count.toFixed(0);
+                woodPerSecondSpan.textContent = resources.wood.perSecond.toFixed(1);
+                chopPowerDisplay.textContent = `+${resources.wood.manualClickAmount}`;
+                chopUpgradeCostSpan.textContent = resources.wood.upgradeCost;
+                upgradeChopPowerButton.disabled = resources.wood.count < resources.wood.upgradeCost;
+                woodPerSecondCostSpan.textContent = resources.wood.automationCost.toFixed(0);
+                buyWoodPerSecondButton.disabled = resources.wood.count < resources.wood.automationCost;
+
+                stoneCountSpan.textContent = resources.stone.count.toFixed(0);
+                stonePerSecondSpan.textContent = resources.stone.perSecond.toFixed(1);
+                buyStoneButton.disabled = resources.wood.count < resources.stone.conversionCost;
+
+                ironCountSpan.textContent = resources.iron.count.toFixed(0);
+                ironPerSecondSpan.textContent = resources.iron.perSecond.toFixed(1);
+                buyIronButton.disabled = resources.stone.count < resources.iron.conversionCost;
+
+                alloyCountSpan.textContent = resources.alloy.count.toFixed(0);
+                alloyPerSecondSpan.textContent = resources.alloy.perSecond.toFixed(1);
+                buyAlloyButton.disabled = resources.iron.count < resources.alloy.conversionCost;
+
+                circuitryCountSpan.textContent = resources.circuitry.count.toFixed(0);
+                circuitryPerSecondSpan.textContent = resources.circuitry.perSecond.toFixed(1);
+                buyCircuitryButton.disabled = resources.alloy.count < resources.circuitry.conversionCost;
+
+                aiCoreCountSpan.textContent = resources.aiCore.count.toFixed(0);
+                aiCorePerSecondSpan.textContent = resources.aiCore.perSecond.toFixed(1);
+                buyAICoreButton.disabled = resources.circuitry.count < resources.aiCore.conversionCost;
+
+                consciousnessCountSpan.textContent = resources.consciousness.count.toFixed(0);
+                consciousnessPerSecondSpan.textContent = resources.consciousness.perSecond.toFixed(1);
+                buyConsciousnessButton.disabled = resources.aiCore.count < resources.consciousness.conversionCost;
+
+                realityShardCountSpan.textContent = resources.realityShard.count.toFixed(0);
+                realityShardPerSecondSpan.textContent = resources.realityShard.perSecond.toFixed(1);
+                buyRealityShardButton.disabled = resources.consciousness.count < resources.realityShard.conversionCost;
+
+                paradoxCountSpan.textContent = resources.paradox.count.toFixed(0);
+                paradoxPerSecondSpan.textContent = resources.paradox.perSecond.toFixed(1);
+                buyParadoxButton.disabled = resources.realityShard.count < resources.paradox.conversionCost;
+
+                singularityCountSpan.textContent = resources.singularity.count.toFixed(0);
+                singularityPerSecondSpan.textContent = resources.singularity.perSecond.toFixed(1);
+                buySingularityButton.disabled = resources.paradox.count < resources.singularity.conversionCost;
+
+                multiverseCountSpan.textContent = resources.multiverse.count.toFixed(0);
+                multiversePerSecondSpan.textContent = resources.multiverse.perSecond.toFixed(1);
+                buyMultiverseButton.disabled = resources.singularity.count < resources.multiverse.conversionCost;
+
+                omniscienceCountSpan.textContent = resources.omniscience.count.toFixed(0);
+                omnisciencePerSecondSpan.textContent = resources.omniscience.perSecond.toFixed(1);
+                buyOmniscienceButton.disabled = resources.multiverse.count < resources.omniscience.conversionCost;
+
+                genesisCountSpan.textContent = resources.genesis.count.toFixed(0);
+                genesisPerSecondSpan.textContent = resources.genesis.perSecond.toFixed(1);
+                buyGenesisButton.disabled = resources.omniscience.count < resources.genesis.conversionCost;
+
+                voidCountSpan.textContent = resources.void.count.toFixed(0);
+                voidPerSecondSpan.textContent = resources.void.perSecond.toFixed(1);
+                buyVoidButton.disabled = resources.genesis.count < resources.void.conversionCost;
+
+                theAllCountSpan.textContent = resources.theAll.count.toFixed(0);
+                theAllPerSecondSpan.textContent = resources.theAll.perSecond.toFixed(1);
+                theAllCost.textContent = resources.theAll.conversionCost;
+                buyTheAllButton.disabled = resources.void.count < resources.theAll.conversionCost;
+
+                transcendenceCountSpan.textContent = resources.transcendence.count.toFixed(0);
+                transcendencePerSecondSpan.textContent = resources.transcendence.perSecond.toFixed(1);
+                transcendenceCost.textContent = resources.transcendence.conversionCost;
+                buyTranscendenceButton.disabled = resources.theAll.count < resources.transcendence.conversionCost;
+
+                theAbsoluteCountSpan.textContent = resources.theAbsolute.count.toFixed(0);
+                theAbsolutePerSecondSpan.textContent = resources.theAbsolute.perSecond.toFixed(1);
+                theAbsoluteCost.textContent = resources.theAbsolute.conversionCost;
+                buyTheAbsoluteButton.disabled = resources.transcendence.count < resources.theAbsolute.conversionCost;
+
+                theEndCountSpan.textContent = resources.theEnd.count.toFixed(0);
+                theEndPerSecondSpan.textContent = resources.theEnd.perSecond.toFixed(1);
+                theEndCost.textContent = resources.theEnd.conversionCost;
+                buyTheEndButton.disabled = resources.theAbsolute.count < resources.theEnd.conversionCost;
+
+                theNewBeginningCountSpan.textContent = resources.theNewBeginning.count.toFixed(0);
+                theNewBeginningPerSecondSpan.textContent = resources.theNewBeginning.perSecond.toFixed(1);
+                theNewBeginningCostSpan.textContent = resources.theNewBeginning.conversionCost;
+                buyTheNewBeginningButton.disabled = resources.theEnd.count < resources.theNewBeginning.conversionCost;
+
+                theArchitectsWillCountSpan.textContent = resources.theArchitectsWill.count.toFixed(0);
+                theArchitectsWillPerSecondSpan.textContent = resources.theArchitectsWill.perSecond.toFixed(1);
+                theArchitectsWillCostSpan.textContent = resources.theArchitectsWill.conversionCost;
+                buyTheArchitectsWillButton.disabled = resources.theNewBeginning.count < resources.theArchitectsWill.conversionCost;
+
+                theOmniverseCountSpan.textContent = resources.theOmniverse.count.toFixed(0);
+                theOmniversePerSecondSpan.textContent = resources.theOmniverse.perSecond.toFixed(1);
+                theOmniverseCost.textContent = resources.theOmniverse.conversionCost;
+                buyTheOmniverseButton.disabled = resources.theArchitectsWill.count < resources.theOmniverse.conversionCost;
+
+                theBoundlessVoidCountSpan.textContent = resources.theBoundlessVoid.count.toFixed(0);
+                theBoundlessVoidPerSecondSpan.textContent = resources.theBoundlessVoid.perSecond.toFixed(1);
+                theBoundlessVoidCost.textContent = resources.theBoundlessVoid.conversionCost;
+                buyTheBoundlessVoidButton.disabled = resources.theOmniverse.count < resources.theBoundlessVoid.conversionCost;
+
+                cosmicFabricCountSpan.textContent = resources.cosmicFabric.count.toFixed(0);
+                cosmicFabricPerSecondSpan.textContent = resources.cosmicFabric.perSecond.toFixed(1);
+                cosmicFabricCost.textContent = resources.cosmicFabric.conversionCost;
+                buyCosmicFabricButton.disabled = resources.theBoundlessVoid.count < resources.cosmicFabric.conversionCost;
+
+                infiniteNexusCountSpan.textContent = resources.infiniteNexus.count.toFixed(0);
+                infiniteNexusPerSecondSpan.textContent = resources.infiniteNexus.perSecond.toFixed(1);
+                infiniteNexusCost.textContent = resources.infiniteNexus.conversionCost;
+                buyInfiniteNexusButton.disabled = resources.cosmicFabric.count < resources.infiniteNexus.conversionCost;
+
+                eternalEchoCountSpan.textContent = resources.eternalEcho.count.toFixed(0);
+                eternalEchoPerSecondSpan.textContent = resources.eternalEcho.perSecond.toFixed(1);
+                eternalEchoCost.textContent = resources.eternalEcho.conversionCost;
+                buyEternalEchoButton.disabled = resources.infiniteNexus.count < resources.eternalEcho.conversionCost;
+
+                zenithOfCreationCountSpan.textContent = resources.zenithOfCreation.count.toFixed(0);
+                zenithOfCreationPerSecondSpan.textContent = resources.zenithOfCreation.perSecond.toFixed(1);
+                zenithOfCreationCost.textContent = resources.zenithOfCreation.conversionCost;
+                buyZenithOfCreationButton.disabled = resources.eternalEcho.count < resources.zenithOfCreation.conversionCost;
+
+                universalSingularityCountSpan.textContent = resources.universalSingularity.count.toFixed(0);
+                universalSingularityPerSecondSpan.textContent = resources.universalSingularity.perSecond.toFixed(1);
+                universalSingularityCost.textContent = resources.universalSingularity.conversionCost;
+                buyUniversalSingularityButton.disabled = resources.zenithOfCreation.count < resources.universalSingularity.conversionCost;
+
+                existentialFabricCountSpan.textContent = resources.existentialFabric.count.toFixed(0);
+                existentialFabricPerSecondSpan.textContent = resources.existentialFabric.perSecond.toFixed(1);
+                existentialFabricCost.textContent = resources.existentialFabric.conversionCost;
+                buyExistentialFabricButton.disabled = resources.universalSingularity.count < resources.existentialFabric.conversionCost;
+
+                temporalFluxCountSpan.textContent = resources.temporalFlux.count.toFixed(0);
+                temporalFluxPerSecondSpan.textContent = resources.temporalFlux.perSecond.toFixed(1);
+                temporalFluxCost.textContent = resources.temporalFlux.conversionCost;
+                buyTemporalFluxButton.disabled = resources.existentialFabric.count < resources.temporalFlux.conversionCost;
+
+                multidimensionalHarmonyCountSpan.textContent = resources.multidimensionalHarmony.count.toFixed(0);
+                multidimensionalHarmonyPerSecondSpan.textContent = resources.multidimensionalHarmony.perSecond.toFixed(1);
+                multidimensionalHarmonyCost.textContent = resources.multidimensionalHarmony.conversionCost;
+                buyMultidimensionalHarmonyButton.disabled = resources.temporalFlux.count < resources.multidimensionalHarmony.conversionCost;
+
+                cosmicAwakeningCountSpan.textContent = resources.cosmicAwakening.count.toFixed(0);
+                cosmicAwakeningPerSecondSpan.textContent = resources.cosmicAwakening.perSecond.toFixed(1);
+                cosmicAwakeningCost.textContent = resources.cosmicAwakening.conversionCost;
+                buyCosmicAwakeningButton.disabled = resources.multidimensionalHarmony.count < resources.cosmicAwakening.conversionCost;
+
+                divineSparkCountSpan.textContent = resources.divineSpark.count.toFixed(0);
+                divineSparkPerSecondSpan.textContent = resources.divineSpark.perSecond.toFixed(1);
+           //     divineSparkCost.textContent = resources.divineSpark.conversionCost;
+                buyDivineSparkButton.disabled = resources.cosmicAwakening.count < resources.divineSpark.conversionCost;
+
+ 		secondaryTachyonFluxRegulatorCountSpan.textContent = resources.secondaryTachyonFluxRegulator.count.toFixed(0);
+                secondaryTachyonFluxRegulatorPerSecondSpan.textContent = resources.secondaryTachyonFluxRegulator.perSecond.toFixed(1);
+                //secondaryTachyonFluxRegulatorCost.textContent = resources.secondaryTachyonFluxRegulator.conversionCost;
+                buySecondaryTachyonFluxRegulatorButton.disabled = resources.divineSpark.count < resources.secondaryTachyonFluxRegulator.conversionCost;
+
+            }
+
+            function addWood() {
+                let woodEarned = resources.wood.manualClickAmount;
+                let isCritical = false;
+
+                if (Math.random() < resources.wood.criticalChance) {
+                    woodEarned *= resources.wood.criticalMultiplier;
+                    isCritical = true;
+                }
+
+                resources.wood.count += woodEarned;
+                updateDisplay();
+
+                if (isCritical) {
+                    criticalHitTextSpan.textContent = `CRITICAL! +${woodEarned.toFixed(0)} Wood!`;
+                    criticalHitFeedbackDiv.style.opacity = 1;
+                } else {
+                    criticalHitFeedbackDiv.style.opacity = 0;
+                }
+            }
+
+            function dismissCriticalFeedback() {
+                criticalHitFeedbackDiv.style.opacity = 0;
+                criticalHitTextSpan.textContent = '';
+            }
+
+            function upgradeChopPower() {
+                const cost = resources.wood.upgradeCost;
+                if (resources.wood.count >= cost) {
+                    resources.wood.count -= cost;
+                    resources.wood.manualClickAmount += resources.wood.upgradeAmount;
+                    resources.wood.upgradeCost = Math.round(resources.wood.upgradeCost * resources.wood.upgradeMultiplier);
+                    updateDisplay();
+                } else {
+                    alert(`Not enough Wood to upgrade Chop Power! You need ${cost} Wood.`);
+                }
+            }
+
+            function buyWoodPerSecondAutomation() {
+                const cost = resources.wood.automationCost;
+                if (resources.wood.count >= cost) {
+                    resources.wood.count -= cost;
+                    resources.wood.perSecond += resources.wood.automationAmount;
+                    resources.wood.automationCost = Math.round(resources.wood.automationCost * resources.wood.automationMultiplier);
+                    updateDisplay();
+                } else {
+                    alert(`Not enough Wood to automate production! You need ${cost} Wood.`);
+                }
+            }
+
+            function buyResource(resourceToBuy, previousResource) {
+                const cost = resources[resourceToBuy].conversionCost;
+                if (resources[previousResource].count >= cost) {
+                    resources[previousResource].count -= cost;
+                    resources[resourceToBuy].count += 1;
+                    resources[resourceToBuy].perSecond += resources[resourceToBuy].perUnitProduction;
+                    updateDisplay();
+                } else {
+                    alert(`Not enough ${previousResource} to buy ${resourceToBuy}! You need ${cost} ${previousResource}.`);
+                }
+            }
+
+            function saveGame(integer) {
+                try {
+                    const saveData = {
+                        resources: resources
+                    };
+                    localStorage.setItem('incrementalGameSave', JSON.stringify(saveData));
+                    if (integer !== 1) {
+                        alert('Tiến độ trò chơi đã được lưu!');
+                    }
+                } catch (e) {
+                    console.error("Lỗi khi lưu game:", e);
+                    alert('Không thể lưu game. Vui lòng kiểm tra dung lượng lưu trữ của trình duyệt.');
+                }
+            }
+            function loadGame() {
+                try {
+                    const savedData = localStorage.getItem('incrementalGameSave');
+                    if (savedData) {
+                        const parsedData = JSON.parse(savedData);
+                        const loadedResources = parsedData.resources;
+
+                        for (const key in resources) {
+                            if (loadedResources[key] !== undefined) {
+                                if (typeof resources[key] === 'object' && resources[key] !== null &&
+                                    typeof loadedResources[key] === 'object' && loadedResources[key] !== null) {
+                                    Object.assign(resources[key], loadedResources[key]);
+                                } else {
+                                    resources[key] = loadedResources[key];
+                                }
+                            }
+                        }
+                        updateDisplay();
+                        alert('Tiến độ trò chơi đã được tải!');
+                    } else {
+                        alert('Không tìm thấy dữ liệu lưu trò chơi nào.');
+                    }
+                } catch (e) {
+                    console.error("Lỗi khi tải game:", e);
+                    alert('Không thể tải game. Dữ liệu lưu có thể bị hỏng.');
+                }
+            }
+          
+
+function saveAsFile(gamedata, filename){
+       const gameState = {
+        resources: resources
+                         
+    };
+    const jsonString = JSON.stringify(gameState);
+
+    const encodedData = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g,
+        function toSolidBytes(match, p1) {
+            return String.fromCharCode('0x' + p1);
+        }));
+    document.getElementById('load-game-data').value = encodedData;
+
+       const password = JSON.stringify(encodedData).replace(/\"/g, "") ;
+       const blob = new Blob([password], { type: 'text/plain' });
+       const url = URL.createObjectURL(blob);
+       const link = document.createElement('a');
+       link.href = url;
+       link.download = filename;
+       document.body.appendChild(link);
+       link.click();
+       document.body.removeChild(link);
+       URL.revokeObjectURL(url);
+
+}
+
+
+
+
+function loadAsFile() {
+    const encodedData = document.getElementById('load-game-data').value;
+    if (!encodedData) {
+        alert('Vui lòng dán dữ liệu game vào ô để tải!');
+        return;
+    }
+    try {
+        const jsonString = decodeURIComponent(atob(encodedData).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        const loadedState = JSON.parse(jsonString);
+
+        resources = loadedState.resources;
+   updateDisplay();
+                        alert('Tiến độ trò chơi đã được tải!');
+
+        }
+catch (e) {
+                    console.error("Lỗi khi tải game:", e);
+                    alert('Không thể tải game. Dữ liệu lưu có thể bị hỏng.');
+}
+}
+
+
+            let cheatCodeSequence = [];
+            const cheatCode = "add10kwood";
+
+            function handleCheatCode(event) {
+                cheatCodeSequence.push(event.key.toLowerCase());
+                if (cheatCodeSequence.length > cheatCode.length) {
+                    cheatCodeSequence.shift();
+                }
+
+                if (cheatCodeSequence.join('') === cheatCode) {
+                    resources.wood.count += 10000;
+                    updateDisplay();
+                    alert("CHEAT ACTIVATED! +10,000 Wood!");
+                    cheatCodeSequence = [];
+                }
+            }
+
+            const quizQuestions = [
+                { question: "What is the first resource you collect?", answer: "wood", reward: 500 },
+                { question: "What resource comes after Stone?", answer: "iron", reward: 750 },
+                { question: "How many Wood do you need to buy 1 Stone?", answer: "1000", reward: 1000 },
+                { question: "What is the next resource after Alloy?", answer: "circuitry", reward: 1500 },
+                { question: "What material is produced after AI Core?", answer: "consciousness", reward: 2000 },
+                { question: "Which resource is obtained after Genesis?", answer: "void", reward: 5000 },
+                { question: "How much Wood do you get per second after automating it once?", answer: "5", reward: 1000 },
+                { question: "What comes after Singularity?", answer: "multiverse", reward: 2500 },
+                { question: "What is the resource after Omniscience?", answer: "genesis", reward: 3000 },
+                { question: "What is the final resource after The Absolute?", answer: "the end", reward: 10000 },
+                { question: "What is the resource after The End?", answer: "the new beginning", reward: 15000 },
+                { question: "What is the resource after The New Beginning?", answer: "the architect's will", reward: 20000 },
+                { question: "What comes after The Architect's Will?", answer: "the omniverse", reward: 50000 },
+                { question: "What comes after The Omniverse?", answer: "the boundless void", reward: 100000 },
+                { question: "What comes after The Boundless Void?", answer: "cosmic fabric", reward: 150000 },
+                { question: "What is the second to last resource in Stage 3?", answer: "eternal echo", reward: 200000 },
+                { question: "What is the final resource in Stage 3?", answer: "zenith of creation", reward: 250000 },
+                { question: "What comes after Zenith of Creation?", answer: "universal singularity", reward: 300000 },
+                { question: "What is the resource after Universal Singularity?", answer: "existential fabric", reward: 350000 },
+                { question: "What is the resource after Temporal Flux?", answer: "multidimensional harmony", reward: 400000 },
+                { question: "What is the ultimate resource of all?", answer: "divine spark", reward: 500000 }
+            ];
+
+            let currentQuestion = null;
+            let answeredQuestions = [];
+            const QUIZ_COOLDOWN_MS = 5000;
+            let quizCooldownTimer = 0;
+
+            function loadNewQuestion() {
+                if (quizQuestions.length === 0) {
+                    quizQuestionParagraph.textContent = "No more questions available!";
+                    quizAnswerInput.disabled = true;
+                    submitQuizAnswerButton.disabled = true;
+                    return;
+                }
+
+                if (answeredQuestions.length === quizQuestions.length) {
+                    answeredQuestions = [];
+                }
+
+                let randomIndex;
+                do {
+                    randomIndex = Math.floor(Math.random() * quizQuestions.length);
+                } while (answeredQuestions.includes(randomIndex));
+
+                answeredQuestions.push(randomIndex);
+                currentQuestion = quizQuestions[randomIndex];
+
+                quizQuestionParagraph.textContent = currentQuestion.question;
+                quizAnswerInput.value = '';
+                quizFeedbackParagraph.textContent = '';
+                quizAnswerInput.disabled = false;
+                submitQuizAnswerButton.disabled = false;
+            }
+
+            function checkAnswer() {
+                if (!currentQuestion) return;
+
+                const userAnswer = quizAnswerInput.value.trim().toLowerCase();
+                const correctAnswer = String(currentQuestion.answer).toLowerCase();
+
+                if (userAnswer === correctAnswer) {
+                    resources.wood.count += currentQuestion.reward;
+                    quizFeedbackParagraph.textContent = `Correct! Bạn đã nhận được ${currentQuestion.reward} Gỗ.`;
+                    quizFeedbackParagraph.style.color = 'green';
+                    updateDisplay();
+                } else {
+                    quizFeedbackParagraph.textContent = `Không đúng. Đáp án là "${currentQuestion.answer}".`;
+                    quizFeedbackParagraph.style.color = 'red';
+                }
+
+                quizAnswerInput.disabled = true;
+                submitQuizAnswerButton.disabled = true;
+
+                quizCooldownTimer = Date.now();
+                setTimeout(() => {
+                    loadNewQuestion();
+                }, QUIZ_COOLDOWN_MS);
+            }
+
+            async function generateLore(resourceName, loreDisplayElement) {
+                loreDisplayElement.textContent = 'Đang tạo lore...';
+                loreDisplayElement.style.color = '#555';
+
+                try {
+                    const prompt = `Viết một đoạn văn ngắn, giàu trí tưởng tượng (khoảng 30-50 từ) về tài nguyên "${resourceName}" trong một trò chơi incremental. Tập trung vào ý nghĩa, cách nó được sử dụng, hoặc cảm giác khi thu thập nó trong bối cảnh trò chơi phiêu lưu khoa học viễn tưởng.`;
+
+                    let chatHistory = [];
+                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+
+                    const payload = { contents: chatHistory };
+                    var apiKey = "";
+                    if (apiKey == "")
+ {
+           apiKey = resources.apiKey; 
+ }
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        loreDisplayElement.textContent = text;
+                        loreDisplayElement.style.color = '#388e3c';
+                        textToSpeech(loreDisplayElement);
+                    } else {
+                        loreDisplayElement.textContent = 'Không thể tạo lore. Cấu trúc phản hồi không mong muốn.';
+                        loreDisplayElement.style.color = 'orange';
+                    }
+                } catch (error) {
+                    console.error("Lỗi khi gọi Gemini API:", error);
+                    loreDisplayElement.textContent = "Haven't got a Gemini API Key. You need to use game.setAPIKey function in the browser console.";
+                    loreDisplayElement.style.color = 'red';
+                }
+            }
+
+            function formatTime(ms) {
+                let seconds = Math.floor(ms / 1000);
+                let minutes = Math.floor(seconds / 60);
+                let hours = Math.floor(minutes / 60);
+
+                seconds = seconds % 60;
+                minutes = minutes % 60;
+
+                const pad = (num) => num < 10 ? '0' + num : num;
+
+                return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+            }
+
+            function updateTimePlayed() {
+                resources.timePlayed.second += 1;
+                if (resources.timePlayed.second === 60) {
+                    resources.timePlayed.second = 0;
+                    resources.timePlayed.minute += 1;
+                }
+                if (resources.timePlayed.minute === 60) {
+                    resources.timePlayed.minute = 0;
+                    resources.timePlayed.hour += 1;
+                }
+                timePlayedSpan.textContent = resources.timePlayed.hour.toString().padStart(2, '0') + ":" + resources.timePlayed.minute.toString().padStart(2, '0') + ":" + resources.timePlayed.second.toString().padStart(2, '0');
+            }
+
+            function notify(type, message) {
+                (() => {
+                    let n = document.createElement("div");
+                    let id = Math.random().toString(36).substr(2, 10);
+                    n.setAttribute("id", id);
+                    n.classList.add("notification", type);
+                    n.classList.add("fade_out");
+                    n.innerText = message;
+                    document.getElementById("notification-area").appendChild(n);
+                    setTimeout(() => {
+                        var notifications = document.getElementById("notification-area").getElementsByClassName("notification");
+                        for (let i = 0; i < notifications.length; i++) {
+                            if (notifications[i].getAttribute("id") === id) {
+                                notifications[i].remove();
+                                break;
+                            }
+                        }
+                    }, 5000);
+                })();
+            }
+
+            function notifySuccess() {
+                notify("success", "The game has been saved.");
+            }
+
+            function autoSave() {
+                saveGame(1);
+                notifySuccess();
+            }
+
+            function gameLoop() {
+                resources.wood.count += resources.wood.perSecond / 10;
+                resources.stone.count += resources.stone.perSecond / 10;
+                resources.iron.count += resources.iron.perSecond / 10;
+                resources.alloy.count += resources.alloy.perSecond / 10;
+                resources.circuitry.count += resources.circuitry.perSecond / 10;
+                resources.aiCore.count += resources.aiCore.perSecond / 10;
+                resources.consciousness.count += resources.consciousness.perSecond / 10;
+                resources.realityShard.count += resources.realityShard.perSecond / 10;
+                resources.paradox.count += resources.paradox.perSecond / 10;
+                resources.singularity.count += resources.singularity.perSecond / 10;
+                resources.multiverse.count += resources.multiverse.perSecond / 10;
+                resources.omniscience.count += resources.omniscience.perSecond / 10;
+                resources.genesis.count += resources.genesis.perSecond / 10;
+                resources.void.count += resources.void.perSecond / 10;
+                resources.theAll.count += resources.theAll.perSecond / 10;
+                resources.transcendence.count += resources.transcendence.perSecond / 10;
+                resources.theAbsolute.count += resources.theAbsolute.perSecond / 10;
+                resources.theEnd.count += resources.theEnd.perSecond / 10;
+                resources.theNewBeginning.count += resources.theNewBeginning.perSecond / 10;
+                resources.theArchitectsWill.count += resources.theArchitectsWill.perSecond / 10;
+                resources.theOmniverse.count += resources.theOmniverse.perSecond / 10;
+                resources.theBoundlessVoid.count += resources.theBoundlessVoid.perSecond / 10;
+                resources.cosmicFabric.count += resources.cosmicFabric.perSecond / 10;
+                resources.infiniteNexus.count += resources.infiniteNexus.perSecond / 10;
+                resources.eternalEcho.count += resources.eternalEcho.perSecond / 10;
+                resources.zenithOfCreation.count += resources.zenithOfCreation.perSecond / 10;
+                resources.universalSingularity.count += resources.universalSingularity.perSecond / 10;
+                resources.existentialFabric.count += resources.existentialFabric.perSecond / 10;
+                resources.temporalFlux.count += resources.temporalFlux.perSecond / 10;
+                resources.multidimensionalHarmony.count += resources.multidimensionalHarmony.perSecond / 10;
+                resources.cosmicAwakening.count += resources.cosmicAwakening.perSecond / 10;
+                resources.divineSpark.count += resources.divineSpark.perSecond / 10;
+      resources.secondaryTachyonFluxRegulator.count += resources.secondaryTachyonFluxRegulator.perSecond / 10;
+                updateDisplay();
+            }
+
+            // Public interface for the game
+            return {
+                init: () => {
+                    // Event Listeners
+                    saveFile.addEventListener('click', function() {
+  saveAsFile(document.getElementById('load-game-data').value, 'Ultimate Incremental Resource Game'); 
+}); 
+
+                    loadFile.addEventListener('click', loadAsFile);
+                    addWoodButton.addEventListener('click', addWood);
+                    upgradeChopPowerButton.addEventListener('click', upgradeChopPower);
+                    buyWoodPerSecondButton.addEventListener('click', buyWoodPerSecondAutomation);
+
+                    buyStoneButton.addEventListener('click', () => buyResource('stone', 'wood'));
+                    buyIronButton.addEventListener('click', () => buyResource('iron', 'stone'));
+                    buyAlloyButton.addEventListener('click', () => buyResource('alloy', 'iron'));
+                    buyCircuitryButton.addEventListener('click', () => buyResource('circuitry', 'alloy'));
+                    buyAICoreButton.addEventListener('click', () => buyResource('aiCore', 'circuitry'));
+                    buyConsciousnessButton.addEventListener('click', () => buyResource('consciousness', 'aiCore'));
+                    buyRealityShardButton.addEventListener('click', () => buyResource('realityShard', 'consciousness'));
+                    buyParadoxButton.addEventListener('click', () => buyResource('paradox', 'realityShard'));
+                    buySingularityButton.addEventListener('click', () => buyResource('singularity', 'paradox'));
+                    buyMultiverseButton.addEventListener('click', () => buyResource('multiverse', 'singularity'));
+                    buyOmniscienceButton.addEventListener('click', () => buyResource('omniscience', 'multiverse'));
+                    buyGenesisButton.addEventListener('click', () => buyResource('genesis', 'omniscience'));
+                    buyVoidButton.addEventListener('click', () => buyResource('void', 'genesis'));
+                    buyTheAllButton.addEventListener('click', () => buyResource('theAll', 'void'));
+                    buyTranscendenceButton.addEventListener('click', () => buyResource('transcendence', 'theAll'));
+                    buyTheAbsoluteButton.addEventListener('click', () => buyResource('theAbsolute', 'transcendence'));
+                    buyTheEndButton.addEventListener('click', () => buyResource('theEnd', 'theAbsolute'));
+                    buyTheNewBeginningButton.addEventListener('click', () => buyResource('theNewBeginning', 'theEnd'));
+                    buyTheArchitectsWillButton.addEventListener('click', () => buyResource('theArchitectsWill', 'theNewBeginning'));
+                    buyTheOmniverseButton.addEventListener('click', () => buyResource('theOmniverse', 'theArchitectsWill'));
+                    buyTheBoundlessVoidButton.addEventListener('click', () => buyResource('theBoundlessVoid', 'theOmniverse'));
+                    buyCosmicFabricButton.addEventListener('click', () => buyResource('cosmicFabric', 'theBoundlessVoid'));
+                    buyInfiniteNexusButton.addEventListener('click', () => buyResource('infiniteNexus', 'cosmicFabric'));
+                    buyEternalEchoButton.addEventListener('click', () => buyResource('eternalEcho', 'infiniteNexus'));
+                    buyZenithOfCreationButton.addEventListener('click', () => buyResource('zenithOfCreation', 'eternalEcho'));
+                    buyUniversalSingularityButton.addEventListener('click', () => buyResource('universalSingularity', 'zenithOfCreation'));
+                    buyExistentialFabricButton.addEventListener('click', () => buyResource('existentialFabric', 'universalSingularity'));
+                    buyTemporalFluxButton.addEventListener('click', () => buyResource('temporalFlux', 'existentialFabric'));
+                    buyMultidimensionalHarmonyButton.addEventListener('click', () => buyResource('multidimensionalHarmony', 'temporalFlux'));
+                    buyCosmicAwakeningButton.addEventListener('click', () => buyResource('cosmicAwakening', 'multidimensionalHarmony'));
+                    buyDivineSparkButton.addEventListener('click', () => buyResource('divineSpark', 'cosmicAwakening'));
+                      buySecondaryTachyonFluxRegulatorButton.addEventListener('click', () => buyResource('secondaryTachyonFluxRegulator', 'divineSpark'));
+
+
+                    saveGameBtn.addEventListener('click', () => saveGame(0));
+                    loadGameBtn.addEventListener('click', loadGame);
+                    closeCriticalFeedbackButton.addEventListener('click', dismissCriticalFeedback);
+                    document.addEventListener('keydown', handleCheatCode);
+
+                    submitQuizAnswerButton.addEventListener('click', checkAnswer);
+                    quizAnswerInput.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter') {
+                            checkAnswer();
+                        }
+                    });
+
+                    const isGitHubPages = window.location.hostname.includes('xxx.io') || window.location.hostname.includes('xxx.com');
+                    if (isGitHubPages) {
+                        loreButtons.forEach(button => {
+                            button.style.display = 'none';
+                            const loreDisplayElement = loreDisplays[button.dataset.resource];
+                            if (loreDisplayElement) {
+                                loreDisplayElement.style.display = 'none';
+                            }
+                        });
+                    } else {
+                        loreButtons.forEach(button => {
+                            button.addEventListener('click', () => {
+                                const resourceName = button.dataset.resource;
+                                const loreDisplayElement = loreDisplays[resourceName];
+                                generateLore(resourceName, loreDisplayElement);
+                            });
+                        });
+                    }
+
+                    // Start game loops
+                    setInterval(gameLoop, 100);
+                    setInterval(updateTimePlayed, 1000);
+                    setInterval(autoSave, 30000);
+
+                    // Initial setup
+                    updateDisplay();
+                    loadGame();
+                    loadNewQuestion();
+                },
+                // Expose specific functions if needed for external interaction, e.g., for testing
+                getWoodCount: () => resources.wood.count,
+                addWoodExternal: (amount) => { resources.wood.count += amount; updateDisplay(); },
+                setAPIKey: (apiKey) => {resources.apiKey = apiKey;}
+            };
+        })();
+
+        // Initialize the game
+        game.init();
+    </script>
+</body>
+</html>
