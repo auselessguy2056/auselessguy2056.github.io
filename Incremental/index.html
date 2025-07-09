@@ -3084,7 +3084,7 @@
 
             function speakText(text) {
                 if ('speechSynthesis' in window && resources.textToSpeechEnabled) {
-                    speechSynthesis.cancel(); // Stop current speech
+                //    speechSynthesis.cancel(); // Stop current speech
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.lang = resources.language === 'en' ? 'en-US' : 'vi-VN';
                     speechSynthesis.speak(utterance);
