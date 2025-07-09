@@ -1367,7 +1367,7 @@
                     loreApiError: (status, statusText, errorData) => `API error: ${status} ${statusText} - ${JSON.stringify(errorData)}`,
                     loreResponseError: "Could not generate lore. Unexpected response structure.",
                     loreGenericError: "Please get a Gemini api key and use game.setAPIKey in the browser console",
-                    gameSaved: "",
+                    
                     gameLoadSuccess: "Game progress loaded!",
                     gameLoadNoData: "No saved game data found.",
                     gameLoadError: "Could not load game. Save data might be corrupted.",
@@ -1375,7 +1375,7 @@
                     quizCorrect: (reward) => `Correct! You received ${reward} Wood.`,
                     quizIncorrect: (answer) => `Incorrect. The answer was "${answer}".`,
                     quizNoMoreQuestions: "No more questions available!",
-                    starClickedNotification: "",
+                    
                     ttsEnabled: "Text to speech enabled.",
                     ttsDisabled: "Text-to-speech disabled.",
                     discordInviteText: "Join our Discord server"
@@ -3084,7 +3084,7 @@
 
             function speakText(text) {
                 if ('speechSynthesis' in window && resources.textToSpeechEnabled) {
-               //     speechSynthesis.cancel(); // Stop current speech
+                    speechSynthesis.cancel(); // Stop current speech
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.lang = resources.language === 'en' ? 'en-US' : 'vi-VN';
                     speechSynthesis.speak(utterance);
@@ -3316,6 +3316,22 @@
 
 
             clickableStar.addEventListener('click', handleStarClick);
+document.addEventListener('keydown', (event) => {
+
+    if(event.key === 's') {
+
+        // do the thing you're wanting to do
+    ttsToggleBtn.click();
+
+    }
+   else if(event.key === 'l') {
+
+        // do the thing you're wanting to do
+languageToggleBtn.click();
+    }
+
+
+});
 
             // Public interface for the game
             return {
@@ -3389,7 +3405,7 @@
                     ttsToggleBtn.addEventListener('click', toggleTextToSpeech);
                     languageToggleBtn.addEventListener('click', toggleLanguage); // New language toggle listener
 
-                    const isGitHubPages = window.location.hostname.includes('xxx.io') || window.location.hostname.includes('xxx.com');
+                    const isGitHubPages = window.location.hostname.includes('github.io') || window.location.hostname.includes('github.com');
                     if (isGitHubPages) {
                         loreButtons.forEach(button => {
                             button.style.display = 'none';
