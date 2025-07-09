@@ -816,6 +816,7 @@
                     minute: 0,
                     second: 0
                 },
+                lastMessage: "",
                 wood: {
                     count: 0,
                     perSecond: 0,
@@ -3082,14 +3083,22 @@
                 }
             }
 
-            function speakText(text) {
+                function speakText(text) {
                 if ('speechSynthesis' in window && resources.textToSpeechEnabled) {
-                //    speechSynthesis.cancel(); // Stop current speech
+                 
+                   // speechSynthesis.cancel(); // Stop current speech
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.lang = resources.language === 'en' ? 'en-US' : 'vi-VN';
+                   if(resources.lastMessage == utterance.text){
+                     speechSynthesis.cancel(); 
+                      }
+                   else {
                     speechSynthesis.speak(utterance);
+                      }
+                        resources.lastMessage = text;
                 }
             }
+
 
             function toggleTextToSpeech() {
                 resources.textToSpeechEnabled = !resources.textToSpeechEnabled;
