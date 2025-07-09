@@ -3090,7 +3090,7 @@
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.lang = resources.language === 'en' ? 'en-US' : 'vi-VN';
                    if(resources.lastMessage == utterance.text){
-                     speechSynthesis.cancel(); 
+                  //   speechSynthesis.cancel(); 
                       }
                    else {
                     speechSynthesis.speak(utterance);
