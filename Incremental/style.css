@@ -1,0 +1,218 @@
+/* Existing CSS */
+#notification-area {
+  position: fixed;
+  bottom: 0px;
+  right: 10px;
+  width: 250px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+#notification-area .notification {
+  position: relative;
+  padding: 15px 10px;
+  background: #111;
+  color: #f5f5f5;
+  font-family: "Raleway";
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 5px;
+  margin: 5px 0px;
+  opacity: 0;
+  left: 20px;
+  animation: showNotification 500ms ease-in-out forwards;
+}
+@-webkit-keyframes fadeInFromNone {
+  0% {
+    display: none;
+    opacity: 1;
+  }
+  50% {
+    display: none;
+    opacity: 1;
+  }
+  100% {
+    display: block;
+    opacity: 0;
+  }
+}
+#notification-area .fade_out {
+  -webkit-animation: fadeInFromNone 5s ease-out;
+}
+@keyframes showNotification {
+  to {
+    opacity: 1;
+    left: 0px;
+  }
+}
+#notification-area .notification.success {
+  background: #389838;
+}
+body {
+  font-family: 'Inter', Arial, sans-serif; /* Using Inter font as per instructions */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px;
+  background-color: #e0f2f7; /* Lighter blue background */
+  color: #263238; /* Darker text */
+  line-height: 1.6;
+  overflow-y: auto; /* Changed from hidden to auto to enable vertical scrolling */
+}
+h1 {
+  color: #007bff; /* Blue heading */
+  margin-bottom: 25px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+.resource-section {
+  background-color: #ffffff;
+  border: 1px solid #b3e5fc; /* Light blue border */
+  border-radius: 12px; /* More rounded corners */
+  padding: 25px;
+  margin: 15px 0;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+.resource-section:hover {
+  transform: translateY(-3px); /* Slight lift on hover */
+}
+h2 {
+  color: #0056b3; /* Darker blue for resource titles */
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+p {
+  font-size: 1.1em;
+  margin-bottom: 8px;
+}
+button {
+  background-color: #2196f3; /* Medium blue button */
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px; /* Rounded buttons */
+  cursor: pointer;
+  font-size: 1em;
+  margin-top: 10px;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+button:hover {
+  background-color: #1976d2; /* Darker blue on hover */
+  transform: translateY(-1px);
+}
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+hr {
+  border: 0;
+  height: 2px; /* Thicker HR */
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
+  width: 70%;
+  margin: 30px 0;
+}
+@media (max-width: 768px) {
+  .resource-section {
+    width: 95%;
+    padding: 18px;
+  }
+  h1 {
+    font-size: 1.8em;
+  }
+  h2 {
+    font-size: 1.4em;
+  }
+  button {
+    padding: 10px 15px;
+    font-size: 0.9em;
+  }
+}
+.critical-feedback {
+  color: #ff0000; /* Red color for critical hit */
+  font-weight: bold;
+  position: relative; /* Changed to relative to better position close button */
+  top: 5px; /* Adjust vertical position */
+  display: flex; /* Use flexbox for alignment */
+  align-items: center; /* Vertically align items */
+  justify-content: center; /* Center horizontally */
+  opacity: 0;
+  transition: opacity 0.3s ease-out; /* Only fade in/out, no transform transition for critical text */
+}
+.critical-feedback .close-btn {
+  background: none;
+  border: none;
+  color: #ff0000; /* Red color for close button */
+  font-size: 1.2em;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 10px; /* Space between text and button */
+  padding: 0 5px;
+  line-height: 1; /* Adjust line height for better alignment */
+  transition: color 0.2s ease;
+}
+.critical-feedback .close-btn:hover {
+  color: #cc0000;
+}
+.lore-display {
+  margin-top: 15px;
+  padding: 10px 15px;
+  background-color: #e8f5e9; /* Light green for lore */
+  border: 1px solid #c8e6c9; /* Green border */
+  border-radius: 8px;
+  font-style: italic;
+  color: #388e3c; /* Darker green text */
+  font-size: 0.95em;
+  text-align: left;
+  min-height: 30px; /* Ensure space even if empty */
+  display: flex;
+  align-items: center; /* Vertically center content */
+  justify-content: center; /* Horizontally center content */
+}
+footer {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: #263238; /* Dark background for footer */
+  color: #ffffff; /* White text */
+  text-align: center;
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
+}
+footer a {
+  color: #81d4fa; /* Light blue link color */
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.2s ease;
+}
+footer a:hover {
+  color: #e0f7fa; /* Lighter blue on hover */
+  text-decoration: underline;
+}
+
+/* New CSS for the star */
+#clickableStar {
+  position: fixed !important; /* Ensure fixed positioning */
+  font-size: 4em !important; /* Ensure large size */
+  width: 4em !important; /* Explicit width */
+  height: 4em !important; /* Explicit height */
+  display: flex !important; /* Use flex to center the emoji if it's smaller */
+  justify-content: center !important;
+  align-items: center !important;
+  cursor: pointer;
+  z-index: 9999 !important; /* Very high z-index to be on top */
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out; /* Smooth fade in/out */
+  text-shadow: 0 0 10px rgba(255, 255, 0, 0.8); /* Glow effect */
+  background-color: rgba(255, 255, 0, 0.2) !important; /* Semi-transparent yellow background for visibility */
+  border: 2px solid gold !important; /* Gold border for visibility */
+  border-radius: 50% !important; /* Make it round if it's a div */
+  padding: 10px !important; /* Add some padding */
+  box-sizing: border-box !important; /* Include padding in element's total width and height */
+}
