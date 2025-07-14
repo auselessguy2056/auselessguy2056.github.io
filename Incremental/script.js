@@ -2733,7 +2733,7 @@ const game = (() => {
             ttsToggleBtn.addEventListener('click', toggleTextToSpeech);
             languageToggleBtn.addEventListener('click', toggleLanguage); // New language toggle listener
 
-            const isGitHubPages = window.location.hostname.includes('github.io') || window.location.hostname.includes('github.com');
+            const isGitHubPages = window.location.hostname.includes('xxx.io') || window.location.hostname.includes('github.com');
             if (isGitHubPages) {
                 loreButtons.forEach(button => {
                     button.style.display = 'none';
