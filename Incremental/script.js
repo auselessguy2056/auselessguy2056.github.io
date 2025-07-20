@@ -349,7 +349,8 @@ const game = (() => {
             perUnitProduction: 1
         },
         textToSpeechEnabled: false, // New property for TTS toggle
-        language: 'en' // New property for current language
+        language: 'en', // New property for current language
+        apiKey: "" // Initialize apiKey here for persistence
     };
 
     // --- Translations Object ---
@@ -599,13 +600,16 @@ const game = (() => {
             quizCorrect: (reward) => `Correct! You received ${reward} Wood.`,
             quizIncorrect: (answer) => `Incorrect. The answer was "${answer}".`,
             quizNoMoreQuestions: "No more questions available!",
-            starClickedNotification: "You clicked the star! You'll get a litte more resource",
+            starClickedNotification: (resourceName) => `You clicked the star! You will get more ${resourceName} per second`,
             ttsEnabled: "Text to speech enabled.",
             ttsDisabled: "Text-to-speech disabled.",
             discordInviteText: "Join our Discord server",
             buyResourceNotification: (resourceName) => `You bought 1 ${resourceName}!`,
             notEnoughResource: (prevResource, targetResource, cost) => `Not enough ${prevResource} to buy ${targetResource}! You need ${cost} ${prevResource}.`,
-            starClickedNotificationError: "An error occurred while awarding star bonus. Please check console."
+            starClickedNotificationError: "An error occurred while awarding star bonus. Please check console.",
+            timeToNextResourceLabel: "Time to next resource",
+            timeToNextResourceValue: (time) => `Next resource in: ${time}`,
+            timeToNextResourceNone: "All resources acquired!"
         },
         vi: {
             gameTitle: "Trò Chơi Tăng Cường Tài Nguyên Tối Thượng",
@@ -709,14 +713,14 @@ const game = (() => {
             currentTheEndLabel: "Kết Thúc Hiện Tại",
             theEndPerSecondLabel: "Kết Thúc mỗi giây",
             buyTheEndBtnText: (cost) => `Chuyển đổi ${cost} Tuyệt Đối thành 1 Kết Thúc`,
-            theNewBeginningTitle: "Khởi nguyên mới",
-            currentTheNewBeginningLabel: "Khởi nguyên mới Hiện Tại",
-            theNewBeginningPerSecondLabel: "Khởi nguyên mới mỗi giây",
-            buyTheNewBeginningBtnText: (cost) => `Chuyển đổi ${cost} Kết Thúc thành 1 Khởi nguyên mới`,
+            theNewBeginningTitle: "Khởi Nguyên Mới", // Translated
+            currentTheNewBeginningLabel: "Khởi Nguyên Mới Hiện Tại",
+            theNewBeginningPerSecondLabel: "Khởi Nguyên Mới mỗi giây",
+            buyTheNewBeginningBtnText: (cost) => `Chuyển đổi ${cost} Kết Thúc thành 1 Khởi Nguyên Mới`,
             theArchitectsWillTitle: "Ý Chí Kiến Trúc Sư",
             currentTheArchitectsWillLabel: "Ý Chí Kiến Trúc Sư Hiện Tại",
             theArchitectsWillPerSecondLabel: "Ý Chí Kiến Trúc Sư mỗi giây",
-            buyTheArchitectsWillBtnText: (cost) => `Chuyển đổi ${cost} Khởi nguyên mới thành 1 Ý Chí Kiến Trúc Sư`,
+            buyTheArchitectsWillBtnText: (cost) => `Chuyển đổi ${cost} Khởi Đầu Mới thành 1 Ý Chí Kiến Trúc Sư`,
             theOmniverseTitle: "Toàn Vũ Trụ",
             currentTheOmniverseLabel: "Toàn Vũ Trụ Hiện Tại",
             theOmniversePerSecondLabel: "Toàn Vũ Trụ mỗi giây",
@@ -852,10 +856,13 @@ const game = (() => {
             quizCorrect: (reward) => `Chính xác! Bạn đã nhận được ${reward} Gỗ.`,
             quizIncorrect: (answer) => `Không đúng. Đáp án là "${answer}".`,
             quizNoMoreQuestions: "Không còn câu hỏi nào!",
-            starClickedNotification: "Bạn đã nhấp vào ngôi sao! Bạn được cộng thêm chút tài nguyên",
+            starClickedNotification: (resourceName) => `Bạn đã nhấp vào ngôi sao! Bạn được cộng thêm chút ${resourceName} mỗi giây`,
             ttsEnabled: "Chuyển văn bản thành giọng nói đã bật.",
             ttsDisabled: "Chuyển văn bản thành giọng nói đã tắt.",
-            discordInviteText: "Tham gia máy chủ Discord của chúng tôi"
+            discordInviteText: "Tham gia máy chủ Discord của chúng tôi",
+            timeToNextResourceLabel: "Thời gian đến tài nguyên tiếp theo",
+            timeToNextResourceValue: (time) => `Tài nguyên tiếp theo trong: ${time}`,
+            timeToNextResourceNone: "Đã thu thập tất cả tài nguyên!"
         }
     };
 
@@ -991,7 +998,7 @@ const game = (() => {
     const generateLoreBtnTextAlloy = document.getElementById('generateLoreBtnTextAlloy');
 
     const circuitryTitle = document.getElementById('circuitryTitle');
-    const currentCircuitryLabel = document.getElementById('currentCircuitryLabel');
+    const currentCircuitryLabel = document = document.getElementById('currentCircuitryLabel');
     const circuitryPerSecondLabel = document.getElementById('circuitryPerSecondLabel');
     const circuitryCountSpan = document.getElementById('circuitryCount');
     const circuitryPerSecondSpan = document.getElementById('circuitryPerSecond');
@@ -1254,7 +1261,7 @@ const game = (() => {
     const cosmicAwakeningPerSecondLabel = document.getElementById('cosmicAwakeningPerSecondLabel');
     const cosmicAwakeningCountSpan = document.getElementById('cosmicAwakeningCount');
     const cosmicAwakeningPerSecondSpan = document.getElementById('cosmicAwakeningPerSecond');
-    const buyCosmicAwakeningButton = document.getElementById('buyCosmicAwakening');
+    const buyCosmicAwakeningButton = document = document.getElementById('buyCosmicAwakening');
     const buyCosmicAwakeningBtnText = document.getElementById('buyCosmicAwakeningBtnText');
     const cosmicAwakeningCost = document.getElementById('cosmicAwakeningCost');
     const generateLoreBtnTextCosmicAwakening = document.getElementById('generateLoreBtnTextCosmicAwakening');
@@ -1434,6 +1441,10 @@ const game = (() => {
     const buyTranscendentEssenceBtnText = document.getElementById('buyTranscendentEssenceBtnText');
     const transcendentEssenceCost = document.getElementById('transcendentEssenceCost');
     const generateLoreBtnTextTranscendentEssence = document.getElementById('generateLoreBtnTextTranscendentEssence');
+
+    // Time to next resource DOM elements
+    const timeToNextResourceLabel = document.getElementById('timeToNextResourceLabel');
+    const timeToNextResourceSpan = document.getElementById('timeToNextResource');
 
 
     // --- Game Logic Functions ---
@@ -1777,6 +1788,9 @@ const game = (() => {
         buyTranscendentEssenceBtnText.textContent = translations[lang].buyTranscendentEssenceBtnText(resources.transcendentEssence.conversionCost);
         generateLoreBtnTextTranscendentEssence.textContent = translations[lang].generateLoreBtnText;
 
+        // Time to next resource translations
+        timeToNextResourceLabel.textContent = translations[lang].timeToNextResourceLabel;
+
 
         discordInviteText.textContent = translations[lang].discordInviteText;
 
@@ -2020,6 +2034,9 @@ const game = (() => {
         // Update TTS status display
         ttsStatusSpan.textContent = resources.textToSpeechEnabled ? 'On' : 'Off';
 
+        // Update time to next resource
+        timeToNextResourceSpan.textContent = calculateTimeToNextResource();
+
         // Update all text content based on current language
         updateTextContent();
     }
@@ -2082,6 +2099,56 @@ const game = (() => {
         }
     }
 
+    // This map defines the prerequisite resource for each craftable resource
+    const resourcePrerequisites = {
+        'stone': 'wood',
+        'iron': 'stone',
+        'alloy': 'iron',
+        'circuitry': 'alloy',
+        'aiCore': 'circuitry',
+        'consciousness': 'aiCore',
+        'realityShard': 'consciousness',
+        'paradox': 'realityShard',
+        'singularity': 'paradox',
+        'multiverse': 'singularity',
+        'omniscience': 'multiverse',
+        'genesis': 'omniscience',
+        'void': 'genesis',
+        'theAll': 'void',
+        'transcendence': 'theAll',
+        'theAbsolute': 'transcendence',
+        'theEnd': 'theAbsolute',
+        'theNewBeginning': 'theEnd',
+        'theArchitectsWill': 'theNewBeginning',
+        'theOmniverse': 'theArchitectsWill',
+        'theBoundlessVoid': 'theOmniverse',
+        'cosmicFabric': 'theBoundlessVoid',
+        'infiniteNexus': 'cosmicFabric',
+        'eternalEcho': 'infiniteNexus',
+        'zenithOfCreation': 'eternalEcho',
+        'universalSingularity': 'zenithOfCreation',
+        'existentialFabric': 'universalSingularity',
+        'temporalFlux': 'existentialFabric',
+        'multidimensionalHarmony': 'temporalFlux',
+        'cosmicAwakening': 'multidimensionalHarmony',
+        'divineSpark': 'cosmicAwakening',
+        'cosmicDust': 'divineSpark',
+        'stellarNucleus': 'cosmicDust',
+        'galacticCore': 'stellarNucleus',
+        'quantumEntanglement': 'galacticCore',
+        'dimensionalRift': 'quantumEntanglement',
+        'realityAnchor': 'dimensionalRift',
+        'omniEnergy': 'realityAnchor',
+        'primeMover': 'omniEnergy',
+        'trueCreator': 'primeMover',
+        'cosmicSingularity': 'trueCreator',
+        'existentialTruth': 'cosmicSingularity',
+        'theUltimateForm': 'existentialTruth',
+        'cosmicNexus': 'theUltimateForm',
+        'quantumSingularity': 'cosmicNexus',
+        'transcendentEssence': 'quantumSingularity'
+    };
+
     function buyResource(resourceToBuy, previousResource) {
         const cost = resources[resourceToBuy].conversionCost;
         if (resources[previousResource].count >= cost) {
@@ -2133,16 +2200,25 @@ const game = (() => {
                 const parsedData = JSON.parse(savedData);
                 const loadedResources = parsedData.resources;
 
+                // Iterate over the keys in the *initial* resources object to ensure all expected properties are present
+                // and then merge the loaded data. This handles new properties added in updates.
                 for (const key in resources) {
                     if (loadedResources[key] !== undefined) {
                         if (typeof resources[key] === 'object' && resources[key] !== null &&
                             typeof loadedResources[key] === 'object' && loadedResources[key] !== null) {
+                            // Deep merge for nested objects like 'wood' properties
                             Object.assign(resources[key], loadedResources[key]);
                         } else {
+                            // Direct assignment for primitive types or if it's not an object
                             resources[key] = loadedResources[key];
                         }
                     }
                 }
+                // Specifically handle apiKey if it was not in initial resources object
+                if (loadedResources.apiKey !== undefined) {
+                    resources.apiKey = loadedResources.apiKey;
+                }
+
                 updateDisplay();
                 const message = translations[resources.language].gameLoadSuccess;
                 alert(message);
@@ -2201,7 +2277,7 @@ const game = (() => {
             { question: "What comes after Zenith of Creation?", answer: "universal singularity", reward: 300000 },
             { question: "What is the resource after Universal Singularity?", answer: "existential fabric", reward: 350000 },
             { question: "What is the resource after Temporal Flux?", answer: "multidimensional harmony", reward: 400000 },
-            { question: "What is the ultimate resource of all?", answer: "Transcendent Essence", reward: 500000 }
+            { question: "What is the ultimate resource of all?", answer: "The Ultimate Form", reward: 500000 }
         ],
         vi: [
             { question: "Tài nguyên đầu tiên bạn thu thập là gì?", answer: "gỗ", reward: 500 },
@@ -2224,7 +2300,7 @@ const game = (() => {
             { question: "Điều gì đến sau Đỉnh Cao Sáng Tạo?", answer: "điểm kỳ dị vũ trụ", reward: 300000 },
             { question: "Tài nguyên sau Điểm Kỳ Dị Vũ Trụ là gì?", answer: "vải tồn tại", reward: 350000 },
             { question: "Tài nguyên sau Dòng Thời Gian là gì?", answer: "hòa hợp đa chiều", reward: 400000 },
-            { question: "Tài nguyên tối thượng của tất cả là gì?", answer: "tinh hoa siêu việt", reward: 500000 }
+            { question: "Tài nguyên tối thượng của tất cả là gì?", answer: "Hình Thức Tối Thượng", reward: 500000 }
         ]
     };
 
@@ -2533,6 +2609,77 @@ const game = (() => {
         return null; // Return null if no resource is owned
     }
 
+    /**
+     * Calculates the time remaining to acquire the next unowned resource.
+     * @returns {string} A formatted string indicating the time, or a message if all resources are owned/production is zero.
+     */
+    function calculateTimeToNextResource() {
+        const lang = resources.language;
+        for (let i = 0; i < resourceOrder.length; i++) {
+            const currentResourceKey = resourceOrder[i];
+            const currentResource = resources[currentResourceKey];
+
+            // Skip if this is wood, or if the player already has at least one of this resource
+            if (currentResourceKey === 'wood' || currentResource.count >= 1) {
+                continue;
+            }
+
+            const prerequisiteResourceKey = resourcePrerequisites[currentResourceKey];
+            if (!prerequisiteResourceKey) {
+                // This should not happen if resourcePrerequisites is correctly mapped
+                console.error(`No prerequisite found for ${currentResourceKey}`);
+                continue;
+            }
+
+            const prerequisiteResource = resources[prerequisiteResourceKey];
+            const cost = currentResource.conversionCost;
+
+            if (prerequisiteResource.perSecond <= 0) {
+                // Cannot automate, needs manual clicks or more automation for prerequisite
+                return translations[lang].timeToNextResourceValue(`N/A (${translations[lang][`${prerequisiteResourceKey}Title`]} production is 0)`);
+            }
+
+            const needed = cost - prerequisiteResource.count;
+            if (needed <= 0) {
+                // Player already has enough prerequisite resource to buy this, move to next
+                continue;
+            }
+
+            const secondsRemaining = needed / prerequisiteResource.perSecond;
+
+            const SECONDS_IN_MINUTE = 60;
+            const SECONDS_IN_HOUR = SECONDS_IN_MINUTE * 60;
+            const SECONDS_IN_DAY = SECONDS_IN_HOUR * 24;
+            const SECONDS_IN_MONTH = SECONDS_IN_DAY * 30; // Approximation
+            const SECONDS_IN_YEAR = SECONDS_IN_DAY * 365; // Approximation
+
+            let years = Math.floor(secondsRemaining / SECONDS_IN_YEAR);
+            let remainingSeconds = secondsRemaining % SECONDS_IN_YEAR;
+            let months = Math.floor(remainingSeconds / SECONDS_IN_MONTH);
+            remainingSeconds %= SECONDS_IN_MONTH;
+            let days = Math.floor(remainingSeconds / SECONDS_IN_DAY);
+            remainingSeconds %= SECONDS_IN_DAY;
+            let hours = Math.floor(remainingSeconds / SECONDS_IN_HOUR);
+            remainingSeconds %= SECONDS_IN_HOUR;
+            let minutes = Math.floor(remainingSeconds / SECONDS_IN_MINUTE);
+            remainingSeconds %= SECONDS_IN_MINUTE;
+            let seconds = Math.floor(remainingSeconds);
+
+            let timeString = [];
+            if (years > 0) timeString.push(`${years}y`);
+            if (months > 0) timeString.push(`${months}mo`);
+            if (days > 0) timeString.push(`${days}d`);
+            if (hours > 0) timeString.push(`${hours}h`);
+            if (minutes > 0) timeString.push(`${minutes}m`);
+            if (seconds > 0 || timeString.length === 0) timeString.push(`${seconds}s`); // Always show seconds if nothing else, or if it's 0 seconds
+
+            return translations[lang].timeToNextResourceValue(timeString.join(' '));
+        }
+
+        return translations[lang].timeToNextResourceNone; // All resources acquired
+    }
+
+
     // --- Star Clicker Feature Initialization ---
     const clickableStar = document.getElementById('clickableStar');
     let starSpawnIntervalId; // To store the interval ID for spawning stars
@@ -2631,7 +2778,7 @@ const game = (() => {
 
         // Format the resource name for display (e.g., 'divineSpark' -> 'Divine Spark')
         const displayResourceName = translations[resources.language][`${resourceToAwardKey}Title`]; // Get translated resource name
-        notify("success", translations[resources.language].starClickedNotification);
+        notify("success", translations[resources.language].starClickedNotification(displayResourceName));
        // console.log('  Calling hideStarOnClick() from handleStarClick().');
         hideStarOnClick(); // Hide the star immediately on click with shorter timeout
         updateDisplay();
@@ -2733,7 +2880,7 @@ const game = (() => {
             ttsToggleBtn.addEventListener('click', toggleTextToSpeech);
             languageToggleBtn.addEventListener('click', toggleLanguage); // New language toggle listener
 
-            const isGitHubPages = window.location.hostname.includes('localpc.io') || window.location.hostname.includes('localpc.com');
+            const isGitHubPages = window.location.hostname.includes('github.io') || window.location.hostname.includes('github.com');
             if (isGitHubPages) {
                 loreButtons.forEach(button => {
                     button.style.display = 'none';
@@ -2770,7 +2917,10 @@ const game = (() => {
         // Expose specific functions if needed for external interaction, e.g., for testing
         getWoodCount: () => resources.wood.count,
         addWoodExternal: (amount) => { resources.wood.count += amount; updateDisplay(); },
-        setAPIKey: (apiKey) => {resources.apiKey = apiKey;},
+        setAPIKey: (apiKey) => {
+            resources.apiKey = apiKey;
+            saveGame(1); // Save the game state after setting the API key
+        },
         findNewestOwnedResource: findNewestOwnedResource // Expose the new function
     };
 })();
