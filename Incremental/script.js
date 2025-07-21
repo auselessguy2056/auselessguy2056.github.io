@@ -2300,7 +2300,7 @@ const game = (() => {
             { question: "Điều gì đến sau Đỉnh Cao Sáng Tạo?", answer: "điểm kỳ dị vũ trụ", reward: 300000 },
             { question: "Tài nguyên sau Điểm Kỳ Dị Vũ Trụ là gì?", answer: "vải tồn tại", reward: 350000 },
             { question: "Tài nguyên sau Dòng Chảy Thời Gian là gì?", answer: "hòa hợp đa chiều", reward: 400000 },
-            { question: "Tài nguyên tối thượng của tất cả là gì?", answer: "Hình Thức Tối Thượng", reward: 500000 }
+            { question: "Tài nguyên tối thượng của tất cả là gì?", answer: "tinh hoa siêu việt", reward: 500000 }
         ]
     };
 
