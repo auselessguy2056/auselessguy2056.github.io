@@ -2277,7 +2277,7 @@ const game = (() => {
             { question: "What comes after Zenith of Creation?", answer: "universal singularity", reward: 300000 },
             { question: "What is the resource after Universal Singularity?", answer: "existential fabric", reward: 350000 },
             { question: "What is the resource after Temporal Flux?", answer: "multidimensional harmony", reward: 400000 },
-            { question: "What is the ultimate resource of all?", answer: "The Ultimate Form", reward: 500000 }
+            { question: "What is the ultimate resource of all?", answer: "Transcendent Essence", reward: 500000 }
         ],
         vi: [
             { question: "Tài nguyên đầu tiên bạn thu thập là gì?", answer: "gỗ", reward: 500 },
