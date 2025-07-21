@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Incremental Resource Game</title>
+    <meta http-equiv='cache-control' content='no-cache'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            padding-top: 80px; /* Default padding for fixed header */
+        }
+
+        h1, h2, h3 {
+            color: #00bcd4;
+            text-shadow: 0 0 5px rgba(0, 188, 212, 0.7);
+        }
+
+        .container {
+            background-color: #2a2a4a;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(0, 188, 212, 0.3);
+            width: 100%;
+            max-width: 900px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section {
+            background-color: #3a3a5a;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: inset 0 0 10px rgba(0, 188, 212, 0.2);
+        }
+
+        .section h3 {
+            margin-top: 0;
+            color: #8bc34a;
+            text-shadow: 0 0 3px rgba(139, 195, 74, 0.5);
+        }
+
+        .resource-display, .stat-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #4a4a6a;
+        }
+
+        .resource-display:last-child, .stat-display:last-child {
+            border-bottom: none;
+        }
+
+        .resource-count, .stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ffeb3b;
+        }
+
+        .resource-per-second {
+            font-size: 0.9em;
+            color: #aed581;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            flex-grow: 1; /* Allow buttons to grow */
+            min-width: 120px; /* Minimum width for buttons */
+        }
+
+        button:hover {
+            background-color: #66bb6a;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            background-color: #388e3c;
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .cost {
+            color: #ff9800;
+            font-weight: bold;
+        }
+
+        .quiz-section {
+            background-color: #3a3a5a;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: inset 0 0 10px rgba(0, 188, 212, 0.2);
+            margin-top: 20px;
+        }
+
+        .quiz-section input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #00bcd4;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+        }
+
+        .quiz-section button {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        #criticalHitFeedback {
+            background-color: #f44336;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            box-shadow: 0 0 15px rgba(244, 67, 54, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #criticalHitFeedback button {
+            background-color: #d32f2f;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            border-radius: 5px;
+            box-shadow: none;
+        }
+
+        #notification-area {
+            position: fixed;
+            bottom: 0px;
+            right: 10px;
+            width: 250px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            pointer-events: none; /* Allow clicks to pass through */
+        }
+
+        #notification-area .notification {
+            position: relative;
+            padding: 15px 10px;
+            background: #111;
+            color: #f5f5f5;
+            font-family: "Raleway";
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 5px;
+            margin: 5px 0px;
+            opacity: 0;
+            left: 20px;
+            animation: showNotification 500ms ease-in-out forwards;
+            pointer-events: auto; /* Re-enable pointer events for the notification itself */
+        }
+
+        @keyframes showNotification {
+            from {
+                opacity: 0;
+                left: 20px;
+            }
+            to {
+                opacity: 1;
+                left: 0px;
+            }
+        }
+
+        .notification.success {
+            background-color: #4CAF50;
+        }
+
+        .notification.error {
+            background-color: #f44336;
+        }
+
+        .notification.info {
+            background-color: #2196F3;
+        }
+
+        .lore-display {
+            background-color: #1f1f3a;
+            border: 1px solid #00bcd4;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-style: italic;
+            color: #b3e5fc;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .discord-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #7289DA;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .discord-link:hover {
+            color: #99aab5;
+        }
+
+        /* Fixed Header Containers */
+        #fixedHeaderContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #2a2a4a; /* Match container background */
+            box-shadow: 0 2px 10px rgba(0, 188, 212, 0.5);
+            z-index: 100; /* Ensure it's above other scrolling content */
+            display: flex;
+            justify-content: space-between; /* Distribute items */
+            align-items: center;
+            box-sizing: border-box;
+            height: 60px; /* Adjust height as needed */
+            padding: 0 20px; /* Padding for the container */
+        }
+
+        #fixedHeaderContainer .fixed-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Space between label and value */
+        }
+
+        #fixedHeaderContainer .stat-display {
+            border-bottom: none; /* Remove border from the fixed element */
+            padding: 0;
+            width: auto; /* Allow content to dictate width */
+        }
+
+        /* Star Clicker Feature Styles */
+        #clickableStar {
+            position: fixed; /* Changed from absolute to fixed */
+            font-size: 2.5em; /* Adjusted size for the emoji */
+            width: 2.5em; /* Explicit width */
+            height: 2.5em; /* Explicit height */
+            display: flex; /* Use flex to center the emoji */
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 9999; /* Very high z-index to be on top */
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out; /* Smooth fade in/out */
+            text-shadow: 0 0 10px rgba(255, 255, 0, 0.8); /* Glow effect */
+            background-color: rgba(255, 255, 0, 0.2); /* Semi-transparent yellow background for visibility */
+            border: 2px solid gold; /* Gold border for visibility */
+            border-radius: 50%; /* Make it round */
+            padding: 5px; /* Reduced padding */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+        }
+
+        /* Combat Section Specific Styles */
+        .combat-log {
+            background-color: #1f1f3a;
+            border: 1px solid #00bcd4;
+            border-radius: 8px;
+            padding: 10px;
+            height: 150px;
+            overflow-y: auto;
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #b3e5fc;
+        }
+
+        .health-bar-container {
+            width: 100%;
+            background-color: #555;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .health-bar {
+            height: 20px;
+            background-color: #4CAF50; /* Green */
+            width: 100%;
+            text-align: center;
+            color: white;
+            line-height: 20px;
+            transition: width 0.3s ease-in-out;
+        }
+
+        .health-bar.player { background-color: #4CAF50; }
+        .health-bar.enemy { background-color: #f44336; }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 110px; /* Adjust padding for two fixed rows on smaller screens */
+            }
+            .container {
+                padding: 15px;
+                margin: 10px;
+            }
+
+            .section {
+                padding: 15px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+                min-width: unset;
+            }
+
+            #notification-area {
+                width: 90%;
+                right: 5%;
+                left: 5%;
+            }
+
+            #fixedHeaderContainer {
+                flex-direction: column; /* Stack items vertically */
+                height: 100px; /* Adjust height for stacked items */
+                padding: 10px;
+            }
+            #fixedHeaderContainer .fixed-stat-item {
+                width: 100%; /* Take full width when stacked */
+                justify-content: space-between; /* Keep label and value separate */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed Header Container for multiple floating elements -->
+    <div id="fixedHeaderContainer">
+        <div class="fixed-stat-item">
+            <span id="timeToNextResourceLabel">Time to next resource:</span>
+            <span id="timeToNextResource">Calculating...</span>
+        </div>
+        <div class="fixed-stat-item">
+            <span id="fixedSkillPointsLabel">Skill Points:</span>
+            <span id="fixedSkillPointsCount">0</span>
+        </div>
+    </div>
+
+    <h1 id="gameTitle">Ultimate Incremental Resource Game</h1>
+
+    <div class="container">
+        <div class="section">
+            <h2 id="gameStatsTitle">Game Stats</h2>
+            <div class="stat-display">
+                <span id="timePlayedLabel">Time Played:</span>
+                <span id="timePlayed">00:00:00</span>
+            </div>
+            <div class="button-group">
+                <button id="saveGameBtn">Save Game</button>
+                <button id="loadGameBtn">Load Game</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 id="languageSectionTitle">Language</h2>
+            <div class="stat-display">
+                <span id="currentLanguageLabel">Current Language:</span>
+                <span id="currentLanguageDisplay">English</span>
+            </div>
+            <div class="button-group">
+                <button id="languageToggleBtn">Toggle Language</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 id="ttsTitle">Text-to-Speech</h2>
+            <div class="stat-display">
+                <span id="ttsStatusLabel">Status:</span>
+                <span id="ttsStatus">Off</span>
+            </div>
+            <div class="button-group">
+                <button id="ttsToggleBtn">Toggle Text-to-Speech</button>
+            </div>
+        </div>
+
+        <div class="section quiz-section">
+            <h2 id="quizTitle">Quiz Time!</h2>
+            <p id="quizQuestion">Loading question...</p>
+            <input type="text" id="quizAnswerInput" placeholder="Type your answer here">
+            <button id="submitQuizAnswer">Submit Answer</button>
+            <p id="quizFeedback"></p>
+        </div>
+
+        <div class="section">
+            <h2 id="stage1Title">Stage 1</h2>
+            <p id="stage1Description">Collect Basic Resources</p>
+
+            <div class="resource-section">
+                <h3 id="woodTitle">Wood</h3>
+                <div class="resource-display">
+                    <span id="currentWoodLabel">Current Wood:</span>
+                    <span class="resource-count" id="woodCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="woodPerSecondLabel">Wood per second:</span>
+                    <span class="resource-per-second" id="woodPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="addWood"><span id="chopWoodBtnText">Chop Wood</span> (<span id="chopPowerDisplay">+1</span>)</button>
+                    <button id="upgradeChopPower"><span id="upgradeChopPowerBtnText">Upgrade Chop Power</span> (<span id="chopUpgradeCostLabel">Cost:</span> <span class="cost" id="chopUpgradeCost">10</span> <span id="woodCostUnit">Wood</span>)</button>
+                    <button id="buyWoodPerSecond"><span id="automateWoodBtnText">Automate Wood</span> (<span id="woodAutoUnit">5 Wood/sec</span> - <span id="woodAutomationCostLabel">Cost:</span> <span class="cost" id="woodPerSecondCost">10000</span> <span id="woodAutoCostUnit">Wood</span>)</button>
+                    <button class="generate-lore-btn" data-resource="Gỗ"><span id="generateLoreBtnTextWood">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="woodLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="stoneTitle">Stone</h3>
+                <div class="resource-display">
+                    <span id="currentStoneLabel">Current Stone:</span>
+                    <span class="resource-count" id="stoneCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="stonePerSecondLabel">Stone per second:</span>
+                    <span class="resource-per-second" id="stonePerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyStone"><span id="buyStoneBtnText">Convert 1000 Wood to 1 Stone</span></button>
+                    <button class="generate-lore-btn" data-resource="Đá"><span id="generateLoreBtnTextStone">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="stoneLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="ironTitle">Iron</h3>
+                <div class="resource-display">
+                    <span id="currentIronLabel">Current Iron:</span>
+                    <span class="resource-count" id="ironCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="ironPerSecondLabel">Iron per second:</span>
+                    <span class="resource-per-second" id="ironPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyIron"><span id="buyIronBtnText">Convert 1000 Stone to 1 Iron</span></button>
+                    <button class="generate-lore-btn" data-resource="Sắt"><span id="generateLoreBtnTextIron">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="ironLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="alloyTitle">Alloy</h3>
+                <div class="resource-display">
+                    <span id="currentAlloyLabel">Current Alloy:</span>
+                    <span class="resource-count" id="alloyCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="alloyPerSecondLabel">Alloy per second:</span>
+                    <span class="resource-per-second" id="alloyPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyAlloy"><span id="buyAlloyBtnText">Convert 1000 Iron to 1 Alloy</span></button>
+                    <button class="generate-lore-btn" data-resource="Hợp Kim"><span id="generateLoreBtnTextAlloy">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="alloyLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="circuitryTitle">Circuitry</h3>
+                <div class="resource-display">
+                    <span id="currentCircuitryLabel">Current Circuitry:</span>
+                    <span class="resource-count" id="circuitryCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="circuitryPerSecondLabel">Circuitry per second:</span>
+                    <span class="resource-per-second" id="circuitryPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyCircuitry"><span id="buyCircuitryBtnText">Convert 1000 Alloy to 1 Circuitry</span></button>
+                    <button class="generate-lore-btn" data-resource="Mạch Điện"><span id="generateLoreBtnTextCircuitry">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="circuitryLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="aiCoreTitle">AI Core</h3>
+                <div class="resource-display">
+                    <span id="currentAICoreLabel">Current AI Core:</span>
+                    <span class="resource-count" id="aiCoreCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="aiCorePerSecondLabel">AI Core per second:</span>
+                    <span class="resource-per-second" id="aiCorePerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyAICore"><span id="buyAICoreBtnText">Convert 1000 Circuitry to 1 AI Core</span></button>
+                    <button class="generate-lore-btn" data-resource="Lõi AI"><span id="generateLoreBtnTextAICore">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="aiCoreLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="consciousnessTitle">Consciousness</h3>
+                <div class="resource-display">
+                    <span id="currentConsciousnessLabel">Current Consciousness:</span>
+                    <span class="resource-count" id="consciousnessCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="consciousnessPerSecondLabel">Consciousness per second:</span>
+                    <span class="resource-per-second" id="consciousnessPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyConsciousness"><span id="buyConsciousnessBtnText">Convert 1000 AI Core to 1 Consciousness</span></button>
+                    <button class="generate-lore-btn" data-resource="Ý Thức"><span id="generateLoreBtnTextConsciousness">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="consciousnessLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="realityShardTitle">Reality Shard</h3>
+                <div class="resource-display">
+                    <span id="currentRealityShardLabel">Current Reality Shard:</span>
+                    <span class="resource-count" id="realityShardCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="realityShardPerSecondLabel">Reality Shard per second:</span>
+                    <span class="resource-per-second" id="realityShardPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyRealityShard"><span id="buyRealityShardBtnText">Convert 1000 Consciousness to 1 Reality Shard</span></button>
+                    <button class="generate-lore-btn" data-resource="Mảnh Vỡ Thực Tại"><span id="generateLoreBtnTextRealityShard">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="realityShardLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="paradoxTitle">Paradox</h3>
+                <div class="resource-display">
+                    <span id="currentParadoxLabel">Current Paradox:</span>
+                    <span class="resource-count" id="paradoxCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="paradoxPerSecondLabel">Paradox per second:</span>
+                    <span class="resource-per-second" id="paradoxPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyParadox"><span id="buyParadoxBtnText">Convert 1000 Reality Shard to 1 Paradox</span></button>
+                    <button class="generate-lore-btn" data-resource="Nghịch Lý"><span id="generateLoreBtnTextParadox">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="paradoxLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="singularityTitle">Singularity</h3>
+                <div class="resource-display">
+                    <span id="currentSingularityLabel">Current Singularity:</span>
+                    <span class="resource-count" id="singularityCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="singularityPerSecondLabel">Singularity per second:</span>
+                    <span class="resource-per-second" id="singularityPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buySingularity"><span id="buySingularityBtnText">Convert 1000 Paradox to 1 Singularity</span></button>
+                    <button class="generate-lore-btn" data-resource="Điểm Kỳ Dị"><span id="generateLoreBtnTextSingularity">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="singularityLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="multiverseTitle">Multiverse</h3>
+                <div class="resource-display">
+                    <span id="currentMultiverseLabel">Current Multiverse:</span>
+                    <span class="resource-count" id="multiverseCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="multiversePerSecondLabel">Multiverse per second:</span>
+                    <span class="resource-per-second" id="multiversePerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyMultiverse"><span id="buyMultiverseBtnText">Convert 1000 Singularity to 1 Multiverse</span></button>
+                    <button class="generate-lore-btn" data-resource="Đa Vũ Trụ"><span id="generateLoreBtnTextMultiverse">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="multiverseLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="omniscienceTitle">Omniscience</h3>
+                <div class="resource-display">
+                    <span id="currentOmniscienceLabel">Current Omniscience:</span>
+                    <span class="resource-count" id="omniscienceCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="omnisciencePerSecondLabel">Omniscience per second:</span>
+                    <span class="resource-per-second" id="omnisciencePerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyOmniscience"><span id="buyOmniscienceBtnText">Convert 1000 Multiverse to 1 Omniscience</span></button>
+                    <button class="generate-lore-btn" data-resource="Toàn Tri"><span id="generateLoreBtnTextOmniscience">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="omniscienceLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="genesisTitle">Genesis</h3>
+                <div class="resource-display">
+                    <span id="currentGenesisLabel">Current Genesis:</span>
+                    <span class="resource-count" id="genesisCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="genesisPerSecondLabel">Genesis per second:</span>
+                    <span class="resource-per-second" id="genesisPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyGenesis"><span id="buyGenesisBtnText">Convert 1000 Omniscience to 1 Genesis</span></button>
+                    <button class="generate-lore-btn" data-resource="Sáng Thế"><span id="generateLoreBtnTextGenesis">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="genesisLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="voidTitle">Void</h3>
+                <div class="resource-display">
+                    <span id="currentVoidLabel">Current Void:</span>
+                    <span class="resource-count" id="voidCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="voidPerSecondLabel">Void per second:</span>
+                    <span class="resource-per-second" id="voidPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyVoid"><span id="buyVoidBtnText">Convert 1000 Genesis to 1 Void</span></button>
+                    <button class="generate-lore-btn" data-resource="Hư Không"><span id="generateLoreBtnTextVoid">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="voidLore"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 id="stage2Title">Stage 2: Reality Transformation</h2>
+            <p id="stage2Description">You are shaping the universe! The cost of high-level resources has increased significantly.</p>
+
+            <div class="resource-section">
+                <h3 id="theAllTitle">The All</h3>
+                <div class="resource-display">
+                    <span id="currentTheAllLabel">Current The All:</span>
+                    <span class="resource-count" id="theAllCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="theAllPerSecondLabel">The All per second:</span>
+                    <span class="resource-per-second" id="theAllPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyTheAll"><span id="buyTheAllBtnText">Convert <span class="cost" id="theAllCost">10000</span> Void to 1 The All</span></button>
+                    <button class="generate-lore-btn" data-resource="Vạn Vật Toàn Thể"><span id="generateLoreBtnTextTheAll">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="theAllLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="transcendenceTitle">Transcendence</h3>
+                <div class="resource-display">
+                    <span id="currentTranscendenceLabel">Current Transcendence:</span>
+                    <span class="resource-count" id="transcendenceCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="transcendencePerSecondLabel">Transcendence per second:</span>
+                    <span class="resource-per-second" id="transcendencePerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyTranscendence"><span id="buyTranscendenceBtnText">Convert <span class="cost" id="transcendenceCost">10000</span> The All to 1 Transcendence</span></button>
+                    <button class="generate-lore-btn" data-resource="Siêu Việt"><span id="generateLoreBtnTextTranscendence">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="transcendenceLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="theAbsoluteTitle">The Absolute</h3>
+                <div class="resource-display">
+                    <span id="currentTheAbsoluteLabel">Current The Absolute:</span>
+                    <span class="resource-count" id="theAbsoluteCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="theAbsolutePerSecondLabel">The Absolute per second:</span>
+                    <span class="resource-per-second" id="theAbsolutePerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyTheAbsolute"><span id="buyTheAbsoluteBtnText">Convert <span class="cost" id="theAbsoluteCost">10000</span> Transcendence to 1 The Absolute</span></button>
+                    <button class="generate-lore-btn" data-resource="Tuyệt Đối"><span id="generateLoreBtnTextTheAbsolute">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="theAbsoluteLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="theEndTitle">The End</h3>
+                <div class="resource-display">
+                    <span id="currentTheEndLabel">Current The End:</span>
+                    <span class="resource-count" id="theEndCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="theEndPerSecondLabel">The End per second:</span>
+                    <span class="resource-per-second" id="theEndPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyTheEnd"><span id="buyTheEndBtnText">Convert <span class="cost" id="theEndCost">10000</span> The Absolute to 1 The End</span></button>
+                    <button class="generate-lore-btn" data-resource="Điểm Kết Thúc"><span id="generateLoreBtnTextTheEnd">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="theEndLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="theNewBeginningTitle">The New Beginning</h3>
+                <div class="resource-display">
+                    <span id="currentTheNewBeginningLabel">Current The New Beginning:</span>
+                    <span class="resource-count" id="theNewBeginningCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="theNewBeginningPerSecondLabel">The New Beginning per second:</span>
+                    <span class="resource-per-second" id="theNewBeginningPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyTheNewBeginning"><span id="buyTheNewBeginningBtnText">Convert <span class="cost" id="theNewBeginningCost">10000</span> The End to 1 The New Beginning</span></button>
+                    <button class="generate-lore-btn" data-resource="Khởi Nguyên Mới"><span id="generateLoreBtnTextTheNewBeginning">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="theNewBeginningLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="theArchitectsWillTitle">The Architect's Will</h3>
+                <div class="resource-display">
+                    <span id="currentTheArchitectsWillLabel">Current The Architect's Will:</span>
+                    <span class="resource-count" id="theArchitectsWillCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="theArchitectsWillPerSecondLabel">The Architect's Will per second:</span>
+                    <span class="resource-per-second" id="theArchitectsWillPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyTheArchitectsWill"><span id="buyTheArchitectsWillBtnText">Convert <span class="cost" id="theArchitectsWillCost">10000</span> The New Beginning to 1 The Architect's Will</span></button>
+                    <button class="generate-lore-btn" data-resource="Ý Chí Kiến Trúc Sư"><span id="generateLoreBtnTextTheArchitectsWill">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="theArchitectsWillLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="theOmniverseTitle">The Omniverse</h3>
+                <div class="resource-display">
+                    <span id="currentTheOmniverseLabel">Current The Omniverse:</span>
+                    <span class="resource-count" id="theOmniverseCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="theOmniversePerSecondLabel">The Omniverse per second:</span>
+                    <span class="resource-per-second" id="theOmniversePerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyTheOmniverse"><span id="buyTheOmniverseBtnText">Convert <span class="cost" id="theOmniverseCost">10000</span> The Architect's Will to 1 The Omniverse</span></button>
+                    <button class="generate-lore-btn" data-resource="The Omniverse"><span id="generateLoreBtnTextTheOmniverse">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="theOmniverseLore"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 id="stage3Title">Stage 3: Universal Unification</h2>
+            <p id="stage3Description">The final frontier of creation. Your will becomes reality!</p>
+
+            <div class="resource-section">
+                <h3 id="theBoundlessVoidTitle">The Boundless Void</h3>
+                <div class="resource-display">
+                    <span id="currentTheBoundlessVoidLabel">Current The Boundless Void:</span>
+                    <span class="resource-count" id="theBoundlessVoidCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="theBoundlessVoidPerSecondLabel">The Boundless Void per second:</span>
+                    <span class="resource-per-second" id="theBoundlessVoidPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyTheBoundlessVoid"><span id="buyTheBoundlessVoidBtnText">Convert <span class="cost" id="theBoundlessVoidCost">100000</span> The Omniverse to 1 The Boundless Void</span></button>
+                    <button class="generate-lore-btn" data-resource="The Boundless Void"><span id="generateLoreBtnTextTheBoundlessVoid">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="theBoundlessVoidLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="cosmicFabricTitle">Cosmic Fabric</h3>
+                <div class="resource-display">
+                    <span id="currentCosmicFabricLabel">Current Cosmic Fabric:</span>
+                    <span class="resource-count" id="cosmicFabricCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="cosmicFabricPerSecondLabel">Cosmic Fabric per second:</span>
+                    <span class="resource-per-second" id="cosmicFabricPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyCosmicFabric"><span id="buyCosmicFabricBtnText">Convert <span class="cost" id="cosmicFabricCost">100000</span> The Boundless Void to 1 Cosmic Fabric</span></button>
+                    <button class="generate-lore-btn" data-resource="Cosmic Fabric"><span id="generateLoreBtnTextCosmicFabric">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="cosmicFabricLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="infiniteNexusTitle">Infinite Nexus</h3>
+                <div class="resource-display">
+                    <span id="currentInfiniteNexusLabel">Current Infinite Nexus:</span>
+                    <span class="resource-count" id="infiniteNexusCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="infiniteNexusPerSecondLabel">Infinite Nexus per second:</span>
+                    <span class="resource-per-second" id="infiniteNexusPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyInfiniteNexus"><span id="buyInfiniteNexusBtnText">Convert <span class="cost" id="infiniteNexusCost">100000</span> Cosmic Fabric to 1 Infinite Nexus</span></button>
+                    <button class="generate-lore-btn" data-resource="Infinite Nexus"><span id="generateLoreBtnTextInfiniteNexus">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="infiniteNexusLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="eternalEchoTitle">Eternal Echo</h3>
+                <div class="resource-display">
+                    <span id="currentEternalEchoLabel">Current Eternal Echo:</span>
+                    <span class="resource-count" id="eternalEchoCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="eternalEchoPerSecondLabel">Eternal Echo per second:</span>
+                    <span class="resource-per-second" id="eternalEchoPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyEternalEcho"><span id="buyEternalEchoBtnText">Convert <span class="cost" id="eternalEchoCost">100000</span> Infinite Nexus to 1 Eternal Echo</span></button>
+                    <button class="generate-lore-btn" data-resource="Eternal Echo"><span id="generateLoreBtnTextEternalEcho">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="eternalEchoLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="zenithOfCreationTitle">Zenith of Creation</h3>
+                <div class="resource-display">
+                    <span id="currentZenithOfCreationLabel">Current Zenith of Creation:</span>
+                    <span class="resource-count" id="zenithOfCreationCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="zenithOfCreationPerSecondLabel">Zenith of Creation per second:</span>
+                    <span class="resource-per-second" id="zenithOfCreationPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyZenithOfCreation"><span id="buyZenithOfCreationBtnText">Convert <span class="cost" id="zenithOfCreationCost">100000</span> Eternal Echo to 1 Zenith of Creation</span></button>
+                    <button class="generate-lore-btn" data-resource="Zenith of Creation"><span id="generateLoreBtnTextZenithOfCreation">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="zenithOfCreationLore"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 id="stage4Title">Stage 4: Cosmic Awakening</h2>
+            <p id="stage4Description">Unraveling the ultimate secrets of existence!</p>
+
+            <div class="resource-section">
+                <h3 id="universalSingularityTitle">Universal Singularity</h3>
+                <div class="resource-display">
+                    <span id="currentUniversalSingularityLabel">Current Universal Singularity:</span>
+                    <span class="resource-count" id="universalSingularityCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="universalSingularityPerSecondLabel">Universal Singularity per second:</span>
+                    <span class="resource-per-second" id="universalSingularityPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyUniversalSingularity"><span id="buyUniversalSingularityBtnText">Convert <span class="cost" id="universalSingularityCost">1000000</span> Zenith of Creation to 1 Universal Singularity</span></button>
+                    <button class="generate-lore-btn" data-resource="Universal Singularity"><span id="generateLoreBtnTextUniversalSingularity">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="universalSingularityLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="existentialFabricTitle">Existential Fabric</h3>
+                <div class="resource-display">
+                    <span id="currentExistentialFabricLabel">Current Existential Fabric:</span>
+                    <span class="resource-count" id="existentialFabricCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="existentialFabricPerSecondLabel">Existential Fabric per second:</span>
+                    <span class="resource-per-second" id="existentialFabricPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyExistentialFabric"><span id="buyExistentialFabricBtnText">Convert <span class="cost" id="existentialFabricCost">1000000</span> Universal Singularity to 1 Existential Fabric</span></button>
+                    <button class="generate-lore-btn" data-resource="Existential Fabric"><span id="generateLoreBtnTextExistentialFabric">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="existentialFabricLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="temporalFluxTitle">Temporal Flux</h3>
+                <div class="resource-display">
+                    <span id="currentTemporalFluxLabel">Current Temporal Flux:</span>
+                    <span class="resource-count" id="temporalFluxCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="temporalFluxPerSecondLabel">Temporal Flux per second:</span>
+                    <span class="resource-per-second" id="temporalFluxPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyTemporalFlux"><span id="buyTemporalFluxBtnText">Convert <span class="cost" id="temporalFluxCost">1000000</span> Existential Fabric to 1 Temporal Flux</span></button>
+                    <button class="generate-lore-btn" data-resource="Temporal Flux"><span id="generateLoreBtnTextTemporalFlux">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="temporalFluxLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="multidimensionalHarmonyTitle">Multidimensional Harmony</h3>
+                <div class="resource-display">
+                    <span id="currentMultidimensionalHarmonyLabel">Current Multidimensional Harmony:</span>
+                    <span class="resource-count" id="multidimensionalHarmonyCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="multidimensionalHarmonyPerSecondLabel">Multidimensional Harmony per second:</span>
+                    <span class="resource-per-second" id="multidimensionalHarmonyPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyMultidimensionalHarmony"><span id="buyMultidimensionalHarmonyBtnText">Convert <span class="cost" id="multidimensionalHarmonyCost">1000000</span> Temporal Flux to 1 Multidimensional Harmony</span></button>
+                    <button class="generate-lore-btn" data-resource="Multidimensional Harmony"><span id="generateLoreBtnTextMultidimensionalHarmony">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="multidimensionalHarmonyLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="cosmicAwakeningTitle">Cosmic Awakening</h3>
+                <div class="resource-display">
+                    <span id="currentCosmicAwakeningLabel">Current Cosmic Awakening:</span>
+                    <span class="resource-count" id="cosmicAwakeningCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="cosmicAwakeningPerSecondLabel">Cosmic Awakening per second:</span>
+                    <span class="resource-per-second" id="cosmicAwakeningPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyCosmicAwakening"><span id="buyCosmicAwakeningBtnText">Convert <span class="cost" id="cosmicAwakeningCost">1000000</span> Multidimensional Harmony to 1 Cosmic Awakening</span></button>
+                    <button class="generate-lore-btn" data-resource="Cosmic Awakening"><span id="generateLoreBtnTextCosmicAwakening">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="cosmicAwakeningLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="divineSparkTitle">Divine Spark</h3>
+                <div class="resource-display">
+                    <span id="currentDivineSparkLabel">Current Divine Spark:</span>
+                    <span class="resource-count" id="divineSparkCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="divineSparkPerSecondLabel">Divine Spark per second:</span>
+                    <span class="resource-per-second" id="divineSparkPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyDivineSpark"><span id="buyDivineSparkBtnText">Convert <span class="cost" id="divineSparkCost">1000000</span> Cosmic Awakening to 1 Divine Spark</span></button>
+                    <button class="generate-lore-btn" data-resource="Divine Spark"><span id="generateLoreBtnTextDivineSpark">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="divineSparkLore"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 id="stage5Title">Stage 5: Cosmic Genesis</h2>
+            <p id="stage5Description">You are now weaving the very fabric of the cosmos!</p>
+
+            <div class="resource-section">
+                <h3 id="cosmicDustTitle">Cosmic Dust</h3>
+                <div class="resource-display">
+                    <span id="currentCosmicDustLabel">Current Cosmic Dust:</span>
+                    <span class="resource-count" id="cosmicDustCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="cosmicDustPerSecondLabel">Cosmic Dust per second:</span>
+                    <span class="resource-per-second" id="cosmicDustPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyCosmicDust"><span id="buyCosmicDustBtnText">Convert <span class="cost" id="cosmicDustCost">5000000</span> Divine Spark to 1 Cosmic Dust</span></button>
+                    <button class="generate-lore-btn" data-resource="Cosmic Dust"><span id="generateLoreBtnTextCosmicDust">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="cosmicDustLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="stellarNucleusTitle">Stellar Nucleus</h3>
+                <div class="resource-display">
+                    <span id="currentStellarNucleusLabel">Current Stellar Nucleus:</span>
+                    <span class="resource-count" id="stellarNucleusCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="stellarNucleusPerSecondLabel">Stellar Nucleus per second:</span>
+                    <span class="resource-per-second" id="stellarNucleusPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyStellarNucleus"><span id="buyStellarNucleusBtnText">Convert <span class="cost" id="stellarNucleusCost">5000000</span> Cosmic Dust to 1 Stellar Nucleus</span></button>
+                    <button class="generate-lore-btn" data-resource="Stellar Nucleus"><span id="generateLoreBtnTextStellarNucleus">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="stellarNucleusLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="galacticCoreTitle">Galactic Core</h3>
+                <div class="resource-display">
+                    <span id="currentGalacticCoreLabel">Current Galactic Core:</span>
+                    <span class="resource-count" id="galacticCoreCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="galacticCorePerSecondLabel">Galactic Core per second:</span>
+                    <span class="resource-per-second" id="galacticCorePerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyGalacticCore"><span id="buyGalacticCoreBtnText">Convert <span class="cost" id="galacticCoreCost">5000000</span> Stellar Nucleus to 1 Galactic Core</span></button>
+                    <button class="generate-lore-btn" data-resource="Galactic Core"><span id="generateLoreBtnTextGalacticCore">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="galacticCoreLore"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 id="stage6Title">Stage 6: Interdimensional Weave</h2>
+            <p id="stage6Description">You are manipulating the very fabric of reality across dimensions!</p>
+
+            <div class="resource-section">
+                <h3 id="quantumEntanglementTitle">Quantum Entanglement</h3>
+                <div class="resource-display">
+                    <span id="currentQuantumEntanglementLabel">Current Quantum Entanglement:</span>
+                    <span class="resource-count" id="quantumEntanglementCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="quantumEntanglementPerSecondLabel">Quantum Entanglement per second:</span>
+                    <span class="resource-per-second" id="quantumEntanglementPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyQuantumEntanglement"><span id="buyQuantumEntanglementBtnText">Convert <span class="cost" id="quantumEntanglementCost">10000000</span> Galactic Core to 1 Quantum Entanglement</span></button>
+                    <button class="generate-lore-btn" data-resource="Quantum Entanglement"><span id="generateLoreBtnTextQuantumEntanglement">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="quantumEntanglementLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="dimensionalRiftTitle">Dimensional Rift</h3>
+                <div class="resource-display">
+                    <span id="currentDimensionalRiftLabel">Current Dimensional Rift:</span>
+                    <span class="resource-count" id="dimensionalRiftCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="dimensionalRiftPerSecondLabel">Dimensional Rift per second:</span>
+                    <span class="resource-per-second" id="dimensionalRiftPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyDimensionalRift"><span id="buyDimensionalRiftBtnText">Convert <span class="cost" id="dimensionalRiftCost">10000000</span> Quantum Entanglement to 1 Dimensional Rift</span></button>
+                    <button class="generate-lore-btn" data-resource="Dimensional Rift"><span id="generateLoreBtnTextDimensionalRift">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="dimensionalRiftLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="realityAnchorTitle">Reality Anchor</h3>
+                <div class="resource-display">
+                    <span id="currentRealityAnchorLabel">Current Reality Anchor:</span>
+                    <span class="resource-count" id="realityAnchorCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="realityAnchorPerSecondLabel">Reality Anchor per second:</span>
+                    <span class="resource-per-second" id="realityAnchorPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyRealityAnchor"><span id="buyRealityAnchorBtnText">Convert <span class="cost" id="realityAnchorCost">10000000</span> Dimensional Rift to 1 Reality Anchor</span></button>
+                    <button class="generate-lore-btn" data-resource="Reality Anchor"><span id="generateLoreBtnTextRealityAnchor">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="realityAnchorLore"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 id="stage7Title">Stage 7: Absolute Dominion</h2>
+            <p id="stage7Description">You are becoming the ultimate power, dictating existence itself!</p>
+
+            <div class="resource-section">
+                <h3 id="omniEnergyTitle">Omni-Energy</h3>
+                <div class="resource-display">
+                    <span id="currentOmniEnergyLabel">Current Omni-Energy:</span>
+                    <span class="resource-count" id="omniEnergyCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="omniEnergyPerSecondLabel">Omni-Energy per second:</span>
+                    <span class="resource-per-second" id="omniEnergyPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyOmniEnergy"><span id="buyOmniEnergyBtnText">Convert <span class="cost" id="omniEnergyCost">50000000</span> Reality Anchor to 1 Omni-Energy</span></button>
+                    <button class="generate-lore-btn" data-resource="Omni-Energy"><span id="generateLoreBtnTextOmniEnergy">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="omniEnergyLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="primeMoverTitle">Prime Mover</h3>
+                <div class="resource-display">
+                    <span id="currentPrimeMoverLabel">Current Prime Mover:</span>
+                    <span class="resource-count" id="primeMoverCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="primeMoverPerSecondLabel">Prime Mover per second:</span>
+                    <span class="resource-per-second" id="primeMoverPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyPrimeMover"><span id="buyPrimeMoverBtnText">Convert <span class="cost" id="primeMoverCost">50000000</span> Omni-Energy to 1 Prime Mover</span></button>
+                    <button class="generate-lore-btn" data-resource="Prime Mover"><span id="generateLoreBtnTextPrimeMover">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="primeMoverLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="trueCreatorTitle">True Creator</h3>
+                <div class="resource-display">
+                    <span id="currentTrueCreatorLabel">Current True Creator:</span>
+                    <span class="resource-count" id="trueCreatorCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="trueCreatorPerSecondLabel">True Creator per second:</span>
+                    <span class="resource-per-second" id="trueCreatorPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyTrueCreator"><span id="buyTrueCreatorBtnText">Convert <span class="cost" id="trueCreatorCost">50000000</span> Prime Mover to 1 True Creator</span></button>
+                    <button class="generate-lore-btn" data-resource="True Creator"><span id="generateLoreBtnTextTrueCreator">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="trueCreatorLore"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 id="stage8Title">Stage 8: Beyond Infinity</h2>
+            <p id="stage8Description">You have transcended all limits. The game is nearing its ultimate conclusion!</p>
+
+            <div class="resource-section">
+                <h3 id="cosmicSingularityTitle">Cosmic Singularity</h3>
+                <div class="resource-display">
+                    <span id="currentCosmicSingularityLabel">Current Cosmic Singularity:</span>
+                    <span class="resource-count" id="cosmicSingularityCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="cosmicSingularityPerSecondLabel">Cosmic Singularity per second:</span>
+                    <span class="resource-per-second" id="cosmicSingularityPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyCosmicSingularity"><span id="buyCosmicSingularityBtnText">Convert <span class="cost" id="cosmicSingularityCost">100000000</span> True Creator to 1 Cosmic Singularity</span></button>
+                    <button class="generate-lore-btn" data-resource="Cosmic Singularity"><span id="generateLoreBtnTextCosmicSingularity">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="cosmicSingularityLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="existentialTruthTitle">Existential Truth</h3>
+                <div class="resource-display">
+                    <span id="currentExistentialTruthLabel">Current Existential Truth:</span>
+                    <span class="resource-count" id="existentialTruthCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="existentialTruthPerSecondLabel">Existential Truth per second:</span>
+                    <span class="resource-per-second" id="existentialTruthPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyExistentialTruth"><span id="buyExistentialTruthBtnText">Convert <span class="cost" id="existentialTruthCost">100000000</span> Cosmic Singularity to 1 Existential Truth</span></button>
+                    <button class="generate-lore-btn" data-resource="Existential Truth"><span id="generateLoreBtnTextExistentialTruth">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="existentialTruthLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="theUltimateFormTitle">The Ultimate Form</h3>
+                <div class="resource-display">
+                    <span id="currentTheUltimateFormLabel">Current The Ultimate Form:</span>
+                    <span class="resource-count" id="theUltimateFormCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="theUltimateFormPerSecondLabel">The Ultimate Form per second:</span>
+                    <span class="resource-per-second" id="theUltimateFormPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyTheUltimateForm"><span id="buyTheUltimateFormBtnText">Convert <span class="cost" id="theUltimateFormCost">100000000</span> Existential Truth to 1 The Ultimate Form</span></button>
+                    <button class="generate-lore-btn" data-resource="The Ultimate Form"><span id="generateLoreBtnTextTheUltimateForm">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="theUltimateFormLore"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 id="stage9Title">Stage 9: Beyond the Veil</h2>
+            <p id="stage9Description">You are now touching the very essence of creation!</p>
+
+            <div class="resource-section">
+                <h3 id="cosmicNexusTitle">Cosmic Nexus</h3>
+                <div class="resource-display">
+                    <span id="currentCosmicNexusLabel">Current Cosmic Nexus:</span>
+                    <span class="resource-count" id="cosmicNexusCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="cosmicNexusPerSecondLabel">Cosmic Nexus per second:</span>
+                    <span class="resource-per-second" id="cosmicNexusPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyCosmicNexus"><span id="buyCosmicNexusBtnText">Convert <span class="cost" id="cosmicNexusCost">500000000</span> The Ultimate Form to 1 Cosmic Nexus</span></button>
+                    <button class="generate-lore-btn" data-resource="Cosmic Nexus"><span id="generateLoreBtnTextCosmicNexus">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="cosmicNexusLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="quantumSingularityTitle">Quantum Singularity</h3>
+                <div class="resource-display">
+                    <span id="currentQuantumSingularityLabel">Current Quantum Singularity:</span>
+                    <span class="resource-count" id="quantumSingularityCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="quantumSingularityPerSecondLabel">Quantum Singularity per second:</span>
+                    <span class="resource-per-second" id="quantumSingularityPerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyQuantumSingularity"><span id="buyQuantumSingularityBtnText">Convert <span class="cost" id="quantumSingularityCost">500000000</span> Cosmic Nexus to 1 Quantum Singularity</span></button>
+                    <button class="generate-lore-btn" data-resource="Quantum Singularity"><span id="generateLoreBtnTextQuantumSingularity">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="quantumSingularityLore"></div>
+            </div>
+
+            <div class="resource-section">
+                <h3 id="transcendentEssenceTitle">Transcendent Essence</h3>
+                <div class="resource-display">
+                    <span id="currentTranscendentEssenceLabel">Current Transcendent Essence:</span>
+                    <span class="resource-count" id="transcendentEssenceCount">0</span>
+                </div>
+                <div class="resource-display">
+                    <span id="transcendentEssencePerSecondLabel">Transcendent Essence per second:</span>
+                    <span class="resource-per-second" id="transcendentEssencePerSecond">0</span>
+                </div>
+                <div class="button-group">
+                    <button id="buyTranscendentEssence"><span id="buyTranscendentEssenceBtnText">Convert <span class="cost" id="transcendentEssenceCost">500000000</span> Quantum Singularity to 1 Transcendent Essence</span></button>
+                    <button class="generate-lore-btn" data-resource="Transcendent Essence"><span id="generateLoreBtnTextTranscendentEssence">Generate Lore</span></button>
+                </div>
+                <div class="lore-display" id="transcendentEssenceLore"></div>
+            </div>
+        </div>
+
+        <!-- New Combat & Skills Section (now fully integrated) -->
+        <div class="section">
+            <h2 id="combatSkillsTitle">Combat & Skills</h2>
+            <p id="combatSkillsDescription">Convert advanced resources into Skill Points to enhance your combat abilities and fight monsters!</p>
+
+            <div class="stat-display">
+                <span id="skillPointsLabel">Skill Points:</span>
+                <span class="resource-count" id="skillPointsCount">0</span>
+            </div>
+            <div class="button-group">
+                <button id="convertTranscendentEssenceToSkillPoint">Convert 100 Transcendent Essence to 1 Skill Point</button>
+                <button id="convertZenithToSkillPoint">Convert 1,000,000 Zenith of Creation to 1 Skill Point</button>
+            </div>
+
+            <h3 id="playerStatsTitle">Your Stats</h3>
+            <div class="stat-display">
+                <span id="atkLabel">Attack:</span>
+                <span class="stat-value" id="playerAtk">1</span>
+                <button id="upgradeAtkBtn">Upgrade ATK (Cost: 1 SP)</button>
+            </div>
+            <div class="stat-display">
+                <span id="defLabel">Defense:</span>
+                <span class="stat-value" id="playerDef">1</span>
+                <button id="upgradeDefBtn">Upgrade DEF (Cost: 1 SP)</button>
+            </div>
+            <div class="stat-display">
+                <span id="hpLabel">Health:</span>
+                <span class="stat-value" id="playerHp">100</span>
+                <button id="upgradeHpBtn">Upgrade HP (Cost: 1 SP)</button>
+            </div>
+
+            <h3 id="monsterCombatTitle">Monster Combat</h3>
+            <div class="stat-display">
+                <span id="currentMonsterLabel">Current Monster:</span>
+                <span class="stat-value" id="currentMonsterName">None</span>
+            </div>
+            <div class="stat-display">
+                <span id="monsterHpLabel">Monster HP:</span>
+                <span class="stat-value" id="monsterHp">N/A</span>
+            </div>
+            <div class="health-bar-container">
+                <div class="health-bar enemy" id="monsterHealthBar" style="width: 100%;"></div>
+            </div>
+            <div class="health-bar-container">
+                <div class="health-bar player" id="playerHealthBar" style="width: 100%;"></div>
+            </div>
+            <div class="button-group">
+                <button id="fightMonsterBtn">Fight Monster</button>
+            </div>
+            <p id="combatLog"></p>
+        </div>
+
+        <a href="https://discord.gg/your-invite-link" target="_blank" class="discord-link" id="discordInviteText">Join our Discord server</a>
+    </div>
+
+    <!-- Critical Hit Feedback -->
+    <div id="criticalHitFeedback" style="display: none;">
+        <span id="criticalHitText"></span>
+        <button id="closeCriticalFeedback">X</button>
+    </div>
+
+    <!-- Notification Area -->
+    <div id="notification-area"></div>
+
+    <!-- Clickable Star -->
+    <div id="clickableStar">⭐</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
