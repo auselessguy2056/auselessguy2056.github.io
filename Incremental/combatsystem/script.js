@@ -2975,6 +2975,7 @@ const combatTranslations = {
         noMoreMonsters: "Bạn đã đánh bại tất cả quái vật đã biết! Sẽ có thêm sau.",
         playerHealthLow: (hp) => `Máu của bạn thấp (${hp} HP). Hãy cân nhắc nâng cấp HP hoặc hồi máu trước khi chiến đấu!`,
         fightInProgress: "Một trận chiến đang diễn ra!",
+             fightStart: "Trận chiến bắt đầu.",
         fightEnd: "Trận chiến kết thúc."
     }
 };
