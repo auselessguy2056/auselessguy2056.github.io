@@ -7,331 +7,375 @@ const game = (() => {
             minute: 0,
             second: 0
         },
-        lastMessage: "",
-        wood: {
-            count: 0,
-            perSecond: 0,
-            manualClickAmount: 1,
-            upgradeCost: 10,
-            upgradeMultiplier: 2,
-            upgradeAmount: 1,
-            automationCost: 10000,
-            automationMultiplier: 1.5,
-            automationAmount: 5,
-            criticalChance: 0.10,
-            criticalMultiplier: 5
-        },
-        stone: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'stone',
-            perUnitProduction: 1
-        },
-        iron: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'iron',
-            perUnitProduction: 1
-        },
-        alloy: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'alloy',
-            perUnitProduction: 1
-        },
-        circuitry: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'circuitry',
-            perUnitProduction: 1
-        },
-        aiCore: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'aiCore',
-            perUnitProduction: 1
-        },
-        consciousness: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'consciousness',
-            perUnitProduction: 1
-        },
-        realityShard: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'realityShard',
-            perUnitProduction: 1
-        },
-        paradox: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'paradox',
-            perUnitProduction: 1
-        },
-        singularity: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'singularity',
-            perUnitProduction: 1
-        },
-        multiverse: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'multiverse',
-            perUnitProduction: 1
-        },
-        omniscience: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'omniscience',
-            perUnitProduction: 1
-        },
-        genesis: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'genesis',
-            perUnitProduction: 1
-        },
-        void: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'void',
-            perUnitProduction: 1
-        },
-        theAll: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000,
-            produces: 'theAll',
-            perUnitProduction: 1
-        },
-        transcendence: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000,
-            produces: 'transcendence',
-            perUnitProduction: 1
-        },
-        theAbsolute: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000,
-            produces: 'theAbsolute',
-            perUnitProduction: 1
-        },
-        theEnd: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000,
-            produces: 'theEnd',
-            perUnitProduction: 1
-        },
-        theNewBeginning: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000,
-            produces: 'theNewBeginning',
-            perUnitProduction: 1
-        },
-        theArchitectsWill: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000,
-            produces: 'theArchitectsWill',
-            perUnitProduction: 1
-        },
-        theOmniverse: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000,
-            produces: 'theOmniverse',
-            perUnitProduction: 1
-        },
-        theBoundlessVoid: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 100000,
-            produces: 'theBoundlessVoid',
-            perUnitProduction: 1
-        },
-        cosmicFabric: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 100000,
-            produces: 'cosmicFabric',
-            perUnitProduction: 1
-        },
-        infiniteNexus: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 100000,
-            produces: 'infiniteNexus',
-            perUnitProduction: 1
-        },
-        eternalEcho: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 100000,
-            produces: 'eternalEcho',
-            perUnitProduction: 1
-        },
-        zenithOfCreation: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 100000,
-            produces: 'zenithOfCreation',
-            perUnitProduction: 1
-        },
-        universalSingularity: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000000,
-            produces: 'universalSingularity',
-            perUnitProduction: 1
-        },
-        existentialFabric: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000000,
-            produces: 'existentialFabric',
-            perUnitProduction: 1
-        },
-        temporalFlux: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000000,
-            produces: 'temporalFlux',
-            perUnitProduction: 1
-        },
-        multidimensionalHarmony: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000000,
-            produces: 'multidimensionalHarmony',
-            perUnitProduction: 1
-        },
-        cosmicAwakening: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000000,
-            produces: 'cosmicAwakening',
-            perUnitProduction: 1
-        },
-        divineSpark: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000000,
-            produces: 'divineSpark',
-            perUnitProduction: 1
-        },
-        // Stage 5 Resources
-        cosmicDust: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 5000000,
-            produces: 'cosmicDust',
-            perUnitProduction: 1
-        },
-        stellarNucleus: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 5000000,
-            produces: 'stellarNucleus',
-            perUnitProduction: 1
-        },
-        galacticCore: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 5000000,
-            produces: 'galacticCore',
-            perUnitProduction: 1
-        },
-        // Stage 6 Resources
-        quantumEntanglement: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000000,
-            produces: 'quantumEntanglement',
-            perUnitProduction: 1
-        },
-        dimensionalRift: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000000,
-            produces: 'dimensionalRift',
-            perUnitProduction: 1
-        },
-        realityAnchor: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000000,
-            produces: 'realityAnchor',
-            perUnitProduction: 1
-        },
-        // Stage 7 Resources
-        omniEnergy: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 50000000,
-            produces: 'omniEnergy',
-            perUnitProduction: 1
-        },
-        primeMover: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 50000000,
-            produces: 'primeMover',
-            perUnitProduction: 1
-        },
-        trueCreator: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 50000000,
-            produces: 'trueCreator',
-            perUnitProduction: 1
-        },
-        // Stage 8 Resources
-        cosmicSingularity: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 100000000,
-            produces: 'cosmicSingularity',
-            perUnitProduction: 1
-        },
-        existentialTruth: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 100000000,
-            produces: 'existentialTruth',
-            perUnitProduction: 1
-        },
-        theUltimateForm: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 100000000,
-            produces: 'theUltimateForm',
-            perUnitProduction: 1
-        },
+        lastMessage: "",  wood: {
+        count: 0,
+        perSecond: 0,
+        manualClickAmount: 1,
+        upgradeCost: 10,
+        upgradeMultiplier: 2,
+        upgradeAmount: 1,
+        automationCost: 10000,
+        automationMultiplier: 1.5,
+        automationAmount: 5,
+        stage: 1,
+        criticalChance: 0.10,
+        criticalMultiplier: 5
+    },
+    stone: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'stone',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    iron: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'iron',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    alloy: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'alloy',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    circuitry: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'circuitry',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    aiCore: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'aiCore',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    consciousness: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'consciousness',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    realityShard: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'realityShard',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    paradox: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'paradox',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    singularity: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'singularity',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    multiverse: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'multiverse',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    omniscience: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'omniscience',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    genesis: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'genesis',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    void: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'void',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    theAll: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000,
+        produces: 'theAll',
+        stage: 2,
+        perUnitProduction: 1
+    },
+    transcendence: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000,
+        produces: 'transcendence',
+        stage: 2,
+        perUnitProduction: 1
+    },
+    theAbsolute: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000,
+        produces: 'theAbsolute',
+        stage: 2,
+        perUnitProduction: 1
+    },
+    theEnd: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000,
+        produces: 'theEnd',
+        stage: 2,
+        perUnitProduction: 1
+    },
+    theNewBeginning: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000,
+        produces: 'theNewBeginning',
+        stage: 2,
+        perUnitProduction: 1
+    },
+    theArchitectsWill: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000,
+        produces: 'theArchitectsWill',
+        stage: 2,
+        perUnitProduction: 1
+    },
+    theOmniverse: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000,
+        produces: 'theOmniverse',
+        stage: 2,
+        perUnitProduction: 1
+    },
+    theBoundlessVoid: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 100000,
+        produces: 'theBoundlessVoid',
+        stage: 3,
+        perUnitProduction: 1
+    },
+    cosmicFabric: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 100000,
+        produces: 'cosmicFabric',
+        stage: 3,
+        perUnitProduction: 1
+    },
+    infiniteNexus: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 100000,
+        produces: 'infiniteNexus',
+        stage: 3,
+        perUnitProduction: 1
+    },
+    eternalEcho: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 100000,
+        produces: 'eternalEcho',
+        stage: 3,
+        perUnitProduction: 1
+    },
+    zenithOfCreation: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 100000,
+        produces: 'zenithOfCreation',
+        stage: 3,
+        perUnitProduction: 1
+    },
+    universalSingularity: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000000,
+        produces: 'universalSingularity',
+        stage: 4,
+        perUnitProduction: 1
+    },
+    existentialFabric: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000000,
+        produces: 'existentialFabric',
+        stage: 4,
+        perUnitProduction: 1
+    },
+    temporalFlux: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000000,
+        produces: 'temporalFlux',
+        stage: 4,
+        perUnitProduction: 1
+    },
+    multidimensionalHarmony: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000000,
+        produces: 'multidimensionalHarmony',
+        stage: 4,
+        perUnitProduction: 1
+    },
+    cosmicAwakening: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000000,
+        produces: 'cosmicAwakening',
+        stage: 4,
+        perUnitProduction: 1
+    },
+    divineSpark: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000000,
+        produces: 'divineSpark',
+        stage: 4,
+        perUnitProduction: 1
+    },
+    // Stage 5 Resources
+    cosmicDust: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 5000000,
+        produces: 'cosmicDust',
+        stage: 5,
+        perUnitProduction: 1
+    },
+    stellarNucleus: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 5000000,
+        produces: 'stellarNucleus',
+        stage: 5,
+        perUnitProduction: 1
+    },
+    galacticCore: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 5000000,
+        produces: 'galacticCore',
+        stage: 5,
+        perUnitProduction: 1
+    },
+    // Stage 6 Resources
+    quantumEntanglement: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000000,
+        produces: 'quantumEntanglement',
+        stage: 6,
+        perUnitProduction: 1
+    },
+    dimensionalRift: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000000,
+        produces: 'dimensionalRift',
+        stage: 6,
+        perUnitProduction: 1
+    },
+    realityAnchor: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000000,
+        produces: 'realityAnchor',
+        stage: 6,
+        perUnitProduction: 1
+    },
+    // Stage 7 Resources
+    omniEnergy: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 50000000,
+        produces: 'omniEnergy',
+        stage: 7,
+        perUnitProduction: 1
+    },
+    primeMover: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 50000000,
+        produces: 'primeMover',
+        stage: 7,
+        perUnitProduction: 1
+    },
+    trueCreator: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 50000000,
+        produces: 'trueCreator',
+        stage: 7,
+        perUnitProduction: 1
+    },
+    // Stage 8 Resources
+    cosmicSingularity: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 100000000,
+        produces: 'cosmicSingularity',
+        stage: 8,
+        perUnitProduction: 1
+    },
+    existentialTruth: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 100000000,
+        produces: 'existentialTruth',
+        stage: 8,
+        perUnitProduction: 1
+    },
+    theUltimateForm: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 100000000,
+        produces: 'theUltimateForm',
+        stage: 8,
+        perUnitProduction: 1
+      },
         // Stage 9 Resources
         cosmicNexus: {
             count: 0,
             perSecond: 0,
             conversionCost: 500000000,
             produces: 'cosmicNexus',
+            stage: 9,
             perUnitProduction: 1
         },
         quantumSingularity: {
@@ -339,6 +383,7 @@ const game = (() => {
             perSecond: 0,
             conversionCost: 500000000,
             produces: 'quantumSingularity',
+                   stage: 9,
             perUnitProduction: 1
         },
         transcendentEssence: {
@@ -346,6 +391,7 @@ const game = (() => {
             perSecond: 0,
             conversionCost: 500000000,
             produces: 'transcendentEssence',
+                   stage: 9,
             perUnitProduction: 1
         },
         textToSpeechEnabled: false, // New property for TTS toggle
