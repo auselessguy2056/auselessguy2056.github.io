@@ -2552,6 +2552,8 @@ const game = (() => {
     function toggleLanguage() {
         resources.language = resources.language === 'en' ? 'vi' : 'en';
         updateDisplay(); // This will call updateTextContent()
+        updateCombatDisplay();
+
         loadNewQuestion(); // Reload quiz question in new language
         saveGame(1); // Save the language setting silently
         speakText(resources.language === 'en' ? "Language set to English." : "Ngôn ngữ đã được đặt thành Tiếng Việt.");
