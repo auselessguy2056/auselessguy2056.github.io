@@ -340,6 +340,13 @@
 .w3-cell-row:before,.w3-cell-row:after,.w3-clear:after,.w3-clear:before,.w3-bar:before,.w3-bar:after{content:"";display:table;clear:both}
 .w3-red,.w3-hover-red:hover{color:#fff!important;background-color:#f44336!important}
 
+   #combatSection {
+    position: fixed;
+    top: 1em;
+    right: 1em;
+}
+
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             body {
@@ -390,6 +397,7 @@
         </div>
         <div class="fixed-stat-item">
                  <span id="timeToNextResource">Calculating...</span>
+<button type="button" id="collapsible">Combat UI</button>
         </div>
     </div>
 
@@ -1285,7 +1293,7 @@
         </div>
 
         <!-- New Combat & Skills Section (now fully integrated) -->
-        <div class="section">
+        <div class="section" id="combatSection">
             <h2 id="combatSkillsTitle">Combat & Skills</h2>
             <p id="combatSkillsDescription">Convert advanced resources into Skill Points to enhance your combat abilities and fight monsters!</p>
 

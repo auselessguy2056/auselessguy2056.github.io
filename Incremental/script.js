@@ -2096,6 +2096,17 @@ const game = (() => {
 
         // Update all text content based on current language
         updateTextContent();
+        
+// your code
+       if(resources.language == "vi") {
+
+document.getElementById('collapsible').textContent = "Giao diện chiến đấu";
+            
+
+       }
+       else {
+       document.getElementById('collapsible').textContent = "Combat UI";
+            }
     }
 
     function addWood() {
@@ -2904,7 +2915,18 @@ const monsters = [
     { name: "Reality Bender", vietName: "Kẻ Bẻ Cong Thực Tại", atk: 150, def: 100, hp: 1500, reward: { realityShard: 10, skillPoints: 3 } },
     { name: "Paradox Anomaly", vietName: "Dị Thường Nghịch Lý", atk: 200, def: 150, hp: 2500, reward: { paradox: 5, skillPoints: 4 } },
     { name: "Singularity Guardian", vietName: "Người Gác Cổng Điểm Kì Dị", atk: 300, def: 200, hp: 4000, reward: { singularity: 2, skillPoints: 5 }
-    }
+    },
+   // --- 10 New Monsters Below ---
+    { name: "Quantum Lurker", vietName: "Kẻ Ẩn Nấp Lượng Tử", atk: 350, def: 250, hp: 5500, reward: { cosmicDust: 1, skillPoints: 6 } },
+    { name: "Galactic Devourer", vietName: "Kẻ Nuốt Chửng Thiên Hà", atk: 400, def: 300, hp: 7000, reward: { stellarNucleus: 1, skillPoints: 7 } },
+    { name: "Celestial Watcher", vietName: "Người Canh Gác Thiên Thể", atk: 450, def: 350, hp: 8500, reward: { galacticCore: 1, skillPoints: 8 } },
+    { name: "Chronal Abomination", vietName: "Quái Vật Thời Gian", atk: 500, def: 400, hp: 10000, reward: { quantumEntanglement: 1, skillPoints: 9 } },
+    { name: "Dimensional Weaver", vietName: "Kẻ Dệt Không Gian", atk: 550, def: 450, hp: 12000, reward: { dimensionalRift: 1, skillPoints: 10 } },
+    { name: "Eldritch Entity", vietName: "Thực Thể Cổ Xưa", atk: 600, def: 500, hp: 14000, reward: { realityAnchor: 1, skillPoints: 11 } },
+    { name: "Void Dragon", vietName: "Rồng Hư Không", atk: 700, def: 600, hp: 17000, reward: { omniEnergy: 1, skillPoints: 12 } },
+    { name: "Primeval Horror", vietName: "Nỗi Kinh Hoàng Nguyên Thủy", atk: 800, def: 700, hp: 20000, reward: { primeMover: 1, skillPoints: 13 } },
+    { name: "Apex Creator", vietName: "Đấng Sáng Tạo Tối Cao", atk: 900, def: 800, hp: 25000, reward: { trueCreator: 1, skillPoints: 14 } },
+    { name: "Cosmic Anomaly", vietName: "Dị Thường Vũ Trụ", atk: 1000, def: 900, hp: 30000, reward: { cosmicSingularity: 1, skillPoints: 15 } }
  ];
 // Define the cost for upgrading stats
 const STAT_UPGRADE_COST = 1; // 1 skill point per stat upgrade
@@ -3111,7 +3133,7 @@ function convertResourceToSkillPoint() {
         }
         else
         {
-            resources.player.sp +=  totalSkillPointsGained;;
+            resources.player.sp = totalSkillPointsGained;
 
         }
 
@@ -3292,6 +3314,25 @@ document.getElementById('health').value = resources.player.currentHp;
     updateCombatDisplay();
 }
 
+
+
+function hideCombatUI(){ document.getElementById("combatSection").style.display = "none";}
+function showCombatUI(){ document.getElementById("combatSection").style.display = "block";}
+function showAndHideCombatUI()
+{
+   if(document.getElementById("combatSection").style.display == "block"){
+document.getElementById("combatSection").style.display = "none";
+      }
+   else {    updateCombatDisplay();
+
+document.getElementById("combatSection").style.display = "block";
+}
+}
+
+
+
+
+
 /**
  * Handles actions after winning a fight.
  * @param {object} defeatedMonster - The monster that was defeated.
@@ -3335,6 +3376,9 @@ function handleFightLoss() {
 }
 
 // 5. Paste these event listeners into your `game.init()` function.
+//your code
+document.getElementById('collapsible').addEventListener('click', showAndHideCombatUI);
+//
 convertZenithToSkillPointBtn.addEventListener('click', convertResourceToSkillPoint);
 upgradeAtkBtn.addEventListener('click', () => upgradeStat('atk'));
 upgradeDefBtn.addEventListener('click', () => upgradeStat('def'));
