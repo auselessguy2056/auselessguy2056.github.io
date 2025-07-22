@@ -3133,7 +3133,7 @@ function convertResourceToSkillPoint() {
         }
         else
         {
-            resources.player.sp = totalSkillPointsGained;
+            resources.player.sp += totalSkillPointsGained;
 
         }
 
