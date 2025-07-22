@@ -2098,6 +2098,18 @@ const game = (() => {
         updateTextContent();
         
 // your code
+
+var stage3LastResource = document.getElementById('zenithOfCreationPerSecond').textContent;
+if(stage3LastResource >0 ){
+       document.getElementById("collapsible").style.display = "block";
+    //document.getElementById("combatSection").style.display = "block";
+}
+else {
+    document.getElementById("collapsible").style.display = "none";
+    document.getElementById("combatSection").style.display = "none";
+}
+
+        
        if(resources.language == "vi") {
 
 document.getElementById('collapsible').textContent = "Giao diện chiến đấu";
