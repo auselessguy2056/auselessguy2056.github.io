@@ -8,330 +8,385 @@ const game = (() => {
             second: 0
         },
         lastMessage: "",
-        wood: {
-            count: 0,
-            perSecond: 0,
-            manualClickAmount: 1,
-            upgradeCost: 10,
-            upgradeMultiplier: 2,
-            upgradeAmount: 1,
-            automationCost: 10000,
-            automationMultiplier: 1.5,
-            automationAmount: 5,
-            criticalChance: 0.10,
-            criticalMultiplier: 5
-        },
-        stone: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'stone',
-            perUnitProduction: 1
-        },
-        iron: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'iron',
-            perUnitProduction: 1
-        },
-        alloy: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'alloy',
-            perUnitProduction: 1
-        },
-        circuitry: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'circuitry',
-            perUnitProduction: 1
-        },
-        aiCore: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'aiCore',
-            perUnitProduction: 1
-        },
-        consciousness: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'consciousness',
-            perUnitProduction: 1
-        },
-        realityShard: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'realityShard',
-            perUnitProduction: 1
-        },
-        paradox: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'paradox',
-            perUnitProduction: 1
-        },
-        singularity: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'singularity',
-            perUnitProduction: 1
-        },
-        multiverse: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'multiverse',
-            perUnitProduction: 1
-        },
-        omniscience: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'omniscience',
-            perUnitProduction: 1
-        },
-        genesis: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'genesis',
-            perUnitProduction: 1
-        },
-        void: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000,
-            produces: 'void',
-            perUnitProduction: 1
-        },
-        theAll: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000,
-            produces: 'theAll',
-            perUnitProduction: 1
-        },
-        transcendence: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000,
-            produces: 'transcendence',
-            perUnitProduction: 1
-        },
-        theAbsolute: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000,
-            produces: 'theAbsolute',
-            perUnitProduction: 1
-        },
-        theEnd: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000,
-            produces: 'theEnd',
-            perUnitProduction: 1
-        },
-        theNewBeginning: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000,
-            produces: 'theNewBeginning',
-            perUnitProduction: 1
-        },
-        theArchitectsWill: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000,
-            produces: 'theArchitectsWill',
-            perUnitProduction: 1
-        },
-        theOmniverse: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000,
-            produces: 'theOmniverse',
-            perUnitProduction: 1
-        },
-        theBoundlessVoid: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 100000,
-            produces: 'theBoundlessVoid',
-            perUnitProduction: 1
-        },
-        cosmicFabric: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 100000,
-            produces: 'cosmicFabric',
-            perUnitProduction: 1
-        },
-        infiniteNexus: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 100000,
-            produces: 'infiniteNexus',
-            perUnitProduction: 1
-        },
-        eternalEcho: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 100000,
-            produces: 'eternalEcho',
-            perUnitProduction: 1
-        },
-        zenithOfCreation: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 100000,
-            produces: 'zenithOfCreation',
-            perUnitProduction: 1
-        },
-        universalSingularity: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000000,
-            produces: 'universalSingularity',
-            perUnitProduction: 1
-        },
-        existentialFabric: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000000,
-            produces: 'existentialFabric',
-            perUnitProduction: 1
-        },
-        temporalFlux: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000000,
-            produces: 'temporalFlux',
-            perUnitProduction: 1
-        },
-        multidimensionalHarmony: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000000,
-            produces: 'multidimensionalHarmony',
-            perUnitProduction: 1
-        },
-        cosmicAwakening: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000000,
-            produces: 'cosmicAwakening',
-            perUnitProduction: 1
-        },
-        divineSpark: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 1000000,
-            produces: 'divineSpark',
-            perUnitProduction: 1
-        },
-        // Stage 5 Resources
-        cosmicDust: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 5000000,
-            produces: 'cosmicDust',
-            perUnitProduction: 1
-        },
-        stellarNucleus: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 5000000,
-            produces: 'stellarNucleus',
-            perUnitProduction: 1
-        },
-        galacticCore: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 5000000,
-            produces: 'galacticCore',
-            perUnitProduction: 1
-        },
-        // Stage 6 Resources
-        quantumEntanglement: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000000,
-            produces: 'quantumEntanglement',
-            perUnitProduction: 1
-        },
-        dimensionalRift: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000000,
-            produces: 'dimensionalRift',
-            perUnitProduction: 1
-        },
-        realityAnchor: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 10000000,
-            produces: 'realityAnchor',
-            perUnitProduction: 1
-        },
-        // Stage 7 Resources
-        omniEnergy: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 50000000,
-            produces: 'omniEnergy',
-            perUnitProduction: 1
-        },
-        primeMover: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 50000000,
-            produces: 'primeMover',
-            perUnitProduction: 1
-        },
-        trueCreator: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 50000000,
-            produces: 'trueCreator',
-            perUnitProduction: 1
-        },
-        // Stage 8 Resources
-        cosmicSingularity: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 100000000,
-            produces: 'cosmicSingularity',
-            perUnitProduction: 1
-        },
-        existentialTruth: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 100000000,
-            produces: 'existentialTruth',
-            perUnitProduction: 1
-        },
-        theUltimateForm: {
-            count: 0,
-            perSecond: 0,
-            conversionCost: 100000000,
-            produces: 'theUltimateForm',
-            perUnitProduction: 1
-        },
+  player: {
+            atk: 0,
+            def: 0,
+            hp: 100,
+            currentHp: 100,
+            sp: 0,
+            spflag: false
+
+
+          },
+  wood: {
+        count: 0,
+        perSecond: 0,
+        manualClickAmount: 1,
+        upgradeCost: 10,
+        upgradeMultiplier: 2,
+        upgradeAmount: 1,
+        automationCost: 10000,
+        automationMultiplier: 1.5,
+        automationAmount: 5,
+        stage: 1,
+        criticalChance: 0.10,
+        criticalMultiplier: 5
+    },
+    stone: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'stone',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    iron: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'iron',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    alloy: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'alloy',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    circuitry: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'circuitry',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    aiCore: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'aiCore',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    consciousness: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'consciousness',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    realityShard: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'realityShard',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    paradox: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'paradox',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    singularity: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'singularity',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    multiverse: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'multiverse',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    omniscience: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'omniscience',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    genesis: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'genesis',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    void: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000,
+        produces: 'void',
+        stage: 1,
+        perUnitProduction: 1
+    },
+    theAll: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000,
+        produces: 'theAll',
+        stage: 2,
+        perUnitProduction: 1
+    },
+    transcendence: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000,
+        produces: 'transcendence',
+        stage: 2,
+        perUnitProduction: 1
+    },
+    theAbsolute: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000,
+        produces: 'theAbsolute',
+        stage: 2,
+        perUnitProduction: 1
+    },
+    theEnd: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000,
+        produces: 'theEnd',
+        stage: 2,
+        perUnitProduction: 1
+    },
+    theNewBeginning: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000,
+        produces: 'theNewBeginning',
+        stage: 2,
+        perUnitProduction: 1
+    },
+    theArchitectsWill: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000,
+        produces: 'theArchitectsWill',
+        stage: 2,
+        perUnitProduction: 1
+    },
+    theOmniverse: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000,
+        produces: 'theOmniverse',
+        stage: 2,
+        perUnitProduction: 1
+    },
+    theBoundlessVoid: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 100000,
+        produces: 'theBoundlessVoid',
+        stage: 3,
+        perUnitProduction: 1
+    },
+    cosmicFabric: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 100000,
+        produces: 'cosmicFabric',
+        stage: 3,
+        perUnitProduction: 1
+    },
+    infiniteNexus: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 100000,
+        produces: 'infiniteNexus',
+        stage: 3,
+        perUnitProduction: 1
+    },
+    eternalEcho: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 100000,
+        produces: 'eternalEcho',
+        stage: 3,
+        perUnitProduction: 1
+    },
+    zenithOfCreation: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 100000,
+        produces: 'zenithOfCreation',
+        stage: 3,
+        perUnitProduction: 1
+    },
+    universalSingularity: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000000,
+        produces: 'universalSingularity',
+        stage: 4,
+        perUnitProduction: 1
+    },
+    existentialFabric: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000000,
+        produces: 'existentialFabric',
+        stage: 4,
+        perUnitProduction: 1
+    },
+    temporalFlux: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000000,
+        produces: 'temporalFlux',
+        stage: 4,
+        perUnitProduction: 1
+    },
+    multidimensionalHarmony: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000000,
+        produces: 'multidimensionalHarmony',
+        stage: 4,
+        perUnitProduction: 1
+    },
+    cosmicAwakening: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000000,
+        produces: 'cosmicAwakening',
+        stage: 4,
+        perUnitProduction: 1
+    },
+    divineSpark: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 1000000,
+        produces: 'divineSpark',
+        stage: 4,
+        perUnitProduction: 1
+    },
+    // Stage 5 Resources
+    cosmicDust: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 5000000,
+        produces: 'cosmicDust',
+        stage: 5,
+        perUnitProduction: 1
+    },
+    stellarNucleus: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 5000000,
+        produces: 'stellarNucleus',
+        stage: 5,
+        perUnitProduction: 1
+    },
+    galacticCore: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 5000000,
+        produces: 'galacticCore',
+        stage: 5,
+        perUnitProduction: 1
+    },
+    // Stage 6 Resources
+    quantumEntanglement: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000000,
+        produces: 'quantumEntanglement',
+        stage: 6,
+        perUnitProduction: 1
+    },
+    dimensionalRift: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000000,
+        produces: 'dimensionalRift',
+        stage: 6,
+        perUnitProduction: 1
+    },
+    realityAnchor: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 10000000,
+        produces: 'realityAnchor',
+        stage: 6,
+        perUnitProduction: 1
+    },
+    // Stage 7 Resources
+    omniEnergy: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 50000000,
+        produces: 'omniEnergy',
+        stage: 7,
+        perUnitProduction: 1
+    },
+    primeMover: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 50000000,
+        produces: 'primeMover',
+        stage: 7,
+        perUnitProduction: 1
+    },
+    trueCreator: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 50000000,
+        produces: 'trueCreator',
+        stage: 7,
+        perUnitProduction: 1
+    },
+    // Stage 8 Resources
+    cosmicSingularity: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 100000000,
+        produces: 'cosmicSingularity',
+        stage: 8,
+        perUnitProduction: 1
+    },
+    existentialTruth: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 100000000,
+        produces: 'existentialTruth',
+        stage: 8,
+        perUnitProduction: 1
+    },
+    theUltimateForm: {
+        count: 0,
+        perSecond: 0,
+        conversionCost: 100000000,
+        produces: 'theUltimateForm',
+        stage: 8,
+        perUnitProduction: 1
+      },
         // Stage 9 Resources
         cosmicNexus: {
             count: 0,
             perSecond: 0,
             conversionCost: 500000000,
             produces: 'cosmicNexus',
+            stage: 9,
             perUnitProduction: 1
         },
         quantumSingularity: {
@@ -339,6 +394,7 @@ const game = (() => {
             perSecond: 0,
             conversionCost: 500000000,
             produces: 'quantumSingularity',
+                   stage: 9,
             perUnitProduction: 1
         },
         transcendentEssence: {
@@ -346,6 +402,7 @@ const game = (() => {
             perSecond: 0,
             conversionCost: 500000000,
             produces: 'transcendentEssence',
+                   stage: 9,
             perUnitProduction: 1
         },
         textToSpeechEnabled: false, // New property for TTS toggle
@@ -2506,6 +2563,7 @@ const game = (() => {
     function toggleLanguage() {
         resources.language = resources.language === 'en' ? 'vi' : 'en';
         updateDisplay(); // This will call updateTextContent()
+        updateCombatDisplay();
         loadNewQuestion(); // Reload quiz question in new language
         saveGame(1); // Save the language setting silently
         speakText(resources.language === 'en' ? "Language set to English." : "Ngôn ngữ đã được đặt thành Tiếng Việt.");
@@ -2804,6 +2862,525 @@ const game = (() => {
 
     });
 
+// --- Combat System Integration (Paste these sections into your script.js) ---
+
+// 1. Paste this block at the top of your `game` IIFE, alongside your `resources` object.
+//    Ensure the 'stage' property is added to ALL your resources in the `resources` object
+//    as described in the previous comments (e.g., wood: { ..., stage: 1 }).
+
+// Skill Point Conversion Rates per Stage
+const SKILL_POINT_RATES = {
+    1: 0.000001, // 1e-6 for Stage 1 resources
+    2: 0.00001,  // 1e-5 for Stage 2 resources
+    3: 0.0001,   // 1e-4 for Stage 3 resources
+    4: 0.001,    // 1e-3 for Stage 4 resources (assuming similar progression)
+    5: 0.01,     // 1e-2 for Stage 5 resources
+    6: 0.1,      // 1e-1 for Stage 6 resources
+    7: 1,        // 1 for Stage 7 resources
+    8: 10,       // 10 for Stage 8 resources
+    9: 100       // 100 for Stage 9 resources
+};
+
+// Combat-related resources and stats
+let combatResources = {
+    skillPoints: 0,
+    atk: 1,
+    def: 1,
+    hp: 100,
+    currentHp: 100, // Current health during combat
+    monstersDefeated: 0,
+    currentMonster: null // The monster currently being fought
+};
+
+// Monster definitions
+const monsters = [
+  { name: "Basic Slime", vietName: "Quái Nhầy Cơ Bản", atk: 5, def: 1, hp: 50, reward: { wood: 1000, skillPoints: 0.1 } },
+    { name: "Forest Goblin", vietName: "Goblin Rừng", atk: 10, def: 5, hp: 80, reward: { wood: 2000, skillPoints: 0.2 } },
+    { name: "Cave Troll", vietName: "Quỷ Hang Động", atk: 20, def: 10, hp: 150, reward: { stone: 500, skillPoints: 0.5 } },
+    { name: "Iron Golem", vietName: "Người Đá Sắt", atk: 30, def: 20, hp: 250, reward: { iron: 200, skillPoints: 0.8 } },
+    { name: "Shadow Beast", vietName: "Quái Vật Bóng Tối", atk: 50, def: 30, hp: 400, reward: { alloy: 100, skillPoints: 1.2 } },
+    { name: "Void Lurker", vietName: "Kẻ Ẩn Nấp Hư Không", atk: 75, def: 50, hp: 600, reward: { circuitry: 50, skillPoints: 1.5 } },
+    { name: "Cosmic Horror", vietName: "Nỗi Kinh Hoàng Vũ Trụ", atk: 100, def: 75, hp: 1000, reward: { aiCore: 20, skillPoints: 2 } },
+    { name: "Reality Bender", vietName: "Kẻ Bẻ Cong Thực Tại", atk: 150, def: 100, hp: 1500, reward: { realityShard: 10, skillPoints: 3 } },
+    { name: "Paradox Anomaly", vietName: "Dị Thường Nghịch Lý", atk: 200, def: 150, hp: 2500, reward: { paradox: 5, skillPoints: 4 } },
+    { name: "Singularity Guardian", vietName: "Người Gác Cổng Điểm Kì Dị", atk: 300, def: 200, hp: 4000, reward: { singularity: 2, skillPoints: 5 }
+    }
+ ];
+// Define the cost for upgrading stats
+const STAT_UPGRADE_COST = 1; // 1 skill point per stat upgrade
+
+// 2. Paste these DOM element references alongside your other `const` UI element declarations.
+const skillPointsCountSpan = document.getElementById('skillPointsCount');
+const playerAtkSpan = document.getElementById('playerAtk');
+const playerDefSpan = document.getElementById('playerDef');
+const playerHpSpan = document.getElementById('playerHp');
+const convertZenithToSkillPointBtn = document.getElementById('convertZenithToSkillPoint');
+const upgradeAtkBtn = document.getElementById('upgradeAtkBtn');
+const upgradeDefBtn = document.getElementById('upgradeDefBtn');
+const upgradeHpBtn = document.getElementById('upgradeHpBtn');
+const currentMonsterNameSpan = document.getElementById('currentMonsterName');
+const monsterHpSpan = document.getElementById('monsterHp');
+const fightMonsterBtn = document.getElementById('fightMonsterBtn');
+const combatLogParagraph = document.getElementById('combatLog');
+
+// 3. Paste these combat-specific translations into your main `translations` object (e.g., within `translations.en` and `translations.vi`).
+//    Make sure to merge them, not overwrite the existing translations.
+const combatTranslations = {
+    en: {
+        combatSkillsTitle: "Combat & Skills",
+        combatSkillsDescription: "Convert all accumulated resources into Skill Points to enhance your combat abilities and fight monsters!",
+        skillPointsLabel: "Skill Points",
+        convertBtnText: "Convert All Resources to Skill Points",
+        playerStatsTitle: "Your Stats",
+        atkLabel: "Attack",
+        defLabel: "Defense",
+        hpLabel: "Health",
+        upgradeBtnText: (cost) => `Upgrade (Cost: ${cost} SP)`,
+        monsterCombatTitle: "Monster Combat",
+        currentMonsterLabel: "Current Monster",
+        monsterHpLabel: "Monster HP",
+        fightMonsterBtn: "Fight Monster",
+        skillPointConversionSuccess: (sp) => `Successfully converted resources! Gained ${sp.toFixed(2)} Skill Points.`,
+        notEnoughSkillPoints: (cost) => `Not enough Skill Points! You need ${cost} SP.`,
+        statUpgradeSuccess: (stat) => `Successfully upgraded ${stat}!`,
+        noMonsterToFight: "No monster to fight. Generate a new one!",
+        monsterEncounter: (monsterName) => `You encounter a ${monsterName}!`,
+        playerAttack: (playerAtk, monsterName, damage) => `You attack the ${monsterName} for ${damage} damage!`,
+        monsterAttack: (monsterName, monsterAtk, playerDamage) => `The ${monsterName} attacks you for ${playerDamage} damage!`,
+        playerDefeatedMonster: (monsterName) => `You defeated the ${monsterName}!`,
+        playerLostFight: (monsterName) => `You were defeated by the ${monsterName}.`,
+        fightReward: (rewardText) => `You gained: ${rewardText}.`,
+        newMonsterSpawned: (monsterName) => `A new monster, ${monsterName}, has appeared!`,
+        noMoreMonsters: "You have defeated all known monsters! More will appear later.",
+        playerHealthLow: (hp) => `Your health is low (0 HP). Consider upgrading HP or healing before fighting!`,
+        fightInProgress: "A fight is already in progress!",
+        fightStart: "Fight started!",
+        fightEnd: "Round ended.",
+fightMonsterLabel: "Fight Monster"
+
+    },
+    vi: {
+        combatSkillsTitle: "Chiến Đấu & Kỹ Năng",
+        combatSkillsDescription: "Chuyển đổi tất cả tài nguyên tích lũy thành Điểm Kỹ Năng để tăng cường khả năng chiến đấu và chiến đấu với quái vật!",
+        skillPointsLabel: "Điểm Kỹ Năng",
+        convertBtnText: "Chuyển đổi Tất Cả Tài Nguyên thành Điểm Kỹ Năng",
+        playerStatsTitle: "Chỉ Số Của Bạn",
+        atkLabel: "Tấn Công",
+        defLabel: "Phòng Thủ",
+        hpLabel: "Máu",
+        upgradeBtnText: (cost) => `Nâng Cấp (Chi Phí: ${cost} ĐKN)`,
+        monsterCombatTitle: "Chiến Đấu Quái Vật",
+        currentMonsterLabel: "Quái Vật Hiện Tại",
+        monsterHpLabel: "Máu Quái Vật",
+        fightMonsterBtn: "Chiến Đấu",
+        skillPointConversionSuccess: (sp) => `Chuyển đổi tài nguyên thành công! Nhận được ${sp.toFixed(2)} Điểm Kỹ Năng.`,
+        notEnoughSkillPoints: (cost) => `Không đủ Điểm Kỹ Năng! Bạn cần ${cost} ĐKN.`,
+        statUpgradeSuccess: (stat) => `Nâng cấp ${stat} thành công!`,
+        noMonsterToFight: "Không có quái vật để chiến đấu. Tạo một con mới!",
+        monsterEncounter: (monsterName) => `Bạn gặp một ${monsterName}!`,
+        playerAttack: (playerAtk, monsterName, damage) => `Bạn tấn công ${monsterName} gây ${damage} sát thương!`,
+        monsterAttack: (monsterName, monsterAtk, playerDamage) => `${monsterName} tấn công bạn gây ${playerDamage} sát thương!`,
+        playerDefeatedMonster: (monsterName) => `Bạn đã đánh bại ${monsterName}!`,
+        playerLostFight: (monsterName) => `Bạn đã bị ${monsterName} đánh bại.`,
+        fightReward: (rewardText) => `Bạn nhận được: ${rewardText}.`,
+        newMonsterSpawned: (monsterName) => `Một quái vật mới, ${monsterName}, đã xuất hiện!`,
+        noMoreMonsters: "Bạn đã đánh bại tất cả quái vật đã biết! Sẽ có thêm sau.",
+        playerHealthLow: (hp) => `Máu của bạn thấp (zero HP). Hãy cân nhắc nâng cấp HP hoặc hồi máu trước khi chiến đấu!`,
+        fightStart: "Một trận chiến đang diễn ra!",
+        fightEnd: "Kết thúc lượt thi đấu.",
+fightMonsterLabel: "Đánh quái vật"
+    }
+};
+
+// 4. Paste these functions into your `game` IIFE, alongside other game logic functions.
+
+/**
+ * Helper function to get translated text. Uses the main `translations` object.
+ */
+function getCombatTranslation(key, ...args) {
+    const lang = resources.language || 'en'; // Default to English
+    let text = combatTranslations[lang][key]; // Use combatTranslations
+    if (typeof text === 'function') {
+        return text(...args);
+    }
+    return text;
+}
+
+
+function loadCombatInfo() {
+ 
+  skillPointsCountSpan.textContent = resources.player.sp.toFixed(2); // Show decimals for SP
+    document.getElementById("playerAtk").textContent = resources.player.atk;
+    playerDefSpan.textContent = resources.player.def;
+    playerHpSpan.textContent = resources.player.currentHp + '/' + resources.player.hp;
+  
+
+}
+/**
+ * Updates the display of combat-related stats.
+ */
+function updateCombatDisplay() {
+
+  //your code
+    combatResources.skillPoints = resources.player.sp; // Show decimals for SP
+    combatResources.atk = resources.player.atk;
+    combatResources.def = resources.player.def;
+    combatResources.currentHp = resources.player.currentHp;
+    combatResources.hp = resources.player.hp;
+  
+
+   //
+    skillPointsCountSpan.textContent = combatResources.skillPoints.toFixed(2); // Show decimals for SP
+    playerAtkSpan.textContent = combatResources.atk.toFixed(0);
+    playerDefSpan.textContent = combatResources.def.toFixed(0);
+    playerHpSpan.textContent = combatResources.currentHp.toFixed(0) + '/' + combatResources.hp.toFixed(0);
+
+ 
+
+    // Update button texts and disable states
+    convertZenithToSkillPointBtn.textContent = getCombatTranslation('convertBtnText');
+    convertZenithToSkillPointBtn.disabled = false; // Always enabled as it converts *all* resources
+
+    upgradeAtkBtn.textContent = getCombatTranslation('upgradeBtnText', STAT_UPGRADE_COST);
+    upgradeAtkBtn.disabled = combatResources.skillPoints < STAT_UPGRADE_COST;
+
+    upgradeDefBtn.textContent = getCombatTranslation('upgradeBtnText', STAT_UPGRADE_COST);
+    upgradeDefBtn.disabled = combatResources.skillPoints < STAT_UPGRADE_COST;
+
+    upgradeHpBtn.textContent = getCombatTranslation('upgradeBtnText', STAT_UPGRADE_COST);
+    upgradeHpBtn.disabled = combatResources.skillPoints < STAT_UPGRADE_COST;
+
+    if (combatResources.currentMonster) {
+
+        //your code
+        if(resources.language == "vi"){
+        currentMonsterNameSpan.textContent = combatResources.currentMonster.vietName;
+        }
+        else {
+        currentMonsterNameSpan.textContent = combatResources.currentMonster.name;
+        }
+        monsterHpSpan.textContent = combatResources.currentMonster.currentHp.toFixed(0) + '/' + combatResources.currentMonster.hp.toFixed(0);
+        fightMonsterBtn.textContent = getCombatTranslation('fightMonsterBtn');
+    } else {
+        currentMonsterNameSpan.textContent = getCombatTranslation('noMonsterToFight');
+        monsterHpSpan.textContent = "N/A";
+        document.getElementById('enemyHealth').style.width = "100%";
+        fightMonsterBtn.textContent = "Spawn Monster"; // Change button text to spawn
+    }
+
+    // Update combat section titles and descriptions
+    document.getElementById('combatSkillsTitle').textContent = getCombatTranslation('combatSkillsTitle');
+    document.getElementById('combatSkillsDescription').textContent = getCombatTranslation('combatSkillsDescription');
+    document.getElementById('skillPointsLabel').textContent = getCombatTranslation('skillPointsLabel');
+    document.getElementById('playerStatsTitle').textContent = getCombatTranslation('playerStatsTitle');
+    document.getElementById('atkLabel').textContent = getCombatTranslation('atkLabel');
+    document.getElementById('defLabel').textContent = getCombatTranslation('defLabel');
+    document.getElementById('hpLabel').textContent = getCombatTranslation('hpLabel');
+    document.getElementById('monsterCombatTitle').textContent = getCombatTranslation('monsterCombatTitle');
+    document.getElementById('currentMonsterLabel').textContent = getCombatTranslation('currentMonsterLabel');
+    document.getElementById('monsterHpLabel').textContent = getCombatTranslation('monsterHpLabel');
+    document.getElementById('fightMonsterBtn').textContent = getCombatTranslation('fightMonsterLabel');
+ //   document.getElementById('health').value =  resources.player.hp;
+   // document.getElementById('health').max = resources.player.hpmax;
+}
+
+/**
+ * Converts all accumulated resources into skill points based on their stage.
+ */
+function convertResourceToSkillPoint() {
+    let totalSkillPointsGained = 0;
+    // Iterate through the predefined resource order to ensure all relevant resources are checked
+    for (const resourceName of resourceOrder) { // Use resourceOrder from script.js
+        const resource = resources[resourceName]; // Directly access resources
+        if (resource && resource.count !== undefined && resource.stage !== undefined && SKILL_POINT_RATES[resource.stage]) {
+            const skillPointsFromResource = resource.count * SKILL_POINT_RATES[resource.stage];
+            totalSkillPointsGained += skillPointsFromResource;
+            resources[resourceName].count = 0; // Reset resource count after conversion
+        }
+    }
+
+    if (totalSkillPointsGained > 0) {
+        combatResources.skillPoints += totalSkillPointsGained;
+
+        //your code
+        if(resources.player.spflag == false)
+        {
+        resources.player.sp += combatResources.skillPoints;
+        resources.player.spflag = true;
+    
+        }
+        else
+        {
+            resources.player.sp = combatResources.skillPoints;
+
+        }
+
+
+        //
+        notify("success", getCombatTranslation('skillPointConversionSuccess', totalSkillPointsGained)); // Use direct notify
+        saveGame(1); // Save silently
+        updateCombatDisplay();
+        updateDisplay(); // Update main game display for resource count changes
+    } else {
+        notify("info", "No resources to convert or resources have no defined stage for skill points."); // Use direct notify
+    }
+}
+
+/**
+ * Upgrades a player stat (ATK, DEF, HP).
+ * @param {string} statType - 'atk', 'def', or 'hp'.
+ */
+function upgradeStat(statType) {
+    if (combatResources.skillPoints >= STAT_UPGRADE_COST) {
+        combatResources.skillPoints -= STAT_UPGRADE_COST;
+        resources.player.sp -= STAT_UPGRADE_COST;
+        if (statType === 'atk') {
+            combatResources.atk += 1; // Increase ATK by 1
+        } else if (statType === 'def') {
+            combatResources.def += 1; // Increase DEF by 1
+        } else if (statType === 'hp') {
+            combatResources.hp += 10; // Increase max HP by 10
+            combatResources.currentHp += 10; // Also heal current HP
+            // your code
+            document.getElementById('health').max = combatResources.hp;
+              document.getElementById('health').value = combatResources.currentHp;
+
+           //
+        }
+        resources.player.atk = combatResources.atk;
+ resources.player.def = combatResources.def;
+ resources.player.hp = combatResources.hp;
+ resources.player.currentHp = combatResources.currentHp;
+// resources.player.sp = combatResources.sp;
+  document.getElementById('skillPointsCount').textContent = combatResources.sp;
+        notify("success", getCombatTranslation('statUpgradeSuccess', getCombatTranslation(statType + 'Label'))); // Use direct notify
+        saveGame(1); // Save silently
+        updateCombatDisplay();
+    } else {
+        notify("error", getCombatTranslation('notEnoughSkillPoints', STAT_UPGRADE_COST)); // Use direct notify
+    }
+}
+
+/**
+ * Spawns a new random monster based on monsters defeated.
+ */
+function spawnMonster() {
+    if (combatResources.currentMonster) {
+        notify("info", getCombatTranslation('fightInProgress')); // Use direct notify
+        return;
+    }
+
+    const availableMonsters = monsters.filter((_, index) => index <= combatResources.monstersDefeated);
+    if (availableMonsters.length === 0) {
+        notify("info", getCombatTranslation('noMoreMonsters')); // Use direct notify
+        return;
+    }
+
+    const monsterIndex = Math.floor(Math.random() * availableMonsters.length);
+    const newMonster = JSON.parse(JSON.stringify(availableMonsters[monsterIndex])); // Deep copy monster object
+    newMonster.currentHp = newMonster.hp; // Initialize current HP for the monster
+
+    combatResources.currentMonster = newMonster;
+   
+    if(resources.language == "vi") {
+ combatLogParagraph.textContent = getCombatTranslation('monsterEncounter', newMonster.vietName);
+        notify("info", getCombatTranslation('newMonsterSpawned', newMonster.vietName)); //
+    }
+    else{
+ combatLogParagraph.textContent = getCombatTranslation('monsterEncounter', newMonster.name);
+    notify("info", getCombatTranslation('newMonsterSpawned', newMonster.name)); // Use direct notify
+    }    
+    updateCombatDisplay();
+}
+
+/**
+ * Simulates a fight turn by turn.
+ */
+function fightMonster() {
+    if (!combatResources.currentMonster) {
+        spawnMonster();
+   //yourcode
+     document.getElementById('enemyHealth').style.width = (combatResources.currentMonster.currentHp / combatResources.currentMonster.hp * 100).toString() + "%";
+    //
+
+
+        return;
+    }
+
+    if (combatResources.currentHp <= 0) {
+        notify("error", getCombatTranslation('playerHealthLow', combatResources.currentHp.toFixed(0))); // Use direct notify
+        combatLogParagraph.textContent = getCombatTranslation('playerHealthLow', combatResources.currentHp.toFixed(0));
+      //yourcode
+     document.getElementById('enemyHealth').style.width = (combatResources.currentMonster.currentHp / combatResources.currentMonster.hp * 100).toString() + "%";
+    //
+
+        return;
+    }
+
+    let log = getCombatTranslation('fightStart') + '\n';
+
+    // Player attacks monster
+    let playerDamage = Math.max(0, combatResources.atk - combatResources.currentMonster.def);
+    combatResources.currentMonster.currentHp -= playerDamage;
+    if (resources.language == "vi") {
+ log += getCombatTranslation('playerAttack', combatResources.atk, combatResources.currentMonster.vietName, playerDamage) + '\n';
+     }
+ else {
+    log += getCombatTranslation('playerAttack', combatResources.atk, combatResources.currentMonster.name, playerDamage) + '\n';
+      }
+    //yourcode
+     document.getElementById('enemyHealth').style.width = (combatResources.currentMonster.currentHp / combatResources.currentMonster.hp * 100).toString() + "%";
+    //
+
+    if (combatResources.currentMonster.currentHp <= 0) {
+        // Monster defeated
+        if (resources.language == "vi")
+        {
+log += getCombatTranslation('playerDefeatedMonster', combatResources.currentMonster.vietName) + '\n';
+        }
+        else {
+               log += getCombatTranslation('playerDefeatedMonster', combatResources.currentMonster.name) + '\n';
+        }
+        handleFightWin(combatResources.currentMonster);
+        combatResources.currentMonster = null; // Clear monster
+        combatResources.monstersDefeated++; // Increment defeated count
+        spawnMonster(); // Spawn a new monster
+           //yourcode
+     document.getElementById('enemyHealth').style.width = (combatResources.currentMonster.currentHp / combatResources.currentMonster.hp * 100).toString() + "%";
+    //
+
+    } else {
+        
+        // Monster attacks player
+        let monsterDamage = Math.max(0, combatResources.currentMonster.atk - combatResources.def);
+        combatResources.currentHp -= monsterDamage;
+        resources.player.currentHp -= monsterDamage;
+        // your code
+            document.getElementById('health').max = combatResources.hp;
+
+        document.getElementById('health').value = combatResources.currentHp;
+          document.getElementById('playerHp').textContent = combatResources.currentHp.toString() + "/" + combatResources.hp.toString();
+
+       if (resources.language == "vi") {
+ log += getCombatTranslation('monsterAttack', combatResources.currentMonster.vietName, combatResources.currentMonster.atk, monsterDamage) + '\n'; 
+
+
+}
+      
+else { 
+ log += getCombatTranslation('monsterAttack', combatResources.currentMonster.name, combatResources.currentMonster.atk, monsterDamage) + '\n'; 
+
+          }
+
+        if (combatResources.currentHp <= 0) {
+            // Player defeated
+            log += getCombatTranslation('playerLostFight', combatResources.currentMonster.name) + '\n';
+            handleFightLoss();
+            combatResources.currentMonster = null; // Clear monster
+            // your code
+        //document.getElementById('health').value = combatResources.currentHp;
+document.getElementById('health').value = resources.player.currentHp;
+
+        //
+
+        }
+    }
+
+    log += getCombatTranslation('fightEnd');
+    combatLogParagraph.textContent = log;
+    saveGame(1); // Save silently after each turn/fight outcome
+    updateCombatDisplay();
+}
+
+/**
+ * Handles actions after winning a fight.
+ * @param {object} defeatedMonster - The monster that was defeated.
+ */
+function handleFightWin(defeatedMonster) {
+    let rewardText = [];
+    for (const resType in defeatedMonster.reward) {
+        const amount = defeatedMonster.reward[resType];
+        if (resType === 'skillPoints') {
+            combatResources.skillPoints += amount;
+            rewardText.push(`${amount.toFixed(1)} ${getCombatTranslation('skillPointsLabel')}`);
+        } else {
+            // Directly add reward to the main game's resources
+            if (resources[resType]) {
+                resources[resType].count += amount;
+                // Get translated resource name from main game's translations
+                const displayResName = translations[resources.language][`${resType}Title`] || resType;
+                rewardText.push(`${amount.toFixed(1)} ${displayResName}`);
+            }
+        }
+    }
+    notify("success", getCombatTranslation('fightReward', rewardText.join(', '))); // Use direct notify
+    updateDisplay(); // Update main game resource display
+}
+
+/**
+ * Handles actions after losing a fight.
+ */
+function handleFightLoss() {
+    if(resources.language == "vi")
+     {
+    notify("error", getCombatTranslation('playerLostFight', combatResources.currentMonster.vietName)); // Use direct notify
+    }
+    else {
+ notify("error", getCombatTranslation('playerLostFight', combatResources.currentMonster.name)); // Use direct notify
+
+}
+    // Optionally, reset player HP or apply other penalties
+    combatResources.currentHp = combatResources.hp; // Fully heal player after loss
+    notify("info", getCombatTranslation('playerHealthLow', combatResources.currentHp.toFixed(0))); // Use direct notify
+}
+
+// 5. Paste these event listeners into your `game.init()` function.
+convertZenithToSkillPointBtn.addEventListener('click', convertResourceToSkillPoint);
+upgradeAtkBtn.addEventListener('click', () => upgradeStat('atk'));
+upgradeDefBtn.addEventListener('click', () => upgradeStat('def'));
+upgradeHpBtn.addEventListener('click', () => upgradeStat('hp'));
+fightMonsterBtn.addEventListener('click', fightMonster);
+
+// 6. Add this function call at the end of your `loadGame()` function,
+//    and also at the very end of your `game.init()` function.
+function loadCombatData() {
+    try {
+        const savedCombatData = localStorage.getItem('incrementalGameCombatSave');
+        if (savedCombatData) {
+            const parsedCombatData = JSON.parse(savedCombatData);
+            Object.assign(combatResources, parsedCombatData);
+            // Ensure currentHp doesn't exceed max HP if max HP was reduced in save
+            if (combatResources.currentHp > combatResources.hp) {
+                combatResources.currentHp = combatResources.hp;
+            }
+        }
+    } catch (e) {
+        console.error("Error loading combat save data:", e);
+    }
+}
+
+// 7. Add this function call at the end of your `saveGame()` function.
+function saveCombatData() {
+    try {
+        localStorage.setItem('incrementalGameCombatSave', JSON.stringify(combatResources));
+    } catch (e) {
+        console.error("Error saving combat data:", e);
+    }
+}
+
+// 8. Ensure your main `updateDisplay()` function calls `updateCombatDisplay()`
+//    at the end, after all other display updates.
+//    (e.g., `updateDisplay() { ... your existing code ... updateCombatDisplay(); }`)
+
+// 9. Merge combatTranslations into your main `translations` object in `script.js`.
+//    Example (do this once, typically near where `translations` is defined):
+//    Object.assign(translations.en, combatTranslations.en);
+//    Object.assign(translations.vi, combatTranslations.vi);
+
+// Initial update of combat display (will be called again by updateDisplay after load)
+updateCombatDisplay();
+
+
     // Public interface for the game
     return {
         init: () => {
@@ -2911,8 +3488,10 @@ const game = (() => {
 
             // Initial setup
             updateDisplay(); // Call once to set initial text and values
+       
             loadGame();
             loadNewQuestion();
+                   loadCombatInfo();
         },
         // Expose specific functions if needed for external interaction, e.g., for testing
         getWoodCount: () => resources.wood.count,
