@@ -3111,7 +3111,7 @@ function convertResourceToSkillPoint() {
         }
         else
         {
-            resources.player.sp = combatResources.skillPoints;
+            resources.player.sp += combatResources.skillPoints;
 
         }
 
