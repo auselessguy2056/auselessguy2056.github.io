@@ -2657,6 +2657,7 @@ document.getElementById('collapsible').textContent = "Giao diện chiến đấu
         if(resources.player.currentHp < resources.player.hp ) { resources.player.currentHp += 0.1};
 
         updateDisplay();
+        loadCombatInfo();
     }
 
     // Define the order of resources from earliest to latest
