@@ -3058,7 +3058,7 @@ function loadCombatInfo() {
   skillPointsCountSpan.textContent = resources.player.sp.toFixed(2); // Show decimals for SP
     document.getElementById("playerAtk").textContent = resources.player.atk;
     playerDefSpan.textContent = resources.player.def;
-    playerHpSpan.textContent = resources.player.currentHp + '/' + resources.player.hp;
+    playerHpSpan.textContent = resources.player.currentHp.toFixed(2) + '/' + resources.player.hp;
   
 
 }
