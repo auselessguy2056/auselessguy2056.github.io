@@ -2917,7 +2917,7 @@ let combatResources = {
 
 // Monster definitions
 const monsters = [
-  { name: "Basic Slime", vietName: "Quái Nhầy Cơ Bản", atk: 5, def: 1, hp: 50, reward: { wood: 1000, skillPoints: 0.1 } },
+    { name: "Basic Slime", vietName: "Quái Nhầy Cơ Bản", atk: 5, def: 1, hp: 50, reward: { wood: 1000, skillPoints: 0.1 } },
     { name: "Forest Goblin", vietName: "Goblin Rừng", atk: 10, def: 5, hp: 80, reward: { wood: 2000, skillPoints: 0.2 } },
     { name: "Cave Troll", vietName: "Quỷ Hang Động", atk: 20, def: 10, hp: 150, reward: { stone: 500, skillPoints: 0.5 } },
     { name: "Iron Golem", vietName: "Người Đá Sắt", atk: 30, def: 20, hp: 250, reward: { iron: 200, skillPoints: 0.8 } },
@@ -2926,20 +2926,31 @@ const monsters = [
     { name: "Cosmic Horror", vietName: "Nỗi Kinh Hoàng Vũ Trụ", atk: 100, def: 75, hp: 1000, reward: { aiCore: 20, skillPoints: 2 } },
     { name: "Reality Bender", vietName: "Kẻ Bẻ Cong Thực Tại", atk: 150, def: 100, hp: 1500, reward: { realityShard: 10, skillPoints: 3 } },
     { name: "Paradox Anomaly", vietName: "Dị Thường Nghịch Lý", atk: 200, def: 150, hp: 2500, reward: { paradox: 5, skillPoints: 4 } },
-    { name: "Singularity Guardian", vietName: "Người Gác Cổng Điểm Kì Dị", atk: 300, def: 200, hp: 4000, reward: { singularity: 2, skillPoints: 5 }
-    },
-   // --- 10 New Monsters Below ---
-    { name: "Quantum Lurker", vietName: "Kẻ Ẩn Nấp Lượng Tử", atk: 350, def: 250, hp: 5500, reward: { cosmicDust: 1, skillPoints: 6 } },
-    { name: "Galactic Devourer", vietName: "Kẻ Nuốt Chửng Thiên Hà", atk: 400, def: 300, hp: 7000, reward: { stellarNucleus: 1, skillPoints: 7 } },
-    { name: "Celestial Watcher", vietName: "Người Canh Gác Thiên Thể", atk: 450, def: 350, hp: 8500, reward: { galacticCore: 1, skillPoints: 8 } },
-    { name: "Chronal Abomination", vietName: "Quái Vật Thời Gian", atk: 500, def: 400, hp: 10000, reward: { quantumEntanglement: 1, skillPoints: 9 } },
-    { name: "Dimensional Weaver", vietName: "Kẻ Dệt Không Gian", atk: 550, def: 450, hp: 12000, reward: { dimensionalRift: 1, skillPoints: 10 } },
-    { name: "Eldritch Entity", vietName: "Thực Thể Cổ Xưa", atk: 600, def: 500, hp: 14000, reward: { realityAnchor: 1, skillPoints: 11 } },
-    { name: "Void Dragon", vietName: "Rồng Hư Không", atk: 700, def: 600, hp: 17000, reward: { omniEnergy: 1, skillPoints: 12 } },
-    { name: "Primeval Horror", vietName: "Nỗi Kinh Hoàng Nguyên Thủy", atk: 800, def: 700, hp: 20000, reward: { primeMover: 1, skillPoints: 13 } },
-    { name: "Apex Creator", vietName: "Đấng Sáng Tạo Tối Cao", atk: 900, def: 800, hp: 25000, reward: { trueCreator: 1, skillPoints: 14 } },
-    { name: "Cosmic Anomaly", vietName: "Dị Thường Vũ Trụ", atk: 1000, def: 900, hp: 30000, reward: { cosmicSingularity: 1, skillPoints: 15 } }
- ];
+    { name: "Singularity Guardian", vietName: "Người Gác Cổng Điểm Kì Dị", atk: 300, def: 200, hp: 4000, reward: { singularity: 2, skillPoints: 5 } }, // Index 9
+    // --- Rebalanced Rewards (Stage 2 to 4) for Monsters from Index 10 onwards ---
+    { name: "Quantum Lurker", vietName: "Kẻ Ẩn Nấp Lượng Tử", atk: 350, def: 250, hp: 5500, reward: { theAll: 1, skillPoints: 6 } }, // Index 10 (Stage 2)
+    { name: "Galactic Devourer", vietName: "Kẻ Nuốt Chửng Thiên Hà", atk: 400, def: 300, hp: 7000, reward: { transcendence: 1, skillPoints: 7 } }, // Index 11 (Stage 2)
+    { name: "Celestial Watcher", vietName: "Người Canh Gác Thiên Thể", atk: 450, def: 350, hp: 8500, reward: { theAbsolute: 1, skillPoints: 8 } }, // Index 12 (Stage 2)
+    { name: "Chronal Abomination", vietName: "Quái Vật Thời Gian", atk: 500, def: 400, hp: 10000, reward: { theEnd: 1, skillPoints: 9 } }, // Index 13 (Stage 2)
+    { name: "Dimensional Weaver", vietName: "Kẻ Dệt Không Gian", atk: 550, def: 450, hp: 12000, reward: { theNewBeginning: 1, skillPoints: 10 } }, // Index 14 (Stage 2)
+    { name: "Eldritch Entity", vietName: "Thực Thể Cổ Xưa", atk: 600, def: 500, hp: 14000, reward: { theArchitectsWill: 1, skillPoints: 11 } }, // Index 15 (Stage 2)
+    { name: "Void Dragon", vietName: "Rồng Hư Không", atk: 700, def: 600, hp: 17000, reward: { theOmniverse: 1, skillPoints: 12 } }, // Index 16 (Stage 2)
+    { name: "Primeval Horror", vietName: "Nỗi Kinh Hoàng Nguyên Thủy", atk: 800, def: 700, hp: 20000, reward: { theBoundlessVoid: 1, skillPoints: 13 } }, // Index 17 (Stage 3)
+    { name: "Apex Creator", vietName: "Đấng Sáng Tạo Tối Cao", atk: 900, def: 800, hp: 25000, reward: { cosmicFabric: 1, skillPoints: 14 } }, // Index 18 (Stage 3)
+    { name: "Cosmic Anomaly", vietName: "Dị Thường Vũ Trụ", atk: 1000, def: 900, hp: 30000, reward: { infiniteNexus: 1, skillPoints: 15 } }, // Index 19 (Stage 3)
+    // --- Next 10 Monsters (Indices 20-29) - Continuing Stage 3 and 4 ---
+    { name: "Grand Architect", vietName: "Kiến Trúc Sư Vĩ Đại", atk: 2000, def: 1800, hp: 75000, reward: { eternalEcho: 2, skillPoints: 16 } }, // Index 20 (Stage 3)
+    { name: "Eternal Dreamer", vietName: "Kẻ Mơ Mộng Vĩnh Hằng", atk: 4000, def: 3600, hp: 187500, reward: { zenithOfCreation: 2, skillPoints: 17 } }, // Index 21 (Stage 3)
+    { name: "Time Lord", vietName: "Chúa Tể Thời Gian", atk: 8000, def: 7200, hp: 468750, reward: { universalSingularity: 3, skillPoints: 18 } }, // Index 22 (Stage 4)
+    { name: "Dimensional Conqueror", vietName: "Kẻ Chinh Phục Chiều Không Gian", atk: 16000, def: 14400, hp: 1171875, reward: { existentialFabric: 3, skillPoints: 19 } }, // Index 23 (Stage 4)
+    { name: "Cosmic Harbinger", vietName: "Điềm Báo Vũ Trụ", atk: 32000, def: 28800, hp: 2929688, reward: { temporalFlux: 3, skillPoints: 20 } }, // Index 24 (Stage 4)
+    { name: "Divine Judge", vietName: "Thẩm Phán Thần Thánh", atk: 64000, def: 57600, hp: 7324219, reward: { multidimensionalHarmony: 4, skillPoints: 21 } }, // Index 25 (Stage 4)
+    { name: "Omniscient Weaver", vietName: "Kẻ Dệt Vạn Năng", atk: 128000, def: 115200, hp: 18310547, reward: { cosmicAwakening: 4, skillPoints: 22 } }, // Index 26 (Stage 4)
+    { name: "Genesis Bringer", vietName: "Người Mang Đến Khởi Nguyên", atk: 256000, def: 230400, hp: 45776367, reward: { divineSpark: 4, skillPoints: 23 } }, // Index 27 (Stage 4)
+    // --- Last 2 monsters rewarding Stage 5 ---
+    { name: "Void Incarnate", vietName: "Hư Không Giáng Thế", atk: 512000, def: 460800, hp: 114440918, reward: { cosmicDust: 1, skillPoints: 24 } }, // Index 28 (Stage 5)
+    { name: "The Absolute Zero", vietName: "Tuyệt Đối Linh", atk: 1024000, def: 921600, hp: 286102295, reward: { stellarNucleus: 1, skillPoints: 25 } } // Index 29 (Stage 5)
+];
 // Define the cost for upgrading stats
 const STAT_UPGRADE_COST = 1; // 1 skill point per stat upgrade
 
