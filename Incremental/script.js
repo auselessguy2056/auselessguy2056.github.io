@@ -2654,7 +2654,7 @@ document.getElementById('collapsible').textContent = "Giao diện chiến đấu
         resources.cosmicNexus.count += resources.cosmicNexus.perSecond / 10;
         resources.quantumSingularity.count += resources.quantumSingularity.perSecond / 10;
         resources.transcendentEssence.count += resources.transcendentEssence.perSecond / 10;
-        if(resources.player.currentHp < resources.player.hp ) { resources.player.currentHp += 0.1};
+        if(resources.player.currentHp < resources.player.hp ) { resources.player.currentHp += 1};
 
         updateDisplay();
         loadCombatInfo();
@@ -3058,7 +3058,7 @@ function loadCombatInfo() {
   skillPointsCountSpan.textContent = resources.player.sp.toFixed(2); // Show decimals for SP
     document.getElementById("playerAtk").textContent = resources.player.atk;
     playerDefSpan.textContent = resources.player.def;
-    playerHpSpan.textContent = resources.player.currentHp.toFixed(2) + '/' + resources.player.hp;
+    playerHpSpan.textContent = resources.player.currentHp.toFixed(0) + '/' + resources.player.hp;
   
 
 }
