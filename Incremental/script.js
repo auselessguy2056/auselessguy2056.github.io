@@ -3187,7 +3187,10 @@ function upgradeStat(statType) {
         } else if (statType === 'hp') {
             combatResources.hp += 10; // Increase max HP by 10
             combatResources.currentHp += 10; // Also heal current HP
+            
             // your code
+            resources.player.hp += 10;
+            resources.player.currentHp += 10; 
             document.getElementById('health').max = combatResources.hp;
               document.getElementById('health').value = combatResources.currentHp;
 
@@ -3196,7 +3199,7 @@ function upgradeStat(statType) {
         resources.player.atk = combatResources.atk;
  resources.player.def = combatResources.def;
  resources.player.hp = combatResources.hp;
- resources.player.currentHp = combatResources.currentHp;
+ //resources.player.currentHp = combatResources.currentHp;
 // resources.player.sp = combatResources.sp;
   document.getElementById('skillPointsCount').textContent = combatResources.sp;
         notify("success", getCombatTranslation('statUpgradeSuccess', getCombatTranslation(statType + 'Label'))); // Use direct notify
