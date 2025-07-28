@@ -2654,7 +2654,7 @@ document.getElementById('collapsible').textContent = "Giao diện chiến đấu
         resources.cosmicNexus.count += resources.cosmicNexus.perSecond / 10;
         resources.quantumSingularity.count += resources.quantumSingularity.perSecond / 10;
         resources.transcendentEssence.count += resources.transcendentEssence.perSecond / 10;
-        if(player.currentHp < player.hp ) { player.currentHp += 0.1};
+        if(resources.player.currentHp < resources.player.hp ) { resources.player.currentHp += 0.1};
 
         updateDisplay();
     }
