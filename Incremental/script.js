@@ -3244,7 +3244,8 @@ function spawnMonster() {
  */
 function fightMonster() {
 
-    if(resources.player.currentHp <=0) { return;}
+    if(resources.player.currentHp <=0) {  notify("error", getCombatTranslation('playerHealthLow', combatResources.currentHp.toFixed(0))); // Use direct notify
+        combatLogParagraph.textContent = getCombatTranslation('playerHealthLow', combatResources.currentHp.toFixed(0)); return;}
     if (!combatResources.currentMonster) {
         spawnMonster();
    //yourcode
