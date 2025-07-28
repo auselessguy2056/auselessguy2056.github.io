@@ -3243,6 +3243,8 @@ function spawnMonster() {
  * Simulates a fight turn by turn.
  */
 function fightMonster() {
+
+    if(resources.player.currentHp <=0) { return;}
     if (!combatResources.currentMonster) {
         spawnMonster();
    //yourcode
