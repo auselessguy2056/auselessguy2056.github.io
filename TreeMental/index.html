@@ -36,7 +36,7 @@
                     Tree Upgrades: {{ player.canvas.upgArray.length }}/100<br>
                     {{ 100-player.treeUpgs.length }} boughts left<br> 
                     <button style="width: 90%; font-size: 22px; font-weight: bold;" v-bind:class="{closed: !FUNCTIONS.floor.can()}" onclick="FUNCTIONS.floor.go()">Go to next floor {{ format(player.floor+1, 0) }}</button><br>
-                    <button style="width: 90%; font-size: 22px; font-weight: bold;" onclick="buyAllTree()">Buy All Upgrades [M]</button>
+                    <button style="width: 90%; font-size: 22px; font-weight: bold; display: none;" onclick="buyAllTree()">Buy All Upgrades [M]</button>
                     <div style="height: 90px;"><br>
                         You have <h2>{{ format(player.points,0) }}</h2> Points.<br>
                         (+{{format(FUNCTIONS.getPointsGain(),0)}}/s)
