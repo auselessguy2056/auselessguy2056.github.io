@@ -27,6 +27,8 @@ const FUNCTIONS = {
         if (player.prestige.upgrades.includes(2)) gain = gain.mul(UPGRADES.prestige[2].eff())
         if (FUNCTIONS.buyables.research.have(1)>0) gain = gain.mul(FUNCTIONS.buyables.research[1].eff())
         if (player.prestige.upgrades.includes(3)) pow = pow.mul(1.15)
+        //your code
+        if (player.prestige.upgrades.includes(14)) gain = gain.mul(100)
         gain = gain.mul(2)
         return gain.pow(pow)
     },
@@ -161,7 +163,7 @@ const UPGRADES = {
                 player.prestige.upgrades.push(x)
             }
         },
-        cols: 13,
+        cols: 14,
         1: {
             unl() { return true },
             desc: 'Tree Upgrades are 12.5% stronger.',
@@ -251,6 +253,11 @@ const UPGRADES = {
             unl() { return player.research.unl },
             desc: 'Raise research points gain by 1.25.',
             cost: E(1e210),
+        },
+        14: { // New prestige upgrade
+            unl() { return player.research.unl },
+            desc: 'Multiply point gain by 100.',
+            cost: E(1e250),
         },
     },
     research: {
