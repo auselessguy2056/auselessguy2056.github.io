@@ -20,40 +20,56 @@ const UPGCHANCES = {
                 4: [2, 3],
             },
             3: {
+                
                 1: [75, 1],
                 2: [35, 2],
                 3: [15, 4],
                 4: [5, 3],
                 5: [2, 5],
             },
+            //your code
+            4: {
+                
+                1: [75, 5],
+                2: [25, 6],
+           
+            
+            },
+
         },
         upgs: {
             1(cost) {
                 let mult = randomInt(3,7)
-                return new treeUpg2('points', `[1] Gain ${format(mult**(player.prestige.upgrades.includes(1)?1.125:1), 1)}x more points.`, cost, 'chance1', {mult: mult})
+                return new treeUpg2('points', `[1] Gain ${format(mult**(player.prestige.upgrades.includes(1)?1.125:1), 1)}x more points.`, cost, 'chance1', {mult: mult},'points')
             },
             2(cost) {
-                return new treeUpg2('points', '[2] Unspent points boost points gain at reduced rate.', cost, 'chance2', {})
+                return new treeUpg2('points', '[2] Unspent points boost points gain at reduced rate.', cost, 'chance2', {},'points')
             },
             3(cost) {
-                return new treeUpg2('points', '[3] Gain more points based on tree upgrades bought.', cost, 'chance3', {})
+                return new treeUpg2('points', '[3] Gain more points based on tree upgrades bought.', cost, 'chance3', {},'points')
             },
             4(cost) {
-                return new treeUpg2('points', '[4] Unspent prestige points boost points at reduced rate.', cost, 'chance4', {})
+                return new treeUpg2('points', '[4] Unspent prestige points boost points at reduced rate.', cost, 'chance4', {},'points')
             },
             5(cost) {
-                return new treeUpg2('points', '[5] Unspent research points boost points at reduced rate.', cost, 'chance5', {})
+                return new treeUpg2('points', '[5] Unspent research points boost points at reduced rate.', cost, 'chance5', {},'points')
+            },
+             // New tree upgrade that costs Essence
+            6(cost) {
+                let mult = randomInt(5,10)
+                return new treeUpg2('points', `[6] Gain ${format(mult, 1)} essence. `, cost.mul(10), 'chance6', {}, 'essence')
             },
         },
     },
 }
 
-function treeUpg2(type, desc, cost, eff, config) {
+function treeUpg2(type, desc, cost, eff, config,  resourceType = 'points') {
     this.type = type
     this.desc = desc
     this.cost = cost
     this.eff = eff
     this.config = config
+    this.resourceType = resourceType
 }
 
 var TreeUpgs = {
@@ -103,6 +119,16 @@ var TreeUpgs = {
             effDesc(x=this.eff()) { return format(x,1)+'x' },
         },
 
+       // your code
+         chance6: {
+            eff(config) {
+                let eff = E(0)
+                return eff
+            },
+            
+        },
+
+
         research: {
             eff(config) {
                 return config.research.floor()
@@ -134,6 +160,16 @@ var TreeUpgs = {
         }
     },
     onBuy(id) {
+        //your code
+            if (player.canvas.TreeUpgs[id].resourceType == 'essence') {
+            if(player.essence == 'undefined') {
+              player.essence = E(0)         
+}
+           player.essence.points = player.essence.points.add(parseInt(player.canvas.TreeUpgs[id].desc.replace("[6] Gain ", "").replace(".0 essence.", "")))
+        
+        }
+
+        //
         if (player.canvas.TreeUpgs[id].type == 'research') {
             player.research.points = player.research.points.add(player.canvas.TreeUpgs[id].config.research)
         }
@@ -197,6 +233,7 @@ function createTreeUpg(newID) {
     let ratioId = 1
     if ((player.canvas.upgArray.length > 50 && player.prestige.upgrades.includes(4)) || player.research.upgrades.includes(2)) ratioId = 2
     if (player.canvas.upgArray.length > 50 && player.research.upgrades.includes(3)) ratioId = 3
+    if( player.prestige.upgrades.includes(15)) ratioId = 4 
     let chance = randomInt(1,UPGCHANCES.points.ratio[ratioId][1][0])
     let cost = getTreeCost()
 

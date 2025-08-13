@@ -10,10 +10,11 @@ const TABS = {
         {id: 'Options', unl() { return true }, style: 'normal_tab'},
         {id: 'Prestige', unl() { return player.prestige.unl }, style: 'normal_tab'},
         {id: 'Research', unl() { return player.research.unl }, style: 'normal_tab'},
+   
     ],
 }
 
-const FUNCTIONS = {
+const FUNCTIONS = {     
     // Calculates the gain rate for points.
     getPointsGain() {
         if (!player.treeUpgs.includes('m13')) return E(0)
@@ -29,7 +30,10 @@ const FUNCTIONS = {
         if (player.prestige.upgrades.includes(3)) pow = pow.mul(1.15)
         //your code
         if (player.prestige.upgrades.includes(14)) gain = gain.mul(100)
-        gain = gain.mul(2)
+        //if (player.prestige.upgrades.includes(15))  gain = gain.mul(player.essence.points.array[0][1])
+        
+        //faster point gain
+        gain = gain.mul(2) 
         return gain.pow(pow)
     },
     // Calculates the gain rate for research points.
@@ -43,6 +47,14 @@ const FUNCTIONS = {
         if (player.prestige.upgrades.includes(11)) gain = gain.mul(UPGRADES.prestige[11].eff())
         if (player.prestige.upgrades.includes(13)) gain = gain.pow(1.25)
         return gain
+    },
+   // New function to calculate essence gain
+    getEssenceGain() {
+        let gain = E(0);
+        if (player.prestige.upgrades.includes(15)) {
+            gain = gain.add(1);
+        }
+        return gain;
     },
     chTabs(i, x) {
         player.tabs[i] = x
@@ -163,7 +175,7 @@ const UPGRADES = {
                 player.prestige.upgrades.push(x)
             }
         },
-        cols: 14,
+        cols: 15,
         1: {
             unl() { return true },
             desc: 'Tree Upgrades are 12.5% stronger.',
@@ -259,6 +271,11 @@ const UPGRADES = {
             desc: 'Multiply point gain by 100.',
             cost: E(1e250),
         },
+        15: { // New prestige upgrade
+            unl() { return player.research.unl },
+            desc: 'Unlock Essence and gain 1 per second.',
+            cost: E(1e300),
+        },
     },
     research: {
         can(x) { return player.research.points.gte(this[x].cost) },
@@ -297,6 +314,7 @@ function loop() {
     calc(diff/1000);
     date = Date.now();
     player.points = player.points.add(player.points);
+    //FUNCTIONS.getPointsPerSecondText();
 }
 
 function format(ex, acc=3) {

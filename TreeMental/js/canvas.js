@@ -20,7 +20,12 @@ function updatePosition(tu) {
     ctx.rect(x*player.zoom+camera_pos.x,y*player.zoom+camera_pos.y,50*player.zoom,50*player.zoom)
     if (player.canvas.TreeUpgs[id].type == 'research') {
         ctx.fillStyle = player.treeUpgs.includes(id)?'#00f':TreeUpgs.can(id)?'#009':'#005'
-    } else ctx.fillStyle = player.treeUpgs.includes(id)?((id == 'm13')?'#ff0':'#0f0'):TreeUpgs.can(id)?'#999':'#555'
+    }   else if (player.canvas.TreeUpgs[id].resourceType == 'essence') {
+        // Essence upgrades are purple
+        ctx.fillStyle = player.treeUpgs.includes(id)?'#8A2BE2':TreeUpgs.can(id)?'#9370DB':'#4B0082' } 
+    else {
+    ctx.fillStyle = player.treeUpgs.includes(id)?((id == 'm13')?'#ff0':'#0f0'):TreeUpgs.can(id)?'#999':'#555'
+         }
     ctx.fill()
     drawStroked(tu.id, x*player.zoom+camera_pos.x+5*player.zoom,y*player.zoom+camera_pos.y+14*player.zoom)
     if (tu.id == player.showUpg) {

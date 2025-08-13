@@ -36,6 +36,7 @@ function calc(dt) {
 
 function getNewPlayer() {
     return {
+        essence: { points: E(0)},
         points: E(0),
         zoom: 1,
         floor: 1,
@@ -66,6 +67,7 @@ function getNewPlayer() {
         autos: {
             treeUpgs: false,
         },
+        
     }
 }
 
@@ -133,6 +135,7 @@ function convertToExpNum() {
     player.points = E(player.points)
     player.prestige.points = E(player.prestige.points)
     player.research.points = E(player.research.points)
+    player.essence.points = E(player.essence.points)
 }
 
 function save(){
