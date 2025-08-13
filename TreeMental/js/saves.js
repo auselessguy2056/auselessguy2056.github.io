@@ -27,6 +27,7 @@ function calc(dt) {
     player.points = player.points.add(FUNCTIONS.getPointsGain().mul(dt))
      // Update research points (this was the missing line)
     player.research.points = player.research.points.add(FUNCTIONS.getRPGain().mul(dt))
+    player.essence.points = player.essence.points.add(FUNCTIONS.getEssenceGain().mul(dt))
     if (player.points.gte(1e10)) player.prestige.unl = true
     if (player.prestige.upgrades.includes(9)) player.research.unl = true
     if (player.autos.treeUpgs && player.research.upgrades.includes(1)) buyAllTree()
