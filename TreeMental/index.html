@@ -36,10 +36,10 @@
                     Tree Upgrades: {{ player.canvas.upgArray.length }}/100<br>
                     {{ 100-player.treeUpgs.length }} boughts left<br> 
                     <button style="width: 90%; font-size: 22px; font-weight: bold;" v-bind:class="{closed: !FUNCTIONS.floor.can()}" onclick="FUNCTIONS.floor.go()">Go to next floor {{ format(player.floor+1, 0) }}</button><br>
-                    <button style="width: 90%; font-size: 22px; font-weight: bold; display: none;" onclick="buyAllTree()">Buy All Upgrades [M]</button>
+                    <button style="width: 90%; font-size: 22px; font-weight: bold; display: none" onclick="buyAllTree()">Buy All Upgrades [M]</button>
                     <div style="height: 90px;"><br>
                         You have <h2>{{ format(player.points,0) }}</h2> Points.<br>
-                        (+{{format(FUNCTIONS.getPointsGain(),0)}}/s)
+                      <div v-if= 'FUNCTIONS.getPointsGain() >0' >  (+{{format(FUNCTIONS.getPointsGain(),0)}}/s) </div>
                     </div><div v-if='player.showUpg != ""'>
                         <div style="height: 100px;">
                             {{player.canvas.TreeUpgs[player.showUpg].desc}}
@@ -63,7 +63,7 @@
             The Treemental - v0.3.2<br>
             Made by MrRedShark77<br>
         </div><div v-if='player.tabs[0] == 2'>
-            You have <h2>{{ format(player.prestige.points, 0) }}</h2> Prestige points.<br><br>
+            You have <h2>{{ format(player.prestige.points, 0) }}</h2> Prestige points.<br><br>     <div v-if="player.essence.points >= 1">You have <h2>{{ format(player.essence.points, 0) }}</h2> Essence points, which boost points <h2>{{ format(player.essence.points, 0) }}x</h2> times<br><br></div>
             <button class="prestige_button" v-bind:class="{closed: !FUNCTIONS.prestige.can()}" onclick="FUNCTIONS.prestige.reset()"><span v-if="FUNCTIONS.prestige.can()">Gain <b>{{ format(FUNCTIONS.prestige.points(),0) }}</b> Prestige points.</span><span v-if="!FUNCTIONS.prestige.can()">Reach <b>1e10</b> points to prestige.</span></button><br>
             <button onclick="FUNCTIONS.prestige.doReset()">Reset without gaining prestige points.</button><br>
             <button onclick="player.prestige.respec = !player.prestige.respec">Respec Tree Upgrades data: {{ player.prestige.respec?'ON':'OFF' }}</button><br>
@@ -106,7 +106,7 @@
                         </button>
                     </div>
                 </div>
-            </div>
+            </div> 
         </div>
     </div>
 </body>
