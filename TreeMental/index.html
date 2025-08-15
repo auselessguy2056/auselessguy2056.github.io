@@ -63,7 +63,7 @@
             The Treemental - v0.3.2<br>
             Made by MrRedShark77<br>
         </div><div v-if='player.tabs[0] == 2'>
-            You have <h2>{{ format(player.prestige.points, 0) }}</h2>  <div v-if= 'player.prestige.points.array[0][1] >= 220' >  (+{{format(FUNCTIONS.prestige.points(),0)}}/s) </div>
+            You have <h2>{{ format(player.prestige.points, 0) }}</h2>  <div v-if= 'player.prestige.points.array[0][1] >= 220 && player?.prestige?.points?.array?.[1]?.[1] !== undefined' >  (+{{format(FUNCTIONS.prestige.points(),0)}}/s) </div>
  Prestige points.<br><br>     <div v-if="player.essence.points >= 1">You have <h2>{{ format(player.essence.points, 0) }}</h2> Essence points, which boost points <h2>{{ format(player.essence.points, 0) }}x</h2> times<br><br></div>
             <button class="prestige_button" v-bind:class="{closed: !FUNCTIONS.prestige.can()}" onclick="FUNCTIONS.prestige.reset()"><span v-if="FUNCTIONS.prestige.can()">Gain <b>{{ format(FUNCTIONS.prestige.points(),0) }}</b> Prestige points.</span><span v-if="!FUNCTIONS.prestige.can()">Reach <b>1e10</b> points to prestige.</span></button><br>
             <button onclick="FUNCTIONS.prestige.doReset()">Reset without gaining prestige points.</button><br>
@@ -83,7 +83,7 @@
             </div>
         </div><div v-if='player.tabs[0] == 3'>
             You have <h2>{{ format(player.research.points,0) }}</h2> research points.<br>
-            Have 5% chance to generate tree upgrade for getting research.<br><br>
+            Have 5% chance to generate tree upgrade for getting research.<br><br><div v-if='player.research.upgrades.includes(5)' ><button v-bind:class="{closed: player.research.points < 1e12}" onclick="FUNCTIONS.research.reset()"> <span>Reset to get <b> {{format(1.1* player.research.resetTimes,1)}}x</b> research points gain next run.</span></button></div><br><br>
             <div class="table_center">
                 <div class="table_center" style="width: 900px;">
                     <div v-for='x in UPGRADES.research.cols' v-if="UPGRADES.research[x].unl()">
