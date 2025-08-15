@@ -122,6 +122,7 @@ const FUNCTIONS = {
                 FUNCTIONS.prestige.doReset();
                 player.floor = 1;
                 player.prestige.points = E(0);
+                player.research.points = E(0);
                // player.research.points = player.research.points.add(player.research.points);
                if(player.research.resetTimes == undefined) player.research.resetTimes = 0;
                player.research.resetTimes += 1;                
