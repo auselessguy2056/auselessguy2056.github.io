@@ -83,7 +83,7 @@
             </div>
         </div><div v-if='player.tabs[0] == 3'>
             You have <h2>{{ format(player.research.points,0) }}</h2> research points.<br>
-            Have 5% chance to generate tree upgrade for getting research.<br><br><div v-if='player.research.upgrades.includes(5)' ><button v-bind:class="{closed: player.research.points < 1e12}" onclick="FUNCTIONS.research.reset()"> <span>Reset to get <b> {{format(1.1* player.research.resetTimes,1)}}x</b> research points gain next run.</span></button></div><br><br>
+            Have 5% chance to generate tree upgrade for getting research.<br><br><div v-if='player.research.upgrades.includes(5)' ><button v-bind:class="{closed: player.research.points < 1e12}" onclick="FUNCTIONS.research.reset()"> <span>Reset to get <b> {{format(1.1* player.research.resetTimes + 1,1)}}x</b> research points gain next run.</span></button></div><br><br>
             <div class="table_center">
                 <div class="table_center" style="width: 900px;">
                     <div v-for='x in UPGRADES.research.cols' v-if="UPGRADES.research[x].unl()">
