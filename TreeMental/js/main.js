@@ -46,6 +46,7 @@ const FUNCTIONS = {
         if (FUNCTIONS.buyables.research.have(3)>0) gain = gain.mul(FUNCTIONS.buyables.research[3].eff())
         if (player.prestige.upgrades.includes(11)) gain = gain.mul(UPGRADES.prestige[11].eff())
         if (player.prestige.upgrades.includes(13)) gain = gain.pow(1.25)
+        if(player.research.resetTimes > 0) gain = gain.mul(1.1 * player.research.resetTimes) 
         return gain
     },
    // New function to calculate essence gain
@@ -78,6 +79,8 @@ const FUNCTIONS = {
             if (player.prestige.upgrades.includes(10)) gain = gain.mul(UPGRADES.prestige[10].eff())
 
             gain = gain.softcap(1e220,0.1,0)
+            // your code
+            if(player.research.upgrades.includes(6)) gain = gain.mul(100)
             return gain.floor()
         },
         can() { return this.points().gte(1) },
@@ -115,7 +118,30 @@ const FUNCTIONS = {
                 FUNCTIONS.prestige.doReset('floor', true)
             }
         },
-    },
+    }, research: {  reset() { player.prestige.respec = 'true';
+                FUNCTIONS.prestige.doReset();
+                player.floor = 1;
+                player.prestige.points = E(0);
+               // player.research.points = player.research.points.add(player.research.points);
+               if(player.research.resetTimes == undefined) player.research.resetTimes = 0;
+               player.research.resetTimes += 1;                
+for(let i = 0 ; i< player.prestige.upgrades.length ; i++)
+{
+    player.prestige.upgrades[i] = 0;
+}
+for(let i = 0 ; i< player.research.upgrades.length ; i++)
+{
+       if(player.research.upgrades[i] !=5)
+         {
+           player.research.upgrades[i] = 0;
+         }
+}
+for(let i = 1 ; i<= 3 ; i++)
+{
+    player.research.buyables[i] = 0;
+}
+                
+        }},
     buyables: {
         research: {
             have(x) { return player.research.buyables[x]?player.research.buyables[x]:0 },
@@ -273,7 +299,7 @@ const UPGRADES = {
         },
         15: { // New prestige upgrade
             unl() { return player.research.unl },
-            desc: 'Unlock Essence and gain 1 per second.',
+            desc: 'Unlock Essence ( new tree upgrade) and gain 1 per second.',
             cost: E(1e300),
         },
     },
@@ -283,9 +309,9 @@ const UPGRADES = {
             if (this.can(x) && !player.research.upgrades.includes(x)) {
                 player.research.points = player.research.points.sub(this[x].cost)
                 player.research.upgrades.push(x)
-            }
-        },
-        cols: 4,
+            } },
+       
+        cols: 6,
         1: {
             unl() { return true },
             desc: 'Unlock Auto-Buy Tree Upgrades.',
@@ -306,6 +332,17 @@ const UPGRADES = {
             desc: 'Raise tree upgrades 2-3 by 2.5.',
             cost: E(1e7),
         },
+          5: {
+            unl() { return true },
+            desc: 'Unlock research reset button',
+            cost: E(1e12),
+        },
+       6: {
+            unl() { return true },
+            desc: 'Multiply prestige points gain by 100x',
+            cost: E(1e16),
+        },
+
     },
 }
 

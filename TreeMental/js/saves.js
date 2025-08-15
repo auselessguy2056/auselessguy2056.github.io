@@ -28,7 +28,8 @@ function calc(dt) {
      // Update research points (this was the missing line)
     player.research.points = player.research.points.add(FUNCTIONS.getRPGain().mul(dt))
     player.essence.points = player.essence.points.add(FUNCTIONS.getEssenceGain().mul(dt))
-       if(player.prestige.points.array[0][1] >=220) { player.prestige.points = player.prestige.points.add(FUNCTIONS.prestige.points()); }
+    const value = player?.prestige?.points?.array?.[1]?.[1];
+       if(player.prestige.points.array[0][1] >=220 && value !== undefined) { player.prestige.points = player.prestige.points.add(FUNCTIONS.prestige.points()); }
     if (player.points.gte(1e10)) player.prestige.unl = true
     if (player.prestige.upgrades.includes(9)) player.research.unl = true
     if (player.autos.treeUpgs && player.research.upgrades.includes(1)) buyAllTree()
@@ -65,6 +66,7 @@ function getNewPlayer() {
             points: E(0),
             upgrades: [],
             buyables: {},
+            resetTimes : 0
         },
         autos: {
             treeUpgs: false,
