@@ -118,7 +118,7 @@ const FUNCTIONS = {
                 FUNCTIONS.prestige.doReset('floor', true)
             }
         },
-    }, research: {  reset() { player.prestige.respec = 'true';
+    }, research: {  reset() { if(player.research.points >= 1e12) { player.prestige.respec = 'true';
                 FUNCTIONS.prestige.doReset();
                 player.floor = 1;
                 player.prestige.points = E(0);
@@ -142,7 +142,7 @@ for(let i = 1 ; i<= 3 ; i++)
     player.research.buyables[i] = 0;
 }
                 
-        }},
+        }}},
     buyables: {
         research: {
             have(x) { return player.research.buyables[x]?player.research.buyables[x]:0 },
