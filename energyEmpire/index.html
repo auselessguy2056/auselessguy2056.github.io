@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Energy Incremental</title>
+
+<style>
+    body{
+        margin:0;
+        background:#101010;
+        color:white;
+        font-family:Arial;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        min-height:100vh;
+    }
+
+    .game{
+        width:500px;
+        background:#1d1d1d;
+        padding:20px;
+        border-radius:14px;
+    }
+
+    h1,h2{
+        text-align:center;
+    }
+
+    .resource{
+        text-align:center;
+        font-size:26px;
+        margin-bottom:10px;
+    }
+
+    .gold{
+        color:gold;
+    }
+
+    .blue{
+        color:#4fc3ff;
+    }
+
+    button{
+        width:100%;
+        padding:12px;
+        margin-top:8px;
+        border:none;
+        border-radius:10px;
+        cursor:pointer;
+        font-size:15px;
+        background:#4caf50;
+        color:white;
+    }
+
+    button:hover{
+        opacity:0.9;
+    }
+
+    .prestigeBtn{
+        background:goldenrod;
+        color:black;
+        font-weight:bold;
+    }
+
+    .superBtn{
+        background:#00b7ff;
+        color:white;
+        font-weight:bold;
+    }
+
+    .item{
+        background:#2b2b2b;
+        padding:12px;
+        border-radius:10px;
+        margin-top:12px;
+    }
+
+    .stats{
+        margin-top:20px;
+        color:#bbb;
+    }
+
+.paginationPage{
+    display:none;
+    animation:fadeIn .3s;
+}
+
+.paginationPage.active{
+    display:block;
+}
+
+.tabs{
+    display:flex;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+.tabBtn{
+    flex:1;
+    background:#333;
+}
+
+.tabBtn.active{
+    background:#00b7ff;
+}
+
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="game">
+
+    <h1>⚡Energy Empire</h1>
+
+    <div class="resource">
+        Energy: <span id="energy">0</span>
+    </div>
+
+    <div class="resource gold">
+        Prestige Points: <span id="prestigePoints">0</span>
+    </div>
+
+    <div class="resource blue">
+        Super Energy: <span id="superEnergy">0</span>
+    </div>
+
+    <button id="clickBtn">
+        Generate Energy
+    </button>
+    <div id='mainPage'>
+    <div class="item">
+        <strong>Generator</strong><br>
+        +1 energy/sec<br>
+        Cost: <span id="genCost">10</span>
+
+        <button onclick="buyGenerator()">
+            Buy Generator
+        </button>
+    </div>
+
+    <div class="item">
+        <strong>Factory</strong><br>
+        +5 energy/sec<br>
+        Cost: <span id="factoryCost">50</span>
+
+        <button onclick="buyFactory()">
+            Buy Factory
+        </button>
+    </div>
+
+    <div class="item">
+        <strong>Click Upgrade</strong><br>
+        Increase click power<br>
+        Cost: <span id="clickCost">25</span>
+
+        <button onclick="buyClickUpgrade()">
+            Upgrade Click
+        </button>
+    </div>
+</div>
+    <div class="item">
+        <strong>Prestige Reset</strong><br>
+        Reset game for prestige points<br>
+        Gain:
+        <span id="prestigeGain">0</span>
+
+        <button class="prestigeBtn"
+        onclick="prestigeReset()">
+            PRESTIGE
+        </button>
+<button id="superTab"
+class="tabBtn"
+onclick="showPage('superPage', this)">
+    Super Shop
+</button>
+<button id="mainTab"
+class="tabBtn"
+onclick="showPage('mainPage', this)">
+    Main
+</button>
+
+    </div>
+   
+<div id="superPage" class="paginationPage">
+
+    <h2 class="blue">SUPER SHOP</h2>
+
+    <div class="item">
+        <strong>Super Generator</strong><br>
+        +50 energy/sec<br>
+        Cost: 1 Super Energy
+
+        <button class="superBtn"
+        onclick="buySuperGenerator()">
+            Buy Super Generator
+        </button>
+    </div>
+
+    <div class="item">
+        <strong>Super Factory</strong><br>
+        +250 energy/sec<br>
+        Cost: 3 Super Energy
+
+        <button class="superBtn"
+        onclick="buySuperFactory()">
+            Buy Super Factory
+        </button>
+    </div>
+
+    <div class="item">
+        <strong>Super Click</strong><br>
+        +100 click power<br>
+        Cost: 2 Super Energy
+
+        <button class="superBtn"
+        onclick="buySuperClick()">
+            Buy Super Click
+        </button>
+    </div>
+
+</div>
+    <div class="stats">
+        <div>
+            Energy/sec:
+            <span id="eps">0</span>
+        </div>
+
+        <div>
+            Click Power:
+            <span id="clickPower">1</span>
+        </div>
+
+        <div>
+            Prestige Multiplier:
+            x<span id="multiplier">1</span>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+let energy = 0;
+
+let prestigePoints = 0;
+
+let superEnergy = 0;
+
+let clickPower = 1;
+
+let generators = 0;
+let factories = 0;
+
+let superGenerators = 0;
+let superFactories = 0;
+
+let genCost = 10;
+let factoryCost = 50;
+let clickCost = 25;
+
+function multiplier(){
+    return 1 + (prestigePoints * 0.5);
+}
+
+function getPrestigeGain(){
+    return Math.floor(Math.sqrt(energy / 1000));
+}
+
+function buyGenerator(){
+
+    if(energy >= genCost){
+
+        energy -= genCost;
+
+        generators++;
+
+        genCost = Math.floor(genCost * 1.5);
+
+        updateUI();
+    }
+}
+
+function updateUI(){
+
+    let production =
+        generators * 1 +
+        factories * 5 +
+        superGenerators * 50 +
+        superFactories * 250;
+
+    production *= multiplier();
+    if(superEnergy ==0 )
+{
+    document.getElementById('superTab').style.display='none'
+}
+    else {
+  document.getElementById('superTab').style.display='block'
+}
+    document.getElementById("energy")
+    .textContent = Math.floor(energy);
+
+    document.getElementById("prestigePoints")
+    .textContent = prestigePoints;
+
+    document.getElementById("superEnergy")
+    .textContent = superEnergy;
+
+    document.getElementById("genCost")
+    .textContent = genCost;
+
+    document.getElementById("factoryCost")
+    .textContent = factoryCost;
+
+    document.getElementById("clickCost")
+    .textContent = clickCost;
+
+    document.getElementById("clickPower")
+    .textContent = clickPower;
+
+    document.getElementById("eps")
+    .textContent = Math.floor(production);
+
+    document.getElementById("multiplier")
+    .textContent = multiplier().toFixed(1);
+
+    document.getElementById("prestigeGain")
+    .textContent = getPrestigeGain();
+
+
+}
+
+
+   document.getElementById("clickBtn")
+    .addEventListener("click", () => {
+
+        energy += clickPower * multiplier();
+
+        updateUI();
+    });
+
+function buyFactory(){
+
+    if(energy >= factoryCost){
+
+        energy -= factoryCost;
+
+        factories++;
+
+        factoryCost = Math.floor(factoryCost * 1.7);
+
+        updateUI();
+    }
+}
+
+function buyClickUpgrade(){
+
+    if(energy >= clickCost){
+
+        energy -= clickCost;
+
+        clickPower++;
+
+        clickCost = Math.floor(clickCost * 2);
+
+        updateUI();
+    }
+}
+function prestigeReset(){
+
+    let gain = getPrestigeGain();
+
+    if(gain <= 0){
+
+        alert("Need more energy!");
+        return;
+    }
+
+    prestigePoints += gain;
+
+    // EVERY 1000 PRESTIGE POINTS:
+    // - gain 1 super energy
+    // - reset prestige points to 0
+    // - reset energy to 0
+
+    if(prestigePoints >= 1000){
+
+        let earned =
+            Math.floor(prestigePoints / 1000);
+
+        superEnergy += earned;
+
+        prestigePoints = 0;
+
+        energy = 0;
+
+        alert(
+            "You reached 1000 Prestige!\n" +
+            "+" + earned + " Super Energy earned!"
+        );
+    }
+
+    // NORMAL RESET
+
+    energy = 0;
+
+    clickPower = 1;
+
+    generators = 0;
+    factories = 0;
+
+    genCost = 10;
+    factoryCost = 50;
+    clickCost = 25;
+
+    updateUI();
+}
+function buySuperGenerator(){
+
+    if(superEnergy >= 1){
+
+        superEnergy -= 1;
+
+        superGenerators++;
+
+        updateUI();
+    }
+}
+
+function buySuperFactory(){
+
+    if(superEnergy >= 3){
+
+        superEnergy -= 3;
+
+        superFactories++;
+
+        updateUI();
+    }
+}
+
+
+function showPage(pageId, btn){
+
+    // hide pages
+    if(pageId != 'mainPage') { document.getElementById('mainPage').style.display ='none'}
+    else { document.getElementById('mainPage').style.display ='block'}
+
+
+    document.querySelectorAll(".paginationPage")
+    .forEach(page => {
+        page.classList.remove("active");
+    });
+
+    // remove active buttons
+
+    document.querySelectorAll(".tabBtn")
+    .forEach(button => {
+        button.classList.remove("active");
+    });
+
+    // show selected page
+
+    document.getElementById(pageId)
+    .classList.add("active");
+
+    btn.classList.add("active");
+}
+function buySuperClick(){
+
+    if(superEnergy >= 2){
+
+        superEnergy -= 2;
+
+        clickPower += 100;
+
+        updateUI();
+    }
+}
+
+setInterval(() => {
+
+    let production =
+        generators * 1 +
+        factories * 5 +
+        superGenerators * 50 +
+        superFactories * 250;
+
+    production *= multiplier();
+
+    energy += production;
+
+    updateUI();
+
+}, 1000);
+
+updateUI();
+
+</script>
+
+</body>
+</html>
