@@ -1,0 +1,543 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 90%;
+    max-width: 900px;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+/* New: Styles for main tabs (World, Settings) */
+.main-tabs {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px; /* Khoảng cách giữa nút và đường kẻ */
+}
+
+.main-tabs .tab-button {
+    background-color: #e0e0e0;
+    border: none;
+    padding: 12px 25px; /* To hơn một chút */
+    cursor: pointer;
+    font-size: 1.1em; /* Chữ to hơn */
+    font-weight: bold;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    transition: background-color 0.3s ease;
+    margin: 0 5px;
+}
+
+.main-tabs .tab-button:hover {
+    background-color: #d0d0d0;
+}
+
+.main-tabs .tab-button.active {
+    background-color: #007bff; /* Màu xanh dương cho tab chính */
+    color: white;
+    border-bottom: 2px solid #007bff; /* Highlight tab active */
+}
+
+
+.resources, .workers {
+    margin-top: 25px; /* Giữ khoảng cách sau tab chính */
+    margin-bottom: 25px;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.resources p, .workers p {
+    font-size: 1.1em;
+    margin: 8px 0;
+}
+
+/* Sub-tab navigation (Khai Thac, Cong Trinh, etc.) */
+.sub-tabs {
+    margin-top: 20px; /* Khoảng cách với phần resources/workers */
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid #eee; /* Đường kẻ mỏng hơn */
+    padding-bottom: 5px;
+}
+
+.sub-tab-button {
+    background-color: #f0f0f0;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 0.95em;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    margin: 0 2px;
+}
+
+.sub-tab-button:hover {
+    background-color: #e0e0e0;
+}
+
+.sub-tab-button.active {
+    background-color: #4CAF50; /* Màu xanh lá cây cho tab con */
+    color: white;
+    font-weight: bold;
+}
+
+/* Main tab content (World, Settings) */
+.tab-content {
+    display: none; /* Mặc định ẩn tất cả các tab content chính */
+    padding: 20px 0;
+}
+
+.tab-content.active {
+    display: block; /* Hiển thị tab content chính đang hoạt động */
+}
+
+/* Sub-tab content (Mining, Buildings, etc.) */
+.sub-tab-content {
+    display: none; /* Mặc định ẩn tất cả các tab content con */
+    padding: 20px 0;
+}
+
+.sub-tab-content.active {
+    display: block; /* Hiển thị tab content con đang hoạt động */
+}
+
+
+/* Specific content areas within tabs */
+.worker-assignment, .building-grid, .training-grid, .research-assignment, .research-technologies, .crafting-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.assignment-item, .building-item, .training-item, .crafting-item, .research-item {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.assignment-item h3, .building-item h3, .training-item h3, .crafting-item h3, .research-item h3 {
+    margin-top: 0;
+    color: #555;
+}
+
+.assignment-item button, .building-item button, .training-item button, .research-assignment button, .research-technologies button, .crafting-item button, .settings-section button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin: 5px;
+    transition: background-color 0.2s ease;
+}
+
+.assignment-item button:hover, .building-item button:hover, .training-item button:hover, .research-assignment button:hover, .research-technologies button:hover, .crafting-item button:hover, .settings-section button:hover {
+    background-color: #45a049;
+}
+
+/* Remove Worker button specific style */
+button[onclick^="removeWorker"], button[onclick^="removeResearcher"] {
+    background-color: #f44336; /* Red */
+}
+
+button[onclick^="removeWorker"]:hover, button[onclick^="removeResearcher"]:hover {
+    background-color: #da190b;
+}
+
+/* Disable button style */
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.building-item ul, .training-item ul, .crafting-item ul, .research-item ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.building-item ul li, .training-item ul li, .crafting-item ul li, .research-item ul li {
+    margin-bottom: 5px;
+    font-size: 0.95em;
+}
+
+/* Progress Bar Styles */
+.progress-bar-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 15px;
+    position: relative; /* Để span .progress-text có thể đặt lên trên */
+    height: 25px; /* Chiều cao của thanh progress */
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #4CAF50; /* Màu xanh lá cây */
+    width: 0%;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 25px; /* Để text nằm giữa */
+    color: white; /* Màu chữ của progress bar */
+    transition: width 0.5s ease-out; /* Hiệu ứng chuyển động mượt mà */
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #333; /* Màu chữ của countdown */
+    font-weight: bold;
+    z-index: 1; /* Đảm bảo text nằm trên progress bar */
+}
+
+/* Settings Tab Specific Styles */
+.settings-section {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.settings-section h3 {
+    margin-top: 0;
+    color: #555;
+}
+.resources p span {
+    /* Để giới hạn hiển thị rõ ràng hơn */
+    font-weight: bold;
+    color: #0056b3; /* Một màu sắc để phân biệt */
+
+.settings-section textarea {
+    width: calc(100% - 20px); /* Kích thước textarea */
+    min-height: 100px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical; /* Cho phép resize theo chiều dọc */
+    font-family: monospace; /* Font chữ đơn cách để dễ đọc mã */
+}
+.exploration-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.exploration-item {
+    background-color: #f0f8ff; /* Light blue background */
+    border: 1px solid #cceeff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    text-align: left;
+}
+
+.exploration-item h3 {
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.exploration-item p {
+    font-size: 0.95em;
+    margin-bottom: 8px;
+}
+
+.exploration-item input[type="number"] {
+    width: 80px;
+    padding: 5px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.exploration-item button {
+    display: block; /* Make button take full width */
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-top: 15px;
+}
+
+.exploration-item button:hover {
+    background-color: #0056b3;
+}
+
+.exploration-item button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Style cho các phần tử tài nguyên để hiển thị giới hạn */
+.resources p span {
+    font-weight: bold;
+    color: #0056b3; /* Một màu sắc để phân biệt */
+
+/* Nút lưu/tải game có màu khác một chút */
+.settings-section button {
+    background-color: #007bff; /* Blue for settings buttons */
+}
+
+.settings-section button:hover {
+    background-color: #0056b3;
+}
+
+/* Thêm vào cuối file style.css */
+
+.exploration-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.exploration-item {
+    background-color: #f0f8ff; /* Light blue background */
+    border: 1px solid #cceeff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    text-align: left;
+}
+
+.exploration-item h3 {
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.exploration-item p {
+    font-size: 0.95em;
+    margin-bottom: 8px;
+}
+
+.exploration-item input[type="number"] {
+    width: 80px;
+    padding: 5px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.exploration-item button {
+    display: block; /* Make button take full width */
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-top: 15px;
+}
+
+.exploration-item button:hover {
+    background-color: #0056b3;
+}
+
+.exploration-item button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Style cho các phần tử tài nguyên để hiển thị giới hạn */
+.resources p span {
+    font-weight: bold;
+    color: #0056b3; /* Một màu sắc để phân biệt */
+}
+
+/* Progress Bar Styles */
+.progress-bar-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 15px;
+    position: relative; /* Để span .progress-text có thể đặt lên trên */
+    height: 25px; /* Chiều cao của thanh progress */
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #4CAF50; /* Màu xanh lá cây */
+    width: 0%;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 25px; /* Để text nằm giữa theo chiều dọc */
+    color: white; /* Màu chữ trên thanh progress */
+    transition: width 1s ease-in-out; /* Hiệu ứng chuyển động mượt mà */
+}
+
+.settings-group {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: left; /* Căn chỉnh nội dung trong nhóm cài đặt */
+}
+
+.settings-group h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #555;
+    text-align: center;
+}
+
+.settings-group h4 {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    color: #666;
+}
+
+#achievements-list {
+    list-style: none;
+    padding: 0;
+}
+
+#achievements-list li {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.achievement-locked {
+    color: #999;
+    font-style: italic;
+    /* Có thể thêm icon khóa */
+}
+
+.achievement-unlocked {
+    color: #4CAF50; /* Màu xanh lá cây */
+    font-weight: bold;
+    /* Có thể thêm icon mở khóa/tick */
+}
+.progress-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 25px; /* Căn giữa chiều dọc */
+    color: #333; /* Màu chữ cho countdown */
+    font-weight: bold;
+}
+
+/* Achievement Styles */
+#achievements-list {
+    list-style: none;
+    padding: 0;
+}
+
+#achievements-list li {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    display: flex; /* Dùng flexbox để căn chỉnh icon và text */
+    align-items: center;
+}
+
+.achievement-locked {
+    color: #999;
+    font-style: italic;
+}
+
+.achievement-unlocked {
+    color: #4CAF50; /* Màu xanh lá cây */
+    font-weight: bold;
+}
+
+.achievement-icon {
+    display: inline-block;
+    width: 20px; /* Kích thước của icon */
+    height: 20px;
+    margin-left: 10px;
+    background-color: transparent; /* Mặc định trong suốt */
+    border: 1px solid #ccc; /* Viền xám cho trạng thái khóa */
+    border-radius: 50%; /* Hình tròn */
+    position: relative; /* Để căn chỉnh dấu tick */
+    flex-shrink: 0; /* Ngăn icon bị co lại */
+}
+
+.achievement-unlocked-icon {
+    background-color: #4CAF50; /* Nền xanh khi mở khóa */
+    border-color: #4CAF50; /* Viền xanh khi mở khóa */
+}
+
+.achievement-unlocked-icon::before {
+    content: '✓'; /* Dấu tick */
+    color: white; /* Màu trắng cho dấu tick */
+    font-size: 1.2em; /* Kích thước dấu tick */
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Căn giữa dấu tick */
+    line-height: 1; /* Đảm bảo dấu tick không bị đẩy xuống */
+}
+
+/* Optional: Improve styling for save/load textareas and buttons */
+.settings-section textarea {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: monospace; /* Font đơn cách cho dữ liệu */
+    resize: vertical; /* Cho phép thay đổi kích thước chiều dọc */
+}
+
+.settings-section button {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s ease;
+}
+
+.settings-section button:hover {
+    background-color: #0056b3;
+}
+
+.settings-section button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
