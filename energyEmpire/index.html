@@ -247,28 +247,80 @@ onclick="showPage('mainPage', this)">
             x<span id="multiplier">1</span>
         </div>
     </div>
+    
+    <button onclick="clearSave()" style="background: #a94442; font-size: 11px; padding: 5px; margin-top: 20px; width: auto; display: block; margin-left: auto; margin-right: auto;">
+        Hard Reset Game
+    </button>
 
 </div>
 
 <script>
 
 let energy = 0;
-
 let prestigePoints = 0;
-
 let superEnergy = 0;
-
 let clickPower = 1;
 
 let generators = 0;
 let factories = 0;
-
 let superGenerators = 0;
 let superFactories = 0;
 
 let genCost = 10;
 let factoryCost = 50;
 let clickCost = 25;
+
+// --- LOCAL STORAGE SAVE / LOAD SYSTEMS ---
+
+function saveGame() {
+    const gameState = {
+        energy,
+        prestigePoints,
+        superEnergy,
+        clickPower,
+        generators,
+        factories,
+        superGenerators,
+        superFactories,
+        genCost,
+        factoryCost,
+        clickCost
+    };
+    localStorage.setItem("energyEmpireSave", JSON.stringify(gameState));
+}
+
+function loadGame() {
+    const savedData = localStorage.getItem("energyEmpireSave");
+    if (savedData) {
+        try {
+            const parsed = JSON.parse(savedData);
+            
+            // Check each variable to prevent breakages if future updates modify state structure
+            if (parsed.energy !== undefined) energy = parsed.energy;
+            if (parsed.prestigePoints !== undefined) prestigePoints = parsed.prestigePoints;
+            if (parsed.superEnergy !== undefined) superEnergy = parsed.superEnergy;
+            if (parsed.clickPower !== undefined) clickPower = parsed.clickPower;
+            if (parsed.generators !== undefined) generators = parsed.generators;
+            if (parsed.factories !== undefined) factories = parsed.factories;
+            if (parsed.superGenerators !== undefined) superGenerators = parsed.superGenerators;
+            if (parsed.superFactories !== undefined) superFactories = parsed.superFactories;
+            if (parsed.genCost !== undefined) genCost = parsed.genCost;
+            if (parsed.factoryCost !== undefined) factoryCost = parsed.factoryCost;
+            if (parsed.clickCost !== undefined) clickCost = parsed.clickCost;
+        } catch (e) {
+            console.error("Failed to parse save game data", e);
+        }
+    }
+}
+
+function clearSave() {
+    if (confirm("Are you sure you want to reset ALL your progress? This cannot be undone.")) {
+        localStorage.removeItem("energyEmpireSave");
+        location.reload();
+    }
+}
+
+// ----------------------------------------
 
 function multiplier(){
     return 1 + (prestigePoints * 0.5);
@@ -279,21 +331,16 @@ function getPrestigeGain(){
 }
 
 function buyGenerator(){
-
     if(energy >= genCost){
-
         energy -= genCost;
-
         generators++;
-
         genCost = Math.floor(genCost * 1.5);
-
         updateUI();
+        saveGame();
     }
 }
 
 function updateUI(){
-
     let production =
         generators * 1 +
         factories * 5 +
@@ -301,108 +348,67 @@ function updateUI(){
         superFactories * 250;
 
     production *= multiplier();
-    if(superEnergy ==0 )
-{
-    document.getElementById('superTab').style.display='none'
-}
-    else {
-  document.getElementById('superTab').style.display='block'
-}
-    document.getElementById("energy")
-    .textContent = Math.floor(energy);
-
-    document.getElementById("prestigePoints")
-    .textContent = prestigePoints;
-
-    document.getElementById("superEnergy")
-    .textContent = superEnergy;
-
-    document.getElementById("genCost")
-    .textContent = genCost;
-
-    document.getElementById("factoryCost")
-    .textContent = factoryCost;
-
-    document.getElementById("clickCost")
-    .textContent = clickCost;
-
-    document.getElementById("clickPower")
-    .textContent = clickPower;
-
-    document.getElementById("eps")
-    .textContent = Math.floor(production);
-
-    document.getElementById("multiplier")
-    .textContent = multiplier().toFixed(1);
-
-    document.getElementById("prestigeGain")
-    .textContent = getPrestigeGain();
-
-
+    
+    if(superEnergy == 0) {
+        document.getElementById('superTab').style.display='none';
+    } else {
+        document.getElementById('superTab').style.display='block';
+    }
+    
+    document.getElementById("energy").textContent = Math.floor(energy);
+    document.getElementById("prestigePoints").textContent = prestigePoints;
+    document.getElementById("superEnergy").textContent = superEnergy;
+    document.getElementById("genCost").textContent = genCost;
+    document.getElementById("factoryCost").textContent = factoryCost;
+    document.getElementById("clickCost").textContent = clickCost;
+    document.getElementById("clickPower").textContent = clickPower;
+    document.getElementById("eps").textContent = Math.floor(production);
+    document.getElementById("multiplier").textContent = multiplier().toFixed(1);
+    document.getElementById("prestigeGain").textContent = getPrestigeGain();
 }
 
-
-   document.getElementById("clickBtn")
-    .addEventListener("click", () => {
-
-        energy += clickPower * multiplier();
-
-        updateUI();
-    });
+document.getElementById("clickBtn").addEventListener("click", () => {
+    energy += clickPower * multiplier();
+    updateUI();
+    // Quick-saving on manual clicks can be throttled if performance suffers, 
+    // but with LocalStorage it's generally safe for casual increments.
+    saveGame(); 
+});
 
 function buyFactory(){
-
     if(energy >= factoryCost){
-
         energy -= factoryCost;
-
         factories++;
-
         factoryCost = Math.floor(factoryCost * 1.7);
-
         updateUI();
+        saveGame();
     }
 }
 
 function buyClickUpgrade(){
-
     if(energy >= clickCost){
-
         energy -= clickCost;
-
         clickPower++;
-
         clickCost = Math.floor(clickCost * 2);
-
         updateUI();
+        saveGame();
     }
 }
-function prestigeReset(){
 
+function prestigeReset(){
     let gain = getPrestigeGain();
 
     if(gain <= 0){
-
         alert("Need more energy!");
         return;
     }
 
     prestigePoints += gain;
 
-    // EVERY 1000 PRESTIGE POINTS:
-    // - gain 1 super energy
-    // - reset prestige points to 0
-    // - reset energy to 0
-
     if(prestigePoints >= 1000){
-
-        let earned =
-            Math.floor(prestigePoints / 1000);
-
+        let earned = Math.floor(prestigePoints / 1000);
         superEnergy += earned;
-
         prestigePoints = 0;
-
         energy = 0;
 
         alert(
@@ -412,85 +418,66 @@ function prestigeReset(){
     }
 
     // NORMAL RESET
-
     energy = 0;
-
     clickPower = 1;
-
     generators = 0;
     factories = 0;
-
     genCost = 10;
     factoryCost = 50;
     clickCost = 25;
 
     updateUI();
+    saveGame();
 }
+
 function buySuperGenerator(){
-
     if(superEnergy >= 1){
-
         superEnergy -= 1;
-
         superGenerators++;
-
         updateUI();
+        saveGame();
     }
 }
 
 function buySuperFactory(){
-
     if(superEnergy >= 3){
-
         superEnergy -= 3;
-
         superFactories++;
-
         updateUI();
+        saveGame();
     }
 }
 
-
 function showPage(pageId, btn){
+    if(pageId != 'mainPage') { 
+        document.getElementById('mainPage').style.display ='none';
+    } else { 
+        document.getElementById('mainPage').style.display ='block';
+    }
 
-    // hide pages
-    if(pageId != 'mainPage') { document.getElementById('mainPage').style.display ='none'}
-    else { document.getElementById('mainPage').style.display ='block'}
-
-
-    document.querySelectorAll(".paginationPage")
-    .forEach(page => {
+    document.querySelectorAll(".paginationPage").forEach(page => {
         page.classList.remove("active");
     });
 
-    // remove active buttons
-
-    document.querySelectorAll(".tabBtn")
-    .forEach(button => {
+    document.querySelectorAll(".tabBtn").forEach(button => {
         button.classList.remove("active");
     });
 
-    // show selected page
-
-    document.getElementById(pageId)
-    .classList.add("active");
-
+    document.getElementById(pageId).classList.add("active");
     btn.classList.add("active");
 }
+
 function buySuperClick(){
-
     if(superEnergy >= 2){
-
         superEnergy -= 2;
-
         clickPower += 100;
-
         updateUI();
+        saveGame();
     }
 }
 
+// Game Loop Tick (Every 1 second)
 setInterval(() => {
-
     let production =
         generators * 1 +
         factories * 5 +
@@ -498,14 +485,18 @@ setInterval(() => {
         superFactories * 250;
 
     production *= multiplier();
-
     energy += production;
-
     updateUI();
-
 }, 1000);
 
-updateUI();
+// Auto-save Interval (Runs every 10 seconds to catch idle generator production)
+setInterval(() => {
+    saveGame();
+}, 10000);
+
+// --- INITIALIZATION ---
+loadGame(); // Load the data first
+updateUI(); // Render the loaded data to screen
 
 </script>
 
