@@ -1,346 +1,193 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv='cache-control' content='no-cache'>
-    <meta http-equiv='expires' content='0'>
-    <meta http-equiv='pragma' content='no-cache'>
-    <title>Game Khai Thác Tài Nguyên</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Incremental Arcade</title>
+<style>
+    :root {
+        --bg-color: #0d0e12;
+        --card-bg: #181a23;
+        --text-color: #e2e8f0;
+        --accent-blue: #00b7ff;
+        --accent-gold: #ffd700;
+        --accent-green: #4caf50;
+        --accent-purple: #9d4edd;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg-color);
+        color: var(--text-color);
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    header {
+        text-align: center;
+        padding: 60px 20px 40px;
+        max-width: 800px;
+    }
+
+    header h1 {
+        font-size: 3rem;
+        margin: 0 0 10px 0;
+        background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: 1px;
+    }
+
+    header p {
+        color: #8a99ad;
+        font-size: 1.2rem;
+        margin: 0;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1100px;
+        padding: 20px;
+        box-sizing: border-box;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 25px;
+        margin-bottom: 60px;
+    }
+
+    .game-card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        border: 1px solid #252938;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .game-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+    }
+
+    /* Card Specific Borders & Accents */
+    .card-energy::before { background: var(--accent-blue); }
+    .card-energy:hover { border-color: rgba(0, 183, 255, 0.4); box-shadow: 0 10px 30px rgba(0, 183, 255, 0.1); }
+    
+    .card-resource::before { background: var(--accent-green); }
+    .card-resource:hover { border-color: rgba(76, 175, 80, 0.4); box-shadow: 0 10px 30px rgba(76, 175, 80, 0.1); }
+
+    .card-tree::before { background: var(--accent-purple); }
+    .card-tree:hover { border-color: rgba(157, 78, 221, 0.4); box-shadow: 0 10px 30px rgba(157, 78, 221, 0.1); }
+
+    .card-incremental::before { background: var(--accent-gold); }
+    .card-incremental:hover { border-color: rgba(255, 215, 0, 0.4); box-shadow: 0 10px 30px rgba(255, 215, 0, 0.1); }
+
+    .game-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .game-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0 0 12px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .game-desc {
+        color: #94a3b8;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin-bottom: 25px;
+        flex-grow: 1;
+    }
+
+    .play-btn {
+        display: inline-block;
+        text-align: center;
+        text-decoration: none;
+        padding: 12px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 0.95rem;
+        transition: background 0.2s, color 0.2s;
+        background: #252938;
+        color: var(--text-color);
+    }
+
+    /* Button Hover Themes */
+    .card-energy .play-btn:hover { background: var(--accent-blue); color: #000; }
+    .card-resource .play-btn:hover { background: var(--accent-green); color: #000; }
+    .card-tree .play-btn:hover { background: var(--accent-purple); color: #fff; }
+    .card-incremental .play-btn:hover { background: var(--accent-gold); color: #000; }
+
+    footer {
+        margin-top: auto;
+        padding: 20px;
+        color: #475569;
+        font-size: 0.85rem;
+    }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Trò Chơi Khai Thác Tài Nguyên</h1>
 
-        <div class="resources">
-            <h2>Tài Nguyên</h2>
-            <p>Gỗ: <span id="wood">0 / 500</span></p>
-            <p>Lúa: <span id="grain">0 / 500</span></p>
-            <p>Vàng: <span id="gold">0 / 500</span></p>
-            <p>Đá: <span id="stone">0 / 500</span></p>
-            <p>Sắt: <span id="iron">0 / 500</span></p>
-            <p>Điểm Nghiên Cứu: <span id="research-points">0</span></p>
-            <p>Áo Giáp: <span id="armor">0</span></p>
+<header>
+    <h1>The Incremental Arcade</h1>
+    <p>A collection of addictive, numbers-go-up idle and clicker games. Choose your universe and start optimizing.</p>
+</header>
+
+<div class="container">
+
+    <div class="game-card card-energy">
+        <div>
+            <div class="game-title">⚡ Energy Empire</div>
+            <div class="game-desc">Build an automated power infrastructure. Generate energy, hire workers, scale up to massive factories, and prestige to unlock powerful Cosmic/Super technologies.</div>
         </div>
-
-        <div class="workers">
-            <h2>Công Nhân</h2>
-            <p>Tổng số công nhân: <span id="total-workers">5</span></p>
-            <p>Công nhân rảnh: <span id="idle-workers">5</span></p>
-            <p>Nhà nghiên cứu: <span id="researchers">0</span></p>
-            <p>Binh sĩ: <span id="soldiers">0</span></p>
-        </div>
-
-        <div class="main-tabs">
-            <button class="tab-button active" onclick="showMainTab('world-tab')">Thế Giới</button>
-            <button class="tab-button" onclick="showMainTab('settings-tab')">Cài Đặt</button>
-        </div>
-
-        <div id="world-tab" class="tab-content active">
-            <div class="sub-tabs">
-                <button class="sub-tab-button active" onclick="showSubTab('mining-tab')">Khai Thác</button>
-                <button class="sub-tab-button" onclick="showSubTab('buildings-tab')">Công Trình</button>
-                <button class="sub-tab-button" onclick="showSubTab('training-research-tab')">Huấn Luyện & Nghiên Cứu</button>
-                <button class="sub-tab-button" onclick="showSubTab('military-tab')">Quân Đội</button>
-                <button class="sub-tab-button" onclick="showSubTab('blacksmith-tab')">Lò Rèn</button>
-                <button class="sub-tab-button" onclick="showSubTab('exploration-tab')">Thám Hiểm</button>
- 		<button class="sub-tab-button" onclick="showSubTab('wonder-tab')">Kỳ Quan</button>
-            </div>
-
-            <div id="mining-tab" class="sub-tab-content active">
-                <h2>Khu Vực Khai Thác</h2>
-                <div class="locations">
-                    <div class="location-item">
-                        <h3>Rừng (Gỗ)</h3>
-                        <p>Công nhân đang làm: <span id="workers-forest">0</span></p>
-                        <div class="button-group">
-                            <button onclick="assignWorker('forest')">Gửi công nhân</button>
-                            <button onclick="removeWorker('forest')">Rút công nhân</button>
-                        </div>
-                    </div>
-                    <div class="location-item">
-                        <h3>Nông Trại (Lúa)</h3>
-                        <p>Công nhân đang làm: <span id="workers-farm">0</span></p>
-                        <div class="button-group">
-                            <button onclick="assignWorker('farm')">Gửi công nhân</button>
-                            <button onclick="removeWorker('farm')">Rút công nhân</button>
-                        </div>
-                    </div>
-                    <div class="location-item">
-                        <h3>Mỏ Vàng (Vàng)</h3>
-                        <p>Công nhân đang làm: <span id="workers-mine">0</span></p>
-                        <div class="button-group">
-                            <button onclick="assignWorker('mine')">Gửi công nhân</button>
-                            <button onclick="removeWorker('mine')">Rút công nhân</button>
-                        </div>
-                    </div>
-                    <div class="location-item">
-                        <h3>Quặng Đá (Đá)</h3>
-                        <p>Công nhân đang làm: <span id="workers-quarry">0</span></p>
-                        <div class="button-group">
-                            <button onclick="assignWorker('quarry')">Gửi công nhân</button>
-                            <button onclick="removeWorker('quarry')">Rút công nhân</button>
-                        </div>
-                    </div>
-                    <div class="location-item">
-                        <h3>Mỏ Sắt (Sắt)</h3>
-                        <p>Công nhân đang làm: <span id="workers-iron-mine">0</span></p>
-                        <div class="button-group">
-                            <button onclick="assignWorker('ironMine')">Gửi công nhân</button>
-                            <button onclick="removeWorker('ironMine')">Rút công nhân</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="buildings-tab" class="sub-tab-content">
-                <h2>Công Trình</h2>
-                <div class="building-grid">
-                    <div class="building-item">
-                        <h3>Nhà ở</h3>
-                        <p>Cấp độ: <span id="house-level">1</span></p>
-                        <p>Công nhân tối đa: <span id="house-max-workers">5</span></p>
-                        <p>Chi phí nâng cấp:</p>
-                        <ul>
-                            <li>Gỗ: <span id="house-upgrade-cost-wood">50</span></li>
-                            <li>Đá: <span id="house-upgrade-cost-stone">30</span></li>
-                        </ul>
-                        <button onclick="upgradeBuilding('house')">Nâng cấp</button>
-                    </div>
-                    <div class="building-item">
-                        <h3>Thư Viện</h3>
-                        <p>Cấp độ: <span id="library-level">0</span></p>
-                        <p>Nhà nghiên cứu tối đa: <span id="library-max-researchers">0</span></p>
-                        <p id="library-cost-label">Chi phí xây dựng:</p>
-                        <ul>
-                            <li>Gỗ: <span id="library-cost-wood">100</span></li>
-                            <li>Đá: <span id="library-cost-stone">70</span></li>
-                        </ul>
-                        <button id="build-library-btn" onclick="buildBuilding('library')">Xây dựng</button>
-                        <button id="upgrade-library-btn" style="display:none;" onclick="upgradeBuilding('library')">Nâng cấp</button>
-                    </div>
-                    <div class="building-item">
-                        <h3>Nhà Kho</h3>
-                        <p>Cấp độ: <span id="warehouse-level">1</span></p>
-                        <p> Không gian kho tối đa: +1000 </p>
-                        <p>Chi phí nâng cấp:</p>
-                        <ul>
-                            <li>Gỗ: <span id="warehouse-upgrade-cost-wood">150</span></li>
-                            <li>Đá: <span id="warehouse-upgrade-cost-stone">100</span></li>
-                        </ul>
-                        <button onclick="upgradeBuilding('warehouse')">Nâng cấp</button>
-                    </div>
-			<div class="building-item">
-                        	<h3>Nhà Lính</h3>
-                        	<p>Cấp độ: <span id="barrack-level">0</span></p>
-                                <p> Giảm thời gian huấn luyện: 15s </p>
-                        	<p>Chi phí nâng cấp:</p>
-                        	<ul>
-                            	  <li>Gỗ: <span id="barrack-upgrade-cost-wood">300</span></li>
-                            	  <li>Đá: <span id="barrack-upgrade-cost-stone">200</span></li>
-                                  <li>Vàng: <span id="barrack-upgrade-cost-gold">100</span></li>
-                        	</ul>
-                        	<button id="btnUpgradeBarrack" onclick="upgradeBuilding('barrack')">Xây dựng</button>
-                        </div>
-			<div  id="cargo-ship-block" class="building-item">
-                        	<h3>Tàu Chở Hàng</h3>
-                        	<p>Cấp độ: <span id="cargo-ship-level">0</span></p>
-                                <p> Không gian kho tối đa: +5000 </p>
-                        	<p>Chi phí nâng cấp:</p>
-                        	<ul>
-                            	  <li>Gỗ: <span id="cargo-ship-upgrade-cost-wood">14500</span></li>
-                            	  <li>Đá: <span id="cargo-ship-cost-stone">14500</span></li>
-                                  <li>Vàng: <span id="cargo-ship-upgrade-cost-gold">14500</span></li>
-                                  <li>Sắt: <span id="cargo-ship-upgrade-cost-iron">14500</span></li>
-                        	</ul>
-                        	<button id="btnUpgradeCargoShip" onclick="upgradeBuilding('cargoship')">Xây dựng</button>
-                        </div>
-
-
-
-                </div>
-            </div>
-
-            <div id="training-research-tab" class="sub-tab-content">
-                <h2>Huấn Luyện & Nghiên Cứu</h2>
-                <div class="training-research-grid">
-                    <div class="training-item">
-                        <h3>Huấn Luyện Nhà Nghiên Cứu</h3>
-                        <p>Công nhân rảnh: <span id="idle-workers-for-researcher-training">5</span></p>
-                        <p>Chi phí huấn luyện:</p>
-                        <ul>
-                            <li>Lúa: 10</li>
-                            <li>Vàng: 5</li>
-                        </ul>
-                        <button id="train-researcher-btn" onclick="startTrainingResearcher()">Huấn luyện (60s)</button>
-                        <div class="progress-bar-container" id="researcher-training-progress-container" style="display:none;">
-                            <div class="progress-bar" id="researcher-training-progress" style="width:0%;"></div>
-                            <span class="progress-text" id="researcher-training-countdown">0 giây</span>
-                        </div>
-                    </div>
-
-                    <div class="research-item">
-                        <h3>Phân Bổ Nhà Nghiên Cứu</h3>
-                        <p>Nhà nghiên cứu rảnh: <span id="idle-researchers">0</span></p>
-                        <p>Nhà nghiên cứu đang làm việc: <span id="assigned-researchers">0</span></p>
-                        <div class="button-group">
-                            <button onclick="assignResearcher()">Gửi</button>
-                            <button onclick="removeResearcher()">Rút</button>
-                        </div>
-                    </div>
-
-                    <div class="research-item">
-                        <h3>Nghiên Cứu</h3>
-                        <p>Điểm Nghiên Cứu mỗi giây: <span id="research-points-per-sec">0</span></p>
-                        <p>Tổng điểm nghiên cứu: <span id="total-research-points">0</span></p>
-                        <h4>Công nghệ cần mở khóa:</h4>
-                        <ul>
-                            <li>Chế tạo Áo Giáp: <span id="armor-unlock-cost">50</span> điểm</li>
-                        </ul>
-                        <button id="unlock-armor-crafting-btn" onclick="unlockTechnology('armorCrafting')" disabled>Mở khóa Chế tạo Áo Giáp</button>
-                        <h4>Công nghệ đã mở khóa:</h4>
-                        <ul id="unlocked-technologies">
-                            </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div id="military-tab" class="sub-tab-content">
-                <h2>Quân Đội</h2>
-                <div class="training-research-grid">
-                    <div class="training-item">
-                        <h3>Huấn Luyện Binh Sĩ</h3>
-                        <p>Công nhân rảnh: <span id="idle-workers-for-soldier-training">5</span></p>
-                        <p>Chi phí huấn luyện:</p>
-                        <ul>
-                            <li>Lúa: 20</li>
-                            <li>Vàng: 15</li>
-                            <li>Áo Giáp: 1</li>
-                        </ul>
-                        <button id="train-soldier-btn" onclick="startTrainingSoldier()">Huấn luyện (300s)</button>
-                        <div class="progress-bar-container" id="soldier-training-progress-container" style="display:none;">
-                            <div class="progress-bar" id="soldier-training-progress" style="width:0%;"></div>
-                            <span class="progress-text" id="soldier-training-countdown">0 giây</span>
-                        </div>
-                        <p>Binh sĩ: <span id="current-soldiers-info">0</span></p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="blacksmith-tab" class="sub-tab-content">
-                <h2>Lò Rèn</h2>
-                <div class="crafting-grid">
-                    <div class="crafting-item">
-                        <h3>Tạo Áo Giáp</h3>
-                        <p>Chi phí:</p>
-                        <ul>
-                            <li>Sắt: 50</li>
-                        </ul>
-                        <button id="craft-armor-btn" onclick="startCraftingArmor()" disabled>Tạo Áo Giáp (60s)</button>
-                        <div class="progress-bar-container" id="armor-crafting-progress-container" style="display:none;">
-                            <div class="progress-bar" id="armor-crafting-progress" style="width:0%;"></div>
-                            <span class="progress-text" id="armor-crafting-countdown">0 giây</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="exploration-tab" class="sub-tab-content">
-                <h2>Thám Hiểm</h2>
-                <div class="exploration-grid">
-                    <div class="exploration-item">
-                        <h3>Vùng Đất Trống</h3>
-                        <p>Phần thưởng: Tài nguyên cơ bản</p>
-                        <p>Rủi ro binh sĩ: Thấp</p>
-                        <p>Binh sĩ rảnh: <span id="idle-soldiers-explore-empty">0</span></p>
-                        <p>Số binh sĩ cử đi: <input type="number" id="soldiers-empty-land" value="0" min="0" oninput="updateExplorationSuccessRate('emptyLand')"></p>
-                                              <button onclick="startExploration('emptyLand')">Thám hiểm</button>
-                        <div class="progress-bar-container" id="empty-land-exploration-progress-container" style="display:none;">
-                            <div class="progress-bar" id="empty-land-exploration-progress" style="width:0%;"></div>
-                            <span class="progress-text" id="empty-land-exploration-countdown">0 giây</span>
-                        </div>
-                    </div>
-                    <div class="exploration-item">
-                        <h3>Thành Trì Lân Cận</h3>
-                        <p>Phần thưởng: Tài nguyên cao cấp, Vàng</p>
-                        <p>Rủi ro binh sĩ: Cao</p>
-                        <p>Binh sĩ rảnh: <span id="idle-soldiers-explore-fortress">0</span></p>
-                        <p>Số binh sĩ cử đi: <input type="number" id="soldiers-fortress" value="0" min="0" oninput="updateExplorationSuccessRate('fortress')"></p>
-                                              <button onclick="startExploration('fortress')">Thám hiểm</button>
-                        <div class="progress-bar-container" id="fortress-exploration-progress-container" style="display:none;">
-                            <div class="progress-bar" id="fortress-exploration-progress" style="width:0%;"></div>
-                            <span class="progress-text" id="fortress-exploration-countdown">0 giây</span>
-                        </div>
-                    </div>
-                </div>
-                <div id="exploration-report-container" style="margin-top: 30px; text-align: left; background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
-                    <h3>Báo Cáo Thám Hiểm</h3>
-                    <div id="exploration-report-content" style="max-height: 300px; overflow-y: auto; background-color: #fff; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
-                        <p>Chưa có báo cáo nào.</p>
-                    </div>
-                </div>
-            </div>
-
- <div id="wonder-tab" class="sub-tab-content">
-                <h2>Kỳ Quan</h2>
-                <div class="wonder-construction">
-                    <p>Mảnh ghép đã hoàn thành: <span id="wonder-segments">0</span> / 100</p>
-                    <p>Chi phí xây dựng 1 mảnh ghép:</p>
-                    <ul>
-                        <li>Gỗ: <span id="wonder-wood-cost">1000</span></li>
-                        <li>Đá: <span id="wonder-stone-cost">1000</span></li>
-                        <li>Sắt: <span id="wonder-iron-cost">500</span></li>
-                        <li>Vàng: <span id="wonder-gold-cost">500</span></li>
-                        <li>Điểm Nghiên Cứu: <span id="wonder-research-cost">100</span></li>
-                    </ul>
-                    <button id="build-wonder-segment-btn" onclick="buildWonderSegment()">Xây Mảnh Ghép Kỳ Quan</button>
-                    <p style="margin-top: 20px;">Khi Kỳ quan hoàn thành, bạn có thể tái thiết thế giới để bắt đầu lại với những phần thưởng đặc biệt!</p>
-                    <button id="reset-game-btn" onclick="resetGame()" disabled>Tái Thiết Thế Giới (Reset Game)</button>
-                </div>
-            </div>
-
-
-        </div>
-
-     <div id="settings-tab" class="tab-content">
-    <h2>Cài Đặt</h2>
-
-    <div class="settings-group"> <h3>Lưu & Tải Game</h3>
-        <div class="settings-section">
-            <h4>Lưu Game</h4>
-            <textarea id="save-game-data" rows="5" cols="50" readonly></textarea>
-            <button onclick="downloadJsonAsText(document.getElementById('save-game-data').value,    datetime + ' gameKhaiThacTaiNguyen.txt')">Tạo File Savegame</button> 
-            <button onclick="saveGame()">Lưu Game</button>
-        </div>
-        <div class="settings-section">
-            <h4>Tải Game</h4>
-            <textarea id="load-game-data" rows="5" cols="50" placeholder="Dán dữ liệu game vào đây"></textarea>
-            <button onclick="loadGame()">Tải Game</button>
-            
-<script>
-  // Get current date and time
-  var now = new Date();
-  var datetime = now.toLocaleString();
-
-  // Insert date and time into HTML
- // document.getElementById("datetime").innerHTML = datetime;
-</script>
-         
-          </div>
+        <a href="https://auselessguy2056.github.io/energyEmpire/" class="play-btn" target="_blank">Launch Empire</a>
     </div>
 
-    <div class="settings-group"> <h3>Đóng Góp</h3>
-        <div class="settings-section">
-            <p>Tác giả: auselessguy2056@gmail.com. This is also his paypal account</p>
-            <p><a href="https://auselessguy2056.github.io/Incremental/">Ultimate Incremental ReSource Game</a></p>
-            <p><a href="https://discord.gg/5dS34cuKHy">Discord group</a></p>      
+    <div class="game-card card-resource">
+        <div>
+            <div class="game-title">⛏️ Resource Gathering</div>
+            <div class="game-desc">Start from scratch harvesting raw elements. Manage resource allocation, automate extraction pipelines, and unlock progressively advanced tiers of production.</div>
         </div>
+        <a href="https://auselessguy2056.github.io/ResourceGathering/" class="play-btn" target="_blank">Start Gathering</a>
     </div>
 
-    
- </div>
+    <div class="game-card card-tree">
+        <div>
+            <div class="game-title">🌳 TreeMental</div>
+            <div class="game-desc">A deep, branch-based incremental game structured around complex unlock paths. Climb the upgrades, branch into alternative structures, and find the perfect build.</div>
+        </div>
+        <a href="https://auselessguy2056.github.io/TreeMental/" class="play-btn" target="_blank">Grow the Tree</a>
+    </div>
 
-    <script src="script.js"></script>
+    <div class="game-card card-incremental">
+        <div>
+            <div class="game-title">📈 Incremental</div>
+            <div class="game-desc">The purest essence of incremental scaling. Strip away the fluff and dive directly into mathematically satisfying layer progression, multipliers, and hyper-growth loops.</div>
+        </div>
+        <a href="https://auselessguy2056.github.io/Incremental/" class="play-btn" target="_blank">Begin Scaling</a>
+    </div>
+
+</div>
+
+<footer>
+    Created by @auselessguy2056
+</footer>
+
 </body>
 </html>
