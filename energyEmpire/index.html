@@ -6,387 +6,222 @@
 <title>Super Energy Incremental</title>
 
 <style>
-    body{
-        margin:0;
-        background:#101010;
-        color:white;
-        font-family:Arial;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        min-height:100vh;
+    body {
+        margin: 0;
+        background: #101010;
+        color: white;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
     }
 
-    .game{
-        width:500px;
-        background:#1d1d1d;
-        padding:20px;
-        border-radius:14px;
+    .game {
+        width: 550px;
+        background: #1d1d1d;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
 
-    h1,h2{
-        text-align:center;
+    h1, h2 { text-align: center; margin-top: 10px; }
+    .resource { text-align: center; font-size: 24px; margin-bottom: 8px; font-weight: bold; }
+    .gold { color: gold; }
+    .blue { color: #4fc3ff; }
+    .purple { color: #b57cff; }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 8px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 15px;
+        background: #4caf50;
+        color: white;
     }
 
-    .resource{
-        text-align:center;
-        font-size:26px;
-        margin-bottom:10px;
+    button:hover { opacity: 0.9; }
+    .prestigeBtn { background: goldenrod; color: black; font-weight: bold; }
+    .superBtn { background: #00b7ff; color: white; font-weight: bold; }
+    .expansionBtn { background: #9b5de5; color: white; font-weight: bold; }
+
+    .item {
+        background: #2b2b2b;
+        padding: 12px;
+        border-radius: 10px;
+        margin-top: 12px;
     }
 
-    .gold{
-        color:gold;
+    .stats {
+        margin-top: 20px;
+        color: #bbb;
+        background: #151515;
+        padding: 15px;
+        border-radius: 10px;
     }
 
-    .blue{
-        color:#4fc3ff;
+    .paginationPage { display: none; }
+    .paginationPage.active { display: block; animation: fadeIn .3s forwards; }
+
+    .tabs { display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px; }
+    .tabBtn { flex: 1; background: #333; margin: 0; transition: background 0.2s; }
+    .tabBtn.active { background: #00b7ff; color: white; }
+    #expansionTab.tabBtn.active { background: #9b5de5; }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
-
-    button{
-        width:100%;
-        padding:12px;
-        margin-top:8px;
-        border:none;
-        border-radius:10px;
-        cursor:pointer;
-        font-size:15px;
-        background:#4caf50;
-        color:white;
-    }
-
-    button:hover{
-        opacity:0.9;
-    }
-
-    .prestigeBtn{
-        background:goldenrod;
-        color:black;
-        font-weight:bold;
-    }
-
-    .superBtn{
-        background:#00b7ff;
-        color:white;
-        font-weight:bold;
-    }
-
-    .item{
-        background:#2b2b2b;
-        padding:12px;
-        border-radius:10px;
-        margin-top:12px;
-    }
-
-    .stats{
-        margin-top:20px;
-        color:#bbb;
-    }
-
-.paginationPage{
-    display:none;
-    animation:fadeIn .3s;
-}
-
-.paginationPage.active{
-    display:block;
-}
-
-.tabs{
-    display:flex;
-    gap:10px;
-    margin-bottom:15px;
-}
-
-.tabBtn{
-    flex:1;
-    background:#333;
-}
-
-.tabBtn.active{
-    background:#00b7ff;
-}
-
-@keyframes fadeIn{
-    from{
-        opacity:0;
-        transform:translateY(10px);
-    }
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-}
 </style>
 </head>
 <body>
 
 <div class="game">
-
     <h1>⚡Energy Empire</h1>
 
-    <div class="resource">
-        Energy: <span id="energy">0</span>
+    <div class="resource">Energy: <span id="energy">0</span></div>
+    <div class="resource gold">Prestige Points: <span id="prestigePoints">0</span></div>
+    <div class="resource blue">Super Energy: <span id="superEnergy">0</span></div>
+
+    <button id="clickBtn">Generate Energy</button>
+
+    <div class="tabs">
+        <button id="mainTab" class="tabBtn active" onclick="showPage('mainPage', this)">Main Layer</button>
+        <button id="superTab" class="tabBtn" onclick="showPage('superPage', this)" style="display:none;">Super Shop</button>
+        <button id="expansionTab" class="tabBtn" onclick="showPage('expansionPage', this)" style="display:none;">Expansion</button>
     </div>
 
-    <div class="resource gold">
-        Prestige Points: <span id="prestigePoints">0</span>
-    </div>
+    <div id="mainPage" class="paginationPage active">
+        <div id="mainBuildingsContainer"></div>
 
-    <div class="resource blue">
-        Super Energy: <span id="superEnergy">0</span>
-    </div>
+        <div class="item">
+            <strong>Click Upgrade</strong><br>
+            Increase click power<br>
+            Cost: <span id="clickCost">25</span> Energy
+            <button onclick="buyClickUpgrade()">Upgrade Click</button>
+        </div>
 
-    <button id="clickBtn">
-        Generate Energy
-    </button>
-    <div id='mainPage'>
-    <div class="item">
-        <strong>Generator</strong><br>
-        +1 energy/sec<br>
-        Cost: <span id="genCost">10</span>
-
-        <button onclick="buyGenerator()">
-            Buy Generator
-        </button>
-    </div>
-
-    <div class="item">
-        <strong>Factory</strong><br>
-        +5 energy/sec<br>
-        Cost: <span id="factoryCost">50</span>
-
-        <button onclick="buyFactory()">
-            Buy Factory
-        </button>
-    </div>
-
-    <div class="item">
-        <strong>Click Upgrade</strong><br>
-        Increase click power<br>
-        Cost: <span id="clickCost">25</span>
-
-        <button onclick="buyClickUpgrade()">
-            Upgrade Click
-        </button>
-    </div>
-</div>
-    <div class="item">
-        <strong>Prestige Reset</strong><br>
-        Reset game for prestige points<br>
-        Gain:
-        <span id="prestigeGain">0</span>
-
-        <button class="prestigeBtn"
-        onclick="prestigeReset()">
-            PRESTIGE
-        </button>
-<button id="superTab"
-class="tabBtn"
-onclick="showPage('superPage', this)">
-    Super Shop
-</button>
-<button id="mainTab"
-class="tabBtn"
-onclick="showPage('mainPage', this)">
-    Main
-</button>
-
+        <div class="item">
+            <strong>Prestige Reset</strong><br>
+            Reset normal layer for multiplier points<br>
+            Gain: <span id="prestigeGain">0</span> Prestige Points
+            <button class="prestigeBtn" onclick="prestigeReset()">PRESTIGE</button>
+        </div>
     </div>
    
-<div id="superPage" class="paginationPage">
+    <div id="superPage" class="paginationPage">
+        <h2 class="blue">SUPER SHOP</h2>
+        <div id="superBuildingsContainer"></div>
 
-    <h2 class="blue">SUPER SHOP</h2>
-
-    <div class="item">
-        <strong>Super Generator</strong><br>
-        +50 energy/sec<br>
-        Cost: 1 Super Energy
-
-        <button class="superBtn"
-        onclick="buySuperGenerator()">
-            Buy Super Generator
-        </button>
+        <div class="item">
+            <strong>Super Click</strong><br>
+            +100 click power<br>
+            Cost: 2 Super Energy
+            <button class="superBtn" onclick="buySuperClick()">Buy Super Click</button>
+        </div>
     </div>
 
-    <div class="item">
-        <strong>Super Factory</strong><br>
-        +250 energy/sec<br>
-        Cost: 3 Super Energy
-
-        <button class="superBtn"
-        onclick="buySuperFactory()">
-            Buy Super Factory
-        </button>
+    <div id="expansionPage" class="paginationPage">
+        <h2 class="purple">EXPANSION LAYER</h2>
+        <div id="expansionBuildingsContainer"></div>
     </div>
 
-    <div class="item">
-        <strong>Super Click</strong><br>
-        +100 click power<br>
-        Cost: 2 Super Energy
-
-        <button class="superBtn"
-        onclick="buySuperClick()">
-            Buy Super Click
-        </button>
-    </div>
-
-</div>
     <div class="stats">
-        <div>
-            Energy/sec:
-            <span id="eps">0</span>
-        </div>
-
-        <div>
-            Click Power:
-            <span id="clickPower">1</span>
-        </div>
-
-        <div>
-            Prestige Multiplier:
-            x<span id="multiplier">1</span>
-        </div>
+        <div>Energy/sec: <span id="eps">0</span></div>
+        <div>Click Power: <span id="clickPower">1</span></div>
+        <div>Prestige Multiplier: x<span id="multiplier">1</span></div>
     </div>
     
     <button onclick="clearSave()" style="background: #a94442; font-size: 11px; padding: 5px; margin-top: 20px; width: auto; display: block; margin-left: auto; margin-right: auto;">
         Hard Reset Game
     </button>
-
 </div>
 
 <script>
-
 let energy = 0;
 let prestigePoints = 0;
 let superEnergy = 0;
 let clickPower = 1;
-
-let generators = 0;
-let factories = 0;
-let superGenerators = 0;
-let superFactories = 0;
-
-let genCost = 10;
-let factoryCost = 50;
 let clickCost = 25;
 
-// --- LOCAL STORAGE SAVE / LOAD SYSTEMS ---
+// Array containing all metadata. Type labels filter where items are rendered.
+const buildings = [
+    { id: "gen", name: "Generator", baseCost: 10, costMult: 1.5, cps: 1, type: "normal", count: 0, currentCost: 10, reqSuper: 0 },
+    { id: "factory", name: "Factory", baseCost: 50, costMult: 1.7, cps: 5, type: "normal", count: 0, currentCost: 50, reqSuper: 0 },
+    
+    // Expansion Tiers (Unlocked at 1,000 Super Energy)
+    { id: "nuke", name: "Nuclear Reactor", baseCost: 1200, costMult: 1.8, cps: 1500, type: "expansion", count: 0, currentCost: 1200, reqSuper: 1000 },
+    { id: "fusion", name: "Fusion Core", baseCost: 25000, costMult: 1.9, cps: 10000, type: "expansion", count: 0, currentCost: 25000, reqSuper: 1000 },
+    { id: "antimatter", name: "Antimatter Engine", baseCost: 400000, costMult: 2.0, cps: 75000, type: "expansion", count: 0, currentCost: 400000, reqSuper: 1000 },
+    { id: "quantum", name: "Quantum Dynamo", baseCost: 7500000, costMult: 2.2, cps: 500000, type: "expansion", count: 0, currentCost: 7500000, reqSuper: 1000 },
+    { id: "dyson", name: "Dyson Sphere", baseCost: 150000000, costMult: 2.5, cps: 4000000, type: "expansion", count: 0, currentCost: 150000000, reqSuper: 1000 },
+    
+    // Super Shop items
+    { id: "sGen", name: "Super Generator", baseCost: 1, costMult: 1, cps: 50, type: "super", count: 0, currentCost: 1, reqSuper: 0 },
+    { id: "sFactory", name: "Super Factory", baseCost: 3, costMult: 1, cps: 250, type: "super", count: 0, currentCost: 3, reqSuper: 0 }
+];
 
-function saveGame() {
-    const gameState = {
-        energy,
-        prestigePoints,
-        superEnergy,
-        clickPower,
-        generators,
-        factories,
-        superGenerators,
-        superFactories,
-        genCost,
-        factoryCost,
-        clickCost
-    };
-    localStorage.setItem("energyEmpireSave", JSON.stringify(gameState));
+// Rebuilt dynamic creation setup that loops across categories seamlessly
+function buildDynamicStoreUI() {
+    let mainHTML = "", superHTML = "", expansionHTML = "";
+    
+    for (let i = 0; i < buildings.length; i++) {
+        let b = buildings[i];
+        let btnClass = b.type === 'super' ? 'superBtn' : (b.type === 'expansion' ? 'expansionBtn' : '');
+        
+        let elementStr = `
+            <div class="item" id="container_${b.id}">
+                <strong>${b.name}</strong> (<span id="count_${b.id}">0</span>)<br>
+                +${b.cps.toLocaleString()} energy/sec<br>
+                Cost: <span id="cost_${b.id}">${b.baseCost}</span> ${b.type === 'super' ? 'Super Energy' : 'Energy'}
+                <button class="${btnClass}" onclick="buyBuilding(${i})">Buy ${b.name}</button>
+            </div>`;
+        
+        if (b.type === "normal") mainHTML += elementStr;
+        else if (b.type === "super") superHTML += elementStr;
+        else if (b.type === "expansion") expansionHTML += elementStr;
+    }
+    document.getElementById("mainBuildingsContainer").innerHTML = mainHTML;
+    document.getElementById("superBuildingsContainer").innerHTML = superHTML;
+    document.getElementById("expansionBuildingsContainer").innerHTML = expansionHTML;
 }
 
-function loadGame() {
-    const savedData = localStorage.getItem("energyEmpireSave");
-    if (savedData) {
-        try {
-            const parsed = JSON.parse(savedData);
-            
-            // Check each variable to prevent breakages if future updates modify state structure
-            if (parsed.energy !== undefined) energy = parsed.energy;
-            if (parsed.prestigePoints !== undefined) prestigePoints = parsed.prestigePoints;
-            if (parsed.superEnergy !== undefined) superEnergy = parsed.superEnergy;
-            if (parsed.clickPower !== undefined) clickPower = parsed.clickPower;
-            if (parsed.generators !== undefined) generators = parsed.generators;
-            if (parsed.factories !== undefined) factories = parsed.factories;
-            if (parsed.superGenerators !== undefined) superGenerators = parsed.superGenerators;
-            if (parsed.superFactories !== undefined) superFactories = parsed.superFactories;
-            if (parsed.genCost !== undefined) genCost = parsed.genCost;
-            if (parsed.factoryCost !== undefined) factoryCost = parsed.factoryCost;
-            if (parsed.clickCost !== undefined) clickCost = parsed.clickCost;
-        } catch (e) {
-            console.error("Failed to parse save game data", e);
+function multiplier() { return 1 + (prestigePoints * 0.5); }
+function getPrestigeGain() { return Math.floor(Math.sqrt(energy / 1000)); }
+
+function calculateTotalProduction() {
+    let rawProduction = 0;
+    for (let i = 0; i < buildings.length; i++) {
+        rawProduction += buildings[i].count * buildings[i].cps;
+    }
+    return rawProduction * multiplier();
+}
+
+function buyBuilding(index) {
+    let b = buildings[index];
+    if (superEnergy < b.reqSuper) return; // Progression lock safeguard
+
+    if (b.type !== "super") {
+        if (energy >= b.currentCost) {
+            energy -= b.currentCost;
+            b.count++;
+            b.currentCost = Math.floor(b.baseCost * Math.pow(b.costMult, b.count));
+        }
+    } else {
+        if (superEnergy >= b.currentCost) {
+            superEnergy -= b.currentCost;
+            b.count++;
         }
     }
-}
-
-function clearSave() {
-    if (confirm("Are you sure you want to reset ALL your progress? This cannot be undone.")) {
-        localStorage.removeItem("energyEmpireSave");
-        location.reload();
-    }
-}
-
-// ----------------------------------------
-
-function multiplier(){
-    return 1 + (prestigePoints * 0.5);
-}
-
-function getPrestigeGain(){
-    return Math.floor(Math.sqrt(energy / 1000));
-}
-
-function buyGenerator(){
-    if(energy >= genCost){
-        energy -= genCost;
-        generators++;
-        genCost = Math.floor(genCost * 1.5);
-        updateUI();
-        saveGame();
-    }
-}
-
-function updateUI(){
-    let production =
-        generators * 1 +
-        factories * 5 +
-        superGenerators * 50 +
-        superFactories * 250;
-
-    production *= multiplier();
-    
-    if(superEnergy == 0) {
-        document.getElementById('superTab').style.display='none';
-    } else {
-        document.getElementById('superTab').style.display='block';
-    }
-    
-    document.getElementById("energy").textContent = Math.floor(energy);
-    document.getElementById("prestigePoints").textContent = prestigePoints;
-    document.getElementById("superEnergy").textContent = superEnergy;
-    document.getElementById("genCost").textContent = genCost;
-    document.getElementById("factoryCost").textContent = factoryCost;
-    document.getElementById("clickCost").textContent = clickCost;
-    document.getElementById("clickPower").textContent = clickPower;
-    document.getElementById("eps").textContent = Math.floor(production);
-    document.getElementById("multiplier").textContent = multiplier().toFixed(1);
-    document.getElementById("prestigeGain").textContent = getPrestigeGain();
-}
-
-document.getElementById("clickBtn").addEventListener("click", () => {
-    energy += clickPower * multiplier();
     updateUI();
-    // Quick-saving on manual clicks can be throttled if performance suffers, 
-    // but with LocalStorage it's generally safe for casual increments.
-    saveGame(); 
-});
-
-function buyFactory(){
-    if(energy >= factoryCost){
-        energy -= factoryCost;
-        factories++;
-        factoryCost = Math.floor(factoryCost * 1.7);
-        updateUI();
-        saveGame();
-    }
+    saveGame();
 }
 
-function buyClickUpgrade(){
-    if(energy >= clickCost){
+function buyClickUpgrade() {
+    if (energy >= clickCost) {
         energy -= clickCost;
         clickPower++;
         clickCost = Math.floor(clickCost * 2);
@@ -395,80 +230,8 @@ function buyClickUpgrade(){
     }
 }
 
-function prestigeReset(){
-    let gain = getPrestigeGain();
-
-    if(gain <= 0){
-        alert("Need more energy!");
-        return;
-    }
-
-    prestigePoints += gain;
-
-    if(prestigePoints >= 1000){
-        let earned = Math.floor(prestigePoints / 1000);
-        superEnergy += earned;
-        prestigePoints = 0;
-        energy = 0;
-
-        alert(
-            "You reached 1000 Prestige!\n" +
-            "+" + earned + " Super Energy earned!"
-        );
-    }
-
-    // NORMAL RESET
-    energy = 0;
-    clickPower = 1;
-    generators = 0;
-    factories = 0;
-    genCost = 10;
-    factoryCost = 50;
-    clickCost = 25;
-
-    updateUI();
-    saveGame();
-}
-
-function buySuperGenerator(){
-    if(superEnergy >= 1){
-        superEnergy -= 1;
-        superGenerators++;
-        updateUI();
-        saveGame();
-    }
-}
-
-function buySuperFactory(){
-    if(superEnergy >= 3){
-        superEnergy -= 3;
-        superFactories++;
-        updateUI();
-        saveGame();
-    }
-}
-
-function showPage(pageId, btn){
-    if(pageId != 'mainPage') { 
-        document.getElementById('mainPage').style.display ='none';
-    } else { 
-        document.getElementById('mainPage').style.display ='block';
-    }
-
-    document.querySelectorAll(".paginationPage").forEach(page => {
-        page.classList.remove("active");
-    });
-
-    document.querySelectorAll(".tabBtn").forEach(button => {
-        button.classList.remove("active");
-    });
-
-    document.getElementById(pageId).classList.add("active");
-    btn.classList.add("active");
-}
-
-function buySuperClick(){
-    if(superEnergy >= 2){
+function buySuperClick() {
+    if (superEnergy >= 2) {
         superEnergy -= 2;
         clickPower += 100;
         updateUI();
@@ -476,28 +239,124 @@ function buySuperClick(){
     }
 }
 
-// Game Loop Tick (Every 1 second)
-setInterval(() => {
-    let production =
-        generators * 1 +
-        factories * 5 +
-        superGenerators * 50 +
-        superFactories * 250;
+function updateUI() {
+    // Dynamic looping data update block
+    for (let i = 0; i < buildings.length; i++) {
+        let b = buildings[i];
+        document.getElementById(`count_${b.id}`).textContent = b.count;
+        document.getElementById(`cost_${b.id}`).textContent = b.currentCost.toLocaleString();
+    }
 
-    production *= multiplier();
-    energy += production;
+    // Dynamic Tab Progression Rules
+    document.getElementById("superTab").style.display = (superEnergy > 0 || buildings[7].count > 0 || buildings[8].count > 0) ? "block" : "none";
+    document.getElementById("expansionTab").style.display = (superEnergy >= 1000) ? "block" : "none";
+
+    document.getElementById("energy").textContent = Math.floor(energy).toLocaleString();
+    document.getElementById("prestigePoints").textContent = prestigePoints.toLocaleString();
+    document.getElementById("superEnergy").textContent = superEnergy.toLocaleString();
+    document.getElementById("clickCost").textContent = clickCost.toLocaleString();
+    document.getElementById("clickPower").textContent = clickPower.toLocaleString();
+    document.getElementById("eps").textContent = Math.floor(calculateTotalProduction()).toLocaleString();
+    document.getElementById("multiplier").textContent = multiplier().toFixed(1);
+    document.getElementById("prestigeGain").textContent = getPrestigeGain().toLocaleString();
+}
+
+document.getElementById("clickBtn").addEventListener("click", () => {
+    energy += clickPower * multiplier();
     updateUI();
-}, 1000);
+    saveGame(); 
+});
 
-// Auto-save Interval (Runs every 10 seconds to catch idle generator production)
-setInterval(() => {
+function prestigeReset() {
+    let gain = getPrestigeGain();
+    if (gain <= 0) { alert("Need more energy!"); return; }
+
+    prestigePoints += gain;
+
+    if (prestigePoints >= 1000) {
+        let earned = Math.floor(prestigePoints / 1000);
+        superEnergy += earned;
+        prestigePoints = 0;
+        energy = 0;
+        alert("You reached 1000 Prestige!\n+" + earned + " Super Energy earned!");
+    }
+
+    energy = 0;
+    clickPower = 1;
+    clickCost = 25;
+    for (let i = 0; i < buildings.length; i++) {
+        if (buildings[i].type !== "super") {
+            buildings[i].count = 0;
+            buildings[i].currentCost = buildings[i].baseCost;
+        }
+    }
+    updateUI();
     saveGame();
-}, 10000);
+}
 
-// --- INITIALIZATION ---
-loadGame(); // Load the data first
-updateUI(); // Render the loaded data to screen
+function showPage(pageId, btn) {
+    document.querySelectorAll(".paginationPage").forEach(page => page.classList.remove("active"));
+    document.querySelectorAll(".tabBtn").forEach(button => button.classList.remove("active"));
+    
+    document.getElementById(pageId).classList.add("active");
+    btn.classList.add("active");
+}
 
+function saveGame() {
+    const buildingCounts = {};
+    for (let i = 0; i < buildings.length; i++) {
+        buildingCounts[buildings[i].id] = buildings[i].count;
+    }
+
+    const gameState = {
+        energy, prestigePoints, superEnergy, clickPower, clickCost, buildingCounts
+    };
+    localStorage.setItem("energyEmpireSave_v3", JSON.stringify(gameState));
+}
+
+function loadGame() {
+    const savedData = localStorage.getItem("energyEmpireSave_v3");
+    if (savedData) {
+        try {
+            const parsed = JSON.parse(savedData);
+            if (parsed.energy !== undefined) energy = parsed.energy;
+            if (parsed.prestigePoints !== undefined) prestigePoints = parsed.prestigePoints;
+            if (parsed.superEnergy !== undefined) superEnergy = parsed.superEnergy;
+            if (parsed.clickPower !== undefined) clickPower = parsed.clickPower;
+            if (parsed.clickCost !== undefined) clickCost = parsed.clickCost;
+            
+            if (parsed.buildingCounts) {
+                for (let i = 0; i < buildings.length; i++) {
+                    let id = buildings[i].id;
+                    if (parsed.buildingCounts[id] !== undefined) {
+                        buildings[i].count = parsed.buildingCounts[id];
+                        if (buildings[i].type !== "super") {
+                            buildings[i].currentCost = Math.floor(buildings[i].baseCost * Math.pow(buildings[i].costMult, buildings[i].count));
+                        }
+                    }
+                }
+            }
+        } catch (e) { console.error("Error patching execution load values", e); }
+    }
+}
+
+function clearSave() {
+    if (confirm("Are you sure you want to reset ALL your progress? This cannot be undone.")) {
+        localStorage.removeItem("energyEmpireSave_v3");
+        location.reload();
+    }
+}
+
+buildDynamicStoreUI();
+loadGame();
+updateUI();
+
+setInterval(() => {
+    energy += calculateTotalProduction() / 10;
+    updateUI();
+}, 100);
+
+setInterval(() => { saveGame(); }, 10000);
 </script>
 
 </body>
