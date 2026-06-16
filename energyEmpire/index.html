@@ -41,9 +41,11 @@
         font-size: 15px;
         background: #4caf50;
         color: white;
+        user-select: none; /* Prevents annoying text selection while holding */
     }
 
     button:hover { opacity: 0.9; }
+    button:active { opacity: 0.8; }
     .prestigeBtn { background: goldenrod; color: black; font-weight: bold; }
     .superBtn { background: #00b7ff; color: white; font-weight: bold; }
     .expansionBtn { background: #9b5de5; color: white; font-weight: bold; }
@@ -105,6 +107,14 @@
         </div>
 
         <div class="item">
+            <strong class="blue">Super Prestige Booster</strong><br>
+            Multiplies prestige point gains by 2x per level<br>
+            Current Multiplier: <span id="prestigeUpgradeMult">1</span>x<br>
+            Cost: <span id="prestigeUpgradeCost">0.1</span> Super Energy
+            <button class="superBtn" onclick="buyPrestigeUpgrade()">Upgrade Gains</button>
+        </div>
+
+        <div class="item">
             <strong>Prestige Reset</strong><br>
             Reset normal layer for multiplier points<br>
             Gain: <span id="prestigeGain">0</span> Prestige Points
@@ -146,8 +156,12 @@ let prestigePoints = 0;
 let superEnergy = 0;
 let clickPower = 1;
 let clickCost = 25;
+let prestigeUpgradeLevel = 0; 
 
-// Array containing all metadata. Type labels filter where items are rendered.
+// Variables to handle hold-down timing logic
+let holdInterval = null;
+const holdSpeed = 100; // Triggers a manual click every 100 milliseconds when holding
+
 const buildings = [
     { id: "gen", name: "Generator", baseCost: 10, costMult: 1.5, cps: 1, type: "normal", count: 0, currentCost: 10, reqSuper: 0 },
     { id: "factory", name: "Factory", baseCost: 50, costMult: 1.7, cps: 5, type: "normal", count: 0, currentCost: 50, reqSuper: 0 },
@@ -164,7 +178,6 @@ const buildings = [
     { id: "sFactory", name: "Super Factory", baseCost: 3, costMult: 1, cps: 250, type: "super", count: 0, currentCost: 3, reqSuper: 0 }
 ];
 
-// Rebuilt dynamic creation setup that loops across categories seamlessly
 function buildDynamicStoreUI() {
     let mainHTML = "", superHTML = "", expansionHTML = "";
     
@@ -190,7 +203,14 @@ function buildDynamicStoreUI() {
 }
 
 function multiplier() { return 1 + (prestigePoints * 0.5); }
-function getPrestigeGain() { return Math.floor(Math.sqrt(energy / 1000)); }
+
+function getPrestigeUpgradeCost() { return 0.1 * Math.pow(10, prestigeUpgradeLevel); }
+function getPrestigeUpgradeEffect() { return Math.pow(2, prestigeUpgradeLevel); }
+
+function getPrestigeGain() { 
+    let baseGain = Math.floor(Math.sqrt(energy / 1000));
+    return baseGain * getPrestigeUpgradeEffect();
+}
 
 function calculateTotalProduction() {
     let rawProduction = 0;
@@ -202,7 +222,7 @@ function calculateTotalProduction() {
 
 function buyBuilding(index) {
     let b = buildings[index];
-    if (superEnergy < b.reqSuper) return; // Progression lock safeguard
+    if (superEnergy < b.reqSuper) return;
 
     if (b.type !== "super") {
         if (energy >= b.currentCost) {
@@ -230,6 +250,22 @@ function buyClickUpgrade() {
     }
 }
 
+function buyPrestigeUpgrade() {
+    let cost = getPrestigeUpgradeCost();
+    if (superEnergy >= (cost - 0.00001)) {
+        superEnergy -= cost;
+        prestigeUpgradeLevel++;
+        updateUI();
+        saveGame();
+    }
+}
+
+// Separate logic execution step for click action
+function handleManualClick() {
+    energy += clickPower * multiplier();
+    updateUI();
+}
+
 function buySuperClick() {
     if (superEnergy >= 2) {
         superEnergy -= 2;
@@ -240,32 +276,58 @@ function buySuperClick() {
 }
 
 function updateUI() {
-    // Dynamic looping data update block
     for (let i = 0; i < buildings.length; i++) {
         let b = buildings[i];
         document.getElementById(`count_${b.id}`).textContent = b.count;
         document.getElementById(`cost_${b.id}`).textContent = b.currentCost.toLocaleString();
     }
 
-    // Dynamic Tab Progression Rules
     document.getElementById("superTab").style.display = (superEnergy > 0 || buildings[7].count > 0 || buildings[8].count > 0) ? "block" : "none";
     document.getElementById("expansionTab").style.display = (superEnergy >= 1000) ? "block" : "none";
 
     document.getElementById("energy").textContent = Math.floor(energy).toLocaleString();
     document.getElementById("prestigePoints").textContent = prestigePoints.toLocaleString();
-    document.getElementById("superEnergy").textContent = superEnergy.toLocaleString();
+    document.getElementById("superEnergy").textContent = Number(superEnergy.toFixed(1)).toLocaleString();
+    
     document.getElementById("clickCost").textContent = clickCost.toLocaleString();
     document.getElementById("clickPower").textContent = clickPower.toLocaleString();
     document.getElementById("eps").textContent = Math.floor(calculateTotalProduction()).toLocaleString();
     document.getElementById("multiplier").textContent = multiplier().toFixed(1);
     document.getElementById("prestigeGain").textContent = getPrestigeGain().toLocaleString();
+    
+    let currentCost = getPrestigeUpgradeCost();
+    document.getElementById("prestigeUpgradeCost").textContent = currentCost < 1 ? currentCost.toFixed(1) : currentCost.toLocaleString();
+    document.getElementById("prestigeUpgradeMult").textContent = getPrestigeUpgradeEffect().toLocaleString();
 }
 
-document.getElementById("clickBtn").addEventListener("click", () => {
-    energy += clickPower * multiplier();
-    updateUI();
-    saveGame(); 
+// Function handling automated click cycles upon continuous click-hold actions
+function startHolding() {
+    if (holdInterval) return;
+    handleManualClick(); // Trigger initial instance click immediately
+    holdInterval = setInterval(handleManualClick, holdSpeed);
+}
+
+function stopHolding() {
+    if (holdInterval) {
+        clearInterval(holdInterval);
+        holdInterval = null;
+        saveGame(); // Execute save process after the user lifts their finger/mouse
+    }
+}
+
+const clickBtn = document.getElementById("clickBtn");
+
+// Mouse Event tracking hooks
+clickBtn.addEventListener("mousedown", startHolding);
+clickBtn.addEventListener("mouseup", stopHolding);
+clickBtn.addEventListener("mouseleave", stopHolding);
+
+// Touch Event tracking hooks for mobile devices
+clickBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault(); // Prevents accidental page-zoom bugs during holds
+    startHolding();
 });
+clickBtn.addEventListener("touchend", stopHolding);
 
 function prestigeReset() {
     let gain = getPrestigeGain();
@@ -309,13 +371,13 @@ function saveGame() {
     }
 
     const gameState = {
-        energy, prestigePoints, superEnergy, clickPower, clickCost, buildingCounts
+        energy, prestigePoints, superEnergy, clickPower, clickCost, prestigeUpgradeLevel, buildingCounts
     };
-    localStorage.setItem("energyEmpireSave_v3", JSON.stringify(gameState));
+    localStorage.setItem("energyEmpireSave_v6", JSON.stringify(gameState));
 }
 
 function loadGame() {
-    const savedData = localStorage.getItem("energyEmpireSave_v3");
+    const savedData = localStorage.getItem("energyEmpireSave_v6");
     if (savedData) {
         try {
             const parsed = JSON.parse(savedData);
@@ -324,6 +386,7 @@ function loadGame() {
             if (parsed.superEnergy !== undefined) superEnergy = parsed.superEnergy;
             if (parsed.clickPower !== undefined) clickPower = parsed.clickPower;
             if (parsed.clickCost !== undefined) clickCost = parsed.clickCost;
+            if (parsed.prestigeUpgradeLevel !== undefined) prestigeUpgradeLevel = parsed.prestigeUpgradeLevel;
             
             if (parsed.buildingCounts) {
                 for (let i = 0; i < buildings.length; i++) {
@@ -342,7 +405,7 @@ function loadGame() {
 
 function clearSave() {
     if (confirm("Are you sure you want to reset ALL your progress? This cannot be undone.")) {
-        localStorage.removeItem("energyEmpireSave_v3");
+        localStorage.removeItem("energyEmpireSave_v6");
         location.reload();
     }
 }
