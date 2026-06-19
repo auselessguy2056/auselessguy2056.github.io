@@ -15,6 +15,8 @@
         justify-content: center;
         align-items: center;
         min-height: 100vh;
+        flex-direction: column;
+        padding: 20px 0;
     }
 
     .game {
@@ -76,6 +78,34 @@
     .tabBtn.active { background: #00b7ff; color: white; }
     #expansionTab.tabBtn.active { background: #9b5de5; }
     #alphaTab.tabBtn.active { background: #00ffff; color: black; }
+
+    .cheat-container {
+        margin-top: 20px;
+        background: #222;
+        padding: 10px;
+        border-radius: 8px;
+        width: 550px;
+        box-sizing: border-box;
+        text-align: center;
+        border: 1px dashed #444;
+    }
+    .cheat-input {
+        width: 70%;
+        padding: 6px;
+        background: #111;
+        border: 1px solid #555;
+        color: #00ff00;
+        font-family: monospace;
+        border-radius: 4px;
+    }
+    .cheat-btn {
+        width: 25%;
+        padding: 6px;
+        margin-top: 0;
+        display: inline-block;
+        font-size: 12px;
+        background: #333;
+    }
 
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
@@ -161,17 +191,31 @@
             Cost: <span id="alphaGenCost">1</span> Dyson Spheres
             <button class="alphaBtn" onclick="buyAlphaGenerator()">Buy Alpha Generator</button>
         </div>
+
+        <div class="item" style="border: 1px solid #00ffff; margin-top: 15px;">
+            <strong class="cyan">Alpha Quantum Shift (Reset)</strong><br>
+            Sacrifice all Main Layer, Super Shop, and Expansion items.<br>
+            Converts your current Alpha Points into a permanent boost.<br>
+            Current Reset Bonus: <span id="alphaBonusText">0</span>% extra Energy Production<br>
+            <button class="alphaBtn" id="alphaResetBtn" onclick="alphaReset()">Perform Alpha Reset</button>
+        </div>
     </div>
 
     <div class="stats">
         <div>Energy/sec: <span id="eps">0</span></div>
         <div>Click Power: <span id="clickPower">1</span></div>
         <div>Prestige Multiplier: x<span id="multiplier">1</span></div>
+        <div class="cyan" id="alphaBonusStatContainer" style="display:none;">Alpha Energy Bonus: +<span id="alphaBonusStat">0</span>%</div>
     </div>
     
     <button onclick="clearSave()" style="background: #a94442; font-size: 11px; padding: 5px; margin-top: 20px; width: auto; display: block; margin-left: auto; margin-right: auto;">
         Hard Reset Game
     </button>
+</div>
+
+<div class="cheat-container">
+    <input type="text" id="cheatInput" class="cheat-input" placeholder="eneW,preX,supY,alpZ">
+    <button class="cheat-btn" onclick="applyCheat()">Apply Cheat</button>
 </div>
 
 <script>
@@ -184,6 +228,7 @@ let clickPower = 1;
 let clickCost = 25;
 let prestigeUpgradeLevel = 0; 
 let passivePrestigeUnlocked = false;
+let alphaBonusPoints = 0; // Tracks total alpha points spent/gained across resets for the energy boost
 
 // Variables to handle hold-down timing logic
 let holdInterval = null;
@@ -237,7 +282,11 @@ function buildDynamicStoreUI() {
     document.getElementById("expansionBuildingsContainer").innerHTML = expansionHTML;
 }
 
-function multiplier() { return 1 + (prestigePoints * 0.5); }
+function multiplier() { 
+    let baseMult = 1 + (prestigePoints * 0.5);
+    let alphaBoost = 1 + (alphaBonusPoints * 1.0); // +100% boost per point
+    return baseMult * alphaBoost;
+}
 
 function getPrestigeUpgradeCost() { return 0.1 * Math.pow(10, prestigeUpgradeLevel); }
 function getPrestigeUpgradeEffect() { return Math.pow(2, prestigeUpgradeLevel); }
@@ -339,7 +388,6 @@ function buySuperClick() {
 }
 
 // Function handling automated conversion of excess prestige points to super energy
-// Added showAlert parameter to prevent loop alert popups during passive tracking
 function checkSuperPrestigeTrigger(showAlert = false) {
     if (prestigePoints >= 1000) {
         let earned = Math.floor(prestigePoints / 1000);
@@ -358,12 +406,13 @@ function updateUI() {
         document.getElementById(`cost_${b.id}`).textContent = formatNum(b.currentCost);
     }
 
-    let hasDysonSphere = buildings[6].count > 0 || alphaGenLevel > 0;
+    let hasDysonSphere = buildings[6].count > 0 || alphaGenLevel > 0 || alphaPoints > 0 || alphaBonusPoints > 0;
 
     document.getElementById("superTab").style.display = (superEnergy > 0 || buildings[7].count > 0 || buildings[8].count > 0 || passivePrestigeUnlocked) ? "block" : "none";
     document.getElementById("expansionTab").style.display = (superEnergy >= 1000) ? "block" : "none";
     document.getElementById("alphaTab").style.display = hasDysonSphere ? "block" : "none";
     document.getElementById("alphaResourceContainer").style.display = hasDysonSphere ? "block" : "none";
+    document.getElementById("alphaBonusStatContainer").style.display = alphaBonusPoints > 0 ? "block" : "none";
 
     document.getElementById("energy").textContent = formatNum(energy);
     document.getElementById("prestigePoints").textContent = formatNum(prestigePoints);
@@ -384,6 +433,11 @@ function updateUI() {
     document.getElementById("alphaGenCount").textContent = alphaGenLevel;
     document.getElementById("alphaGenCost").textContent = formatNum(getAlphaGenCost());
     document.getElementById("alphaGenRate").textContent = (alphaGenLevel * 0.001).toFixed(3);
+    document.getElementById("alphaBonusText").textContent = formatNum(alphaBonusPoints * 100);
+    document.getElementById("alphaBonusStat").textContent = formatNum(alphaBonusPoints * 100);
+
+    // Alpha Reset button locking mechanism
+    document.getElementById("alphaResetBtn").disabled = alphaPoints < 1;
 
     // Passive Prestige Upgrade Button UI
     let pBtn = document.getElementById("passivePrestigeBtn");
@@ -442,6 +496,71 @@ function prestigeReset() {
     saveGame();
 }
 
+// Global Alpha Reset - Wipes everything except current Alpha Points and accumulates the Alpha bonus
+function alphaReset() {
+    if (alphaPoints < 1) {
+        alert("You need at least 1 Alpha Point to perform an Alpha Quantum Shift!");
+        return;
+    }
+
+    if (confirm(`Are you sure? This will sacrifice all Energy, Prestige Points, Super Energy, and purchased buildings to add +${formatNum(Math.floor(alphaPoints) * 100)}% to your permanent Energy Multiplier.`)) {
+        alphaBonusPoints += Math.floor(alphaPoints);
+        alphaPoints = alphaPoints - Math.floor(alphaPoints); // Keep fractional alpha generation progress
+
+        // Complete wipe of all progression variables down to the core
+        energy = 0;
+        prestigePoints = 0;
+        superEnergy = 0;
+        clickPower = 1;
+        clickCost = 25;
+        prestigeUpgradeLevel = 0;
+        passivePrestigeUnlocked = false;
+        alphaGenLevel = 0;
+
+        // Loop clean structural reset of every single store building entry
+        for (let i = 0; i < buildings.length; i++) {
+            buildings[i].count = 0;
+            buildings[i].currentCost = buildings[i].baseCost;
+        }
+
+        showPage('mainPage', document.getElementById('mainTab'));
+        updateUI();
+        saveGame();
+        alert("Quantum Shift Complete! Your Energy production engine is now fundamentally augmented.");
+    }
+}
+
+// Password Hack Input System
+function applyCheat() {
+    let code = document.getElementById("cheatInput").value.trim();
+    if(!code) return;
+
+    // Regex check matching formats like: eneW,preX,supY,alpZ (where variables accept decimals/scientific figures)
+    let pattern = /(ene|pre|sup|alp)([0-9eE\.]+)/g;
+    let match;
+    let valid = false;
+
+    while ((match = pattern.exec(code)) !== null) {
+        let type = match[1];
+        let val = parseFloat(match[2]);
+        if (isNaN(val)) continue;
+
+        valid = true;
+        if (type === "ene") energy = val;
+        if (type === "pre") prestigePoints = val;
+        if (type === "sup") superEnergy = val;
+        if (type === "alp") alphaPoints = val;
+    }
+
+    if (valid) {
+        updateUI();
+        saveGame();
+        document.getElementById("cheatInput").value = "";
+    } else {
+        alert("Invalid cheat formula! Use format format: eneW,preX,supY,alpZ\nExample: ene100000,sup50");
+    }
+}
+
 function showPage(pageId, btn) {
     document.querySelectorAll(".paginationPage").forEach(page => page.classList.remove("active"));
     document.querySelectorAll(".tabBtn").forEach(button => button.classList.remove("active"));
@@ -457,13 +576,13 @@ function saveGame() {
     }
 
     const gameState = {
-        energy, prestigePoints, superEnergy, alphaPoints, alphaGenLevel, clickPower, clickCost, prestigeUpgradeLevel, passivePrestigeUnlocked, buildingCounts
+        energy, prestigePoints, superEnergy, alphaPoints, alphaGenLevel, clickPower, clickCost, prestigeUpgradeLevel, passivePrestigeUnlocked, alphaBonusPoints, buildingCounts
     };
-    localStorage.setItem("energyEmpireSave_v7", JSON.stringify(gameState));
+    localStorage.setItem("energyEmpireSave_v8", JSON.stringify(gameState));
 }
 
 function loadGame() {
-    const savedData = localStorage.getItem("energyEmpireSave_v7");
+    const savedData = localStorage.getItem("energyEmpireSave_v8");
     if (savedData) {
         try {
             const parsed = JSON.parse(savedData);
@@ -476,15 +595,14 @@ function loadGame() {
             if (parsed.clickCost !== undefined) clickCost = parsed.clickCost;
             if (parsed.prestigeUpgradeLevel !== undefined) prestigeUpgradeLevel = parsed.prestigeUpgradeLevel;
             if (parsed.passivePrestigeUnlocked !== undefined) passivePrestigeUnlocked = parsed.passivePrestigeUnlocked;
+            if (parsed.alphaBonusPoints !== undefined) alphaBonusPoints = parsed.alphaBonusPoints;
             
             if (parsed.buildingCounts) {
                 for (let i = 0; i < buildings.length; i++) {
                     let id = buildings[i].id;
                     if (parsed.buildingCounts[id] !== undefined) {
                         buildings[i].count = parsed.buildingCounts[id];
-                        if (buildings[i].type !== "super") {
-                            buildings[i].currentCost = Math.floor(buildings[i].baseCost * Math.pow(buildings[i].costMult, buildings[i].count));
-                        }
+                        buildings[i].currentCost = Math.floor(buildings[i].baseCost * Math.pow(buildings[i].costMult, buildings[i].count));
                     }
                 }
             }
@@ -494,7 +612,7 @@ function loadGame() {
 
 function clearSave() {
     if (confirm("Are you sure you want to reset ALL your progress? This cannot be undone.")) {
-        localStorage.removeItem("energyEmpireSave_v7");
+        localStorage.removeItem("energyEmpireSave_v8");
         location.reload();
     }
 }
