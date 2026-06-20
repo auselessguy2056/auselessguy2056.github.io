@@ -139,7 +139,7 @@
             <strong>Click Upgrade</strong><br>
             Increase click power<br>
             Cost: <span id="clickCost">25</span> Energy
-            <button onclick="buyClickUpgrade()">Upgrade Click</button>
+            <button id="clickUpgradeBtn">Upgrade Click</button>
         </div>
 
         <div class="item">
@@ -228,11 +228,9 @@ let clickPower = 1;
 let clickCost = 25;
 let prestigeUpgradeLevel = 0; 
 let passivePrestigeUnlocked = false;
-let alphaBonusPoints = 0; // Tracks total alpha points spent/gained across resets for the energy boost
+let alphaBonusPoints = 0; 
 
-// Variables to handle hold-down timing logic
-let holdInterval = null;
-const holdSpeed = 100; // Triggers a manual click every 100 milliseconds when holding
+const holdSpeed = 100; // Triggers a manual click/purchase every 100ms when holding
 
 const buildings = [
     { id: "gen", name: "Generator", baseCost: 10, costMult: 1.5, cps: 1, type: "normal", count: 0, currentCost: 10, reqSuper: 0 },
@@ -250,7 +248,32 @@ const buildings = [
     { id: "sFactory", name: "Super Factory", baseCost: 3, costMult: 1, cps: 250, type: "super", count: 0, currentCost: 3, reqSuper: 0 }
 ];
 
-// Helper function to format numbers gracefully into scientific notation past 1 Billion
+// Reusable action-holding mechanism
+function bindHoldAction(element, actionCallback) {
+    let holdInterval = null;
+
+    const startHolding = (e) => {
+        if (e.type === 'touchstart') e.preventDefault();
+        if (holdInterval) return;
+        actionCallback(); 
+        holdInterval = setInterval(actionCallback, holdSpeed);
+    };
+
+    const stopHolding = () => {
+        if (holdInterval) {
+            clearInterval(holdInterval);
+            holdInterval = null;
+            saveGame(); 
+        }
+    };
+
+    element.addEventListener("mousedown", startHolding);
+    element.addEventListener("mouseup", stopHolding);
+    element.addEventListener("mouseleave", stopHolding);
+    element.addEventListener("touchstart", startHolding, { passive: false });
+    element.addEventListener("touchend", stopHolding);
+}
+
 function formatNum(num) {
     if (num >= 1000000000) {
         return num.toExponential(2).replace("+", "");
@@ -270,7 +293,7 @@ function buildDynamicStoreUI() {
                 <strong>${b.name}</strong> (<span id="count_${b.id}">0</span>)<br>
                 +${formatNum(b.cps)} energy/sec<br>
                 Cost: <span id="cost_${b.id}">${formatNum(b.baseCost)}</span> ${b.type === 'super' ? 'Super Energy' : 'Energy'}
-                <button class="${btnClass}" onclick="buyBuilding(${i})">Buy ${b.name}</button>
+                <button class="${btnClass}" id="btn_${b.id}">Buy ${b.name}</button>
             </div>`;
         
         if (b.type === "normal") mainHTML += elementStr;
@@ -280,11 +303,20 @@ function buildDynamicStoreUI() {
     document.getElementById("mainBuildingsContainer").innerHTML = mainHTML;
     document.getElementById("superBuildingsContainer").innerHTML = superHTML;
     document.getElementById("expansionBuildingsContainer").innerHTML = expansionHTML;
+
+    // Attach holding logic loop to newly created store buttons
+    for (let i = 0; i < buildings.length; i++) {
+        let b = buildings[i];
+        let btnEl = document.getElementById(`btn_${b.id}`);
+        if (btnEl) {
+            bindHoldAction(btnEl, () => buyBuilding(i));
+        }
+    }
 }
 
 function multiplier() { 
     let baseMult = 1 + (prestigePoints * 0.5);
-    let alphaBoost = 1 + (alphaBonusPoints * 1.0); // +100% boost per point
+    let alphaBoost = 1 + (alphaBonusPoints * 1.0); 
     return baseMult * alphaBoost;
 }
 
@@ -321,7 +353,6 @@ function buyBuilding(index) {
         }
     }
     updateUI();
-    saveGame();
 }
 
 function buyClickUpgrade() {
@@ -330,11 +361,9 @@ function buyClickUpgrade() {
         clickPower++;
         clickCost = Math.floor(clickCost * 2);
         updateUI();
-        saveGame();
     }
 }
 
-// Purchase function for the new Passive Prestige upgrade
 function buyPassivePrestige() {
     if (!passivePrestigeUnlocked && superEnergy >= 10) {
         superEnergy -= 10;
@@ -365,9 +394,7 @@ function buyAlphaGenerator() {
     if (buildings[dysonIndex].count >= cost) {
         buildings[dysonIndex].count -= cost;
         alphaGenLevel++;
-        
         buildings[dysonIndex].currentCost = Math.floor(buildings[dysonIndex].baseCost * Math.pow(buildings[dysonIndex].costMult, buildings[dysonIndex].count));
-        
         updateUI();
         saveGame();
     }
@@ -387,7 +414,6 @@ function buySuperClick() {
     }
 }
 
-// Function handling automated conversion of excess prestige points to super energy
 function checkSuperPrestigeTrigger(showAlert = false) {
     if (prestigePoints >= 1000) {
         let earned = Math.floor(prestigePoints / 1000);
@@ -402,16 +428,19 @@ function checkSuperPrestigeTrigger(showAlert = false) {
 function updateUI() {
     for (let i = 0; i < buildings.length; i++) {
         let b = buildings[i];
-        document.getElementById(`count_${b.id}`).textContent = b.count;
-        document.getElementById(`cost_${b.id}`).textContent = formatNum(b.currentCost);
+        let el = document.getElementById(`count_${b.id}`);
+        if(el) el.textContent = b.count;
+        let costEl = document.getElementById(`cost_${b.id}`);
+        if(costEl) costEl.textContent = formatNum(b.currentCost);
     }
 
-    let hasDysonSphere = buildings[6].count > 0 || alphaGenLevel > 0 || alphaPoints > 0 || alphaBonusPoints > 0;
+    // Alpha configuration logic (Hides completely if alphaPoints reaches 0, unless Dyson layers are active)
+    let hasAlphaActivity = alphaPoints > 0 || alphaGenLevel > 0 || buildings[6].count > 0;
 
     document.getElementById("superTab").style.display = (superEnergy > 0 || buildings[7].count > 0 || buildings[8].count > 0 || passivePrestigeUnlocked) ? "block" : "none";
     document.getElementById("expansionTab").style.display = (superEnergy >= 1000) ? "block" : "none";
-    document.getElementById("alphaTab").style.display = hasDysonSphere ? "block" : "none";
-    document.getElementById("alphaResourceContainer").style.display = hasDysonSphere ? "block" : "none";
+    document.getElementById("alphaTab").style.display = hasAlphaActivity ? "block" : "none";
+    document.getElementById("alphaResourceContainer").style.display = hasAlphaActivity ? "block" : "none";
     document.getElementById("alphaBonusStatContainer").style.display = alphaBonusPoints > 0 ? "block" : "none";
 
     document.getElementById("energy").textContent = formatNum(energy);
@@ -429,17 +458,14 @@ function updateUI() {
     document.getElementById("prestigeUpgradeCost").textContent = currentCost < 1 ? currentCost.toFixed(1) : formatNum(currentCost);
     document.getElementById("prestigeUpgradeMult").textContent = formatNum(getPrestigeUpgradeEffect());
 
-    // Alpha Layer UI Rendering
     document.getElementById("alphaGenCount").textContent = alphaGenLevel;
     document.getElementById("alphaGenCost").textContent = formatNum(getAlphaGenCost());
     document.getElementById("alphaGenRate").textContent = (alphaGenLevel * 0.001).toFixed(3);
     document.getElementById("alphaBonusText").textContent = formatNum(alphaBonusPoints * 100);
     document.getElementById("alphaBonusStat").textContent = formatNum(alphaBonusPoints * 100);
 
-    // Alpha Reset button locking mechanism
     document.getElementById("alphaResetBtn").disabled = alphaPoints < 1;
 
-    // Passive Prestige Upgrade Button UI
     let pBtn = document.getElementById("passivePrestigeBtn");
     if (passivePrestigeUnlocked) {
         pBtn.textContent = "UNLOCKED";
@@ -450,38 +476,16 @@ function updateUI() {
     }
 }
 
-function startHolding() {
-    if (holdInterval) return;
-    handleManualClick(); 
-    holdInterval = setInterval(handleManualClick, holdSpeed);
-}
-
-function stopHolding() {
-    if (holdInterval) {
-        clearInterval(holdInterval);
-        holdInterval = null;
-        saveGame(); 
-    }
-}
-
-const clickBtn = document.getElementById("clickBtn");
-
-clickBtn.addEventListener("mousedown", startHolding);
-clickBtn.addEventListener("mouseup", stopHolding);
-clickBtn.addEventListener("mouseleave", stopHolding);
-
-clickBtn.addEventListener("touchstart", (e) => {
-    e.preventDefault(); 
-    startHolding();
-});
-clickBtn.addEventListener("touchend", stopHolding);
+// Bind static action holding buttons
+bindHoldAction(document.getElementById("clickBtn"), handleManualClick);
+bindHoldAction(document.getElementById("clickUpgradeBtn"), buyClickUpgrade);
 
 function prestigeReset() {
     let gain = getPrestigeGain();
     if (gain <= 0) { alert("Need more energy!"); return; }
 
     prestigePoints += gain;
-    checkSuperPrestigeTrigger(true); // Alert user on explicit manual resets
+    checkSuperPrestigeTrigger(true); 
 
     energy = 0;
     clickPower = 1;
@@ -496,7 +500,6 @@ function prestigeReset() {
     saveGame();
 }
 
-// Global Alpha Reset - Wipes everything except current Alpha Points and accumulates the Alpha bonus
 function alphaReset() {
     if (alphaPoints < 1) {
         alert("You need at least 1 Alpha Point to perform an Alpha Quantum Shift!");
@@ -505,9 +508,8 @@ function alphaReset() {
 
     if (confirm(`Are you sure? This will sacrifice all Energy, Prestige Points, Super Energy, and purchased buildings to add +${formatNum(Math.floor(alphaPoints) * 100)}% to your permanent Energy Multiplier.`)) {
         alphaBonusPoints += Math.floor(alphaPoints);
-        alphaPoints = alphaPoints - Math.floor(alphaPoints); // Keep fractional alpha generation progress
+        alphaPoints = alphaPoints - Math.floor(alphaPoints); 
 
-        // Complete wipe of all progression variables down to the core
         energy = 0;
         prestigePoints = 0;
         superEnergy = 0;
@@ -517,7 +519,6 @@ function alphaReset() {
         passivePrestigeUnlocked = false;
         alphaGenLevel = 0;
 
-        // Loop clean structural reset of every single store building entry
         for (let i = 0; i < buildings.length; i++) {
             buildings[i].count = 0;
             buildings[i].currentCost = buildings[i].baseCost;
@@ -530,12 +531,10 @@ function alphaReset() {
     }
 }
 
-// Password Hack Input System
 function applyCheat() {
     let code = document.getElementById("cheatInput").value.trim();
     if(!code) return;
 
-    // Regex check matching formats like: eneW,preX,supY,alpZ (where variables accept decimals/scientific figures)
     let pattern = /(ene|pre|sup|alp)([0-9eE\.]+)/g;
     let match;
     let valid = false;
@@ -625,17 +624,15 @@ updateUI();
 setInterval(() => {
     energy += calculateTotalProduction() / 10;
     
-    // Alpha generation execution rate handler (0.001 * level per second / divided into 10 ticks per second)
     if (alphaGenLevel > 0) {
         alphaPoints += (alphaGenLevel * 0.001) / 10;
     }
     
-    // Passive prestige handler: Gain 1% of potential reset per second (divided into 10 ticks per second = 0.001 * gain per tick)
     if (passivePrestigeUnlocked) {
         let potentialGain = getPrestigeGain();
         if (potentialGain > 0) {
             prestigePoints += (potentialGain * 0.01) / 10;
-            checkSuperPrestigeTrigger(false); // Pass false to prevent alert spams
+            checkSuperPrestigeTrigger(false); 
         }
     }
     
