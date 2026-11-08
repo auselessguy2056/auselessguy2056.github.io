@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting...</title>
+  <script>
+    // Kiểm tra URL hiện tại, nếu có chứa 'DRWCoin' thì thay bằng 'DRWcoin'
+    var currentUrl = window.location.href;
+    if (currentUrl.includes('/DRWCoin')) {
+      var newUrl = currentUrl.replace('/DRWCoin', '/DRWcoin');
+      window.location.replace(newUrl);
+    }
+  </script>
+</head>
+<body>
+  <p>Đang chuyển hướng sang <a href="https://auselessguy2056.github.io/DRWcoin/">DRWcoin</a>...</p>
+</body>
+</html>
